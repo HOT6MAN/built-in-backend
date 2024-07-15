@@ -1,0 +1,3 @@
+[submodule "secure"]
+	path = secure
+	url = https://github.com/HOT6MAN/pjt-backend-secret.git
