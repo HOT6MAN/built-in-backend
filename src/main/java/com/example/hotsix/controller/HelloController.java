@@ -1,5 +1,6 @@
 package com.example.hotsix.controller;
 
+import com.example.hotsix.vo.MemberVo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,5 +26,10 @@ public class HelloController {
     @GetMapping("/hot6man/hello3/member/{id}")
     public String hello3(@PathVariable long id) {
         return memberService.getMemberByQueryDsl(id).getNickname();
+    }
+
+    @GetMapping("/hot6man/hello4/member/{id}")
+    public MemberVo hello4(@PathVariable long id) {
+        return memberService.getPartialMemberInfoByProjections(id);
     }
 }
