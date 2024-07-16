@@ -1,5 +1,6 @@
 package com.example.hotsix.service;
 
+import com.example.hotsix.vo.MemberVo;
 import lombok.RequiredArgsConstructor;
 import com.example.hotsix.model.Member;
 import org.springframework.stereotype.Service;
@@ -20,5 +21,10 @@ public class MemberService {
     @Transactional(readOnly = true)
     public Member getMemberByQueryDsl(long id) {
         return memberRepository.findMemberById(id);
+    }
+
+    @Transactional(readOnly = true)
+    public MemberVo getPartialMemberInfoByProjections(long id) {
+        return memberRepository.findPartialInfoById(id);
     }
 }
