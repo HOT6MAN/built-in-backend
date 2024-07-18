@@ -18,7 +18,7 @@ public class MemberRepositoryImpl extends Querydsl4RepositorySupport implements 
     @Override
     public MemberVo findPartialInfoById(long id) {
         return select(Projections.bean(MemberVo.class,
-                member.id, member.nickname, member.deleted))
+                member.id, member.nickname))
                 .from(member)
                 .where(member.id.eq(id))
                 .fetchOne();

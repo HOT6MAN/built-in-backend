@@ -30,9 +30,6 @@ public class Member {
     @Column(name = "address")
     private String address;
 
-    @Column(name = "deleted", nullable = false)
-    private boolean deleted;
-
     @Column(name = "role", nullable = false)
     private String role;
 

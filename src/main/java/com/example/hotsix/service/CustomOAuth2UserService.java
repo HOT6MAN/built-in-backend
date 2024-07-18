@@ -41,7 +41,9 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         }
 
         //리소스 서버에서 발급 받은 정보로 사용자를 특정할 아이디값
-        String username = oAuth2Response.getProvider() + " " + oAuth2Response.getProvider();
+
+        log.info("oAuth2Response: {}", oAuth2Response);
+        String username = oAuth2Response.getProvider() + " " + oAuth2Response.getProviderId();
         String email = oAuth2Response.getEmail();
         Member existData = memberRepository.findByEmail(email);
 
@@ -50,7 +52,9 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         if(existData == null){
             Member member = new Member();
             member.setEmail(email);
+            member.setNickname(oAuth2Response.getName());
             member.setRole("ROLE_USER");
+            member.setLgnMtd(oAuth2Response.getProvider());
 
             memberRepository.save(member);
 
@@ -58,6 +62,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             userDTO.setUsername(username);
             userDTO.setName(oAuth2Response.getName());
             userDTO.setRole("ROLE_USER");
+
 
             return new CustomOAuth2User(userDTO);
         }else{
@@ -69,6 +74,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 userDTO.setUsername(username);
                 userDTO.setName(oAuth2Response.getName());
                 userDTO.setRole("ROLE_USER");
+
                 return new CustomOAuth2User(userDTO);
 
             }
