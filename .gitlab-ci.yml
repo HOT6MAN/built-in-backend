@@ -1,0 +1,49 @@
+stages:
+  - build
+  - test
+  - package
+  - deploy
+
+build-job-1:
+  stage: build
+  image: openjdk:17.0.1-oraclelinux8
+  script:
+    - ./gradlew clean build
+  artifacts:
+    paths:
+      - build/libs/*.jar
+    expire_in: 10 min
+
+test-job-1:
+  stage: test
+  image: openjdk:17.0.1-oraclelinux8
+  script:
+    - ./gradlew test
+
+package-job-1:
+  stage: package
+  image: docker:latest
+  variables:
+    IMAGE_NAME: noah0504/hotsix
+  services:
+    - docker:dind
+  before_script:
+    - echo $DOCKER_HUB_PW | docker login -u $DOCKER_HUB_USER --password-stdin
+  script:
+    - docker build -t $IMAGE_NAME .
+    - docker push $IMAGE_NAME
+  after_script:
+    - docker logout
+
+deploy-job-1:
+  stage: deploy
+  image: docker:latest
+  before_script:
+    - echo $DOCKER_HUB_PW | docker login -u $DOCKER_HUB_USER --password-stdin
+  script:
+    - docker stop hotsix || true
+    - docker rm hotsix || true
+    - docker pull noah0504/hotsix
+    - docker run -d --restart always -p 8080:8080/tcp --name hotsix noah0504/hotsix
+  after_script:
+    - docker logout
