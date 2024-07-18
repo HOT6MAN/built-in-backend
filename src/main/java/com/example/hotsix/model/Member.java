@@ -32,4 +32,8 @@ public class Member {
 
     @Column(name = "deleted", nullable = false)
     private boolean deleted;
+
+    @Column(name = "role", nullable = false)
+    private String role;
+
 }
