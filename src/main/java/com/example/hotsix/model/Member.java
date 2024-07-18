@@ -36,4 +36,8 @@ public class Member {
     @Column(name = "role", nullable = false)
     private String role;
 
+    @Column(name = "lgn_mtd", nullable = false)
+    private String lgnMtd;
+
+
 }
