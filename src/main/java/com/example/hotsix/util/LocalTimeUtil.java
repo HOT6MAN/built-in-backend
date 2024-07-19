@@ -3,6 +3,7 @@ package com.example.hotsix.util;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
@@ -20,5 +21,10 @@ public class LocalTimeUtil {
                 .withZone(ZoneId.systemDefault())
                 .format(thirtyDaysAgo);
         return date;
+    }
+
+    public static Long getDescDateTime(){
+        LocalDateTime now = LocalDateTime.now();
+        return -now.toEpochSecond(ZoneOffset.UTC);
     }
 }

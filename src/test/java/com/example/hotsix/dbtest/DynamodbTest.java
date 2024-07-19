@@ -23,20 +23,31 @@ import java.util.List;
 public class DynamodbTest {
     @Autowired
     ChatMessageService service;
+    @Autowired
+    ChatMessageRepository repository;
 
 
     @DisplayName("DynamoDB에 데이터를 삽입한다. NoSQL이기때문에 스키마 제약 없는 데이터가 삽입 가능하다.")
     @Test
     public void insertTest(){
-        ChatMessageVo chatMessageVo = ChatMessageVo.builder()
-                .chatroomId("test_room_2")
-                .chatroomName("test")
-                .sender("lim")
-                .receiver("ssafy")
-                .date(LocalTimeUtil.getDateTime())
-                .content("hello World")
-                .build();
-        service.insert(chatMessageVo);
+        ChatMessageVo chatMessageVo = null;
+        for(int i=0; i<10; i++){
+            chatMessageVo = ChatMessageVo.builder()
+                    .chatroomId("test_room_"+(100+i))
+                    .chatroomName("test")
+                    .sender("lim")
+                    .receiver("ssafy5")
+                    .sendDate(LocalTimeUtil.getDateTime())
+                    .descSendDate(LocalTimeUtil.getDescDateTime())
+                    .content("hello World"+i)
+                    .build();
+            service.insert(chatMessageVo);
+        }
+    }
+
+    @Test
+    void selectTest(){
+        System.out.println(service.getUserChatRooms("lim"));
     }
 
     @DisplayName("DynamoDB의 아이템을 Select한다." +

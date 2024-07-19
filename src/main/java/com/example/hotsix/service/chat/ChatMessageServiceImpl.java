@@ -8,8 +8,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.sql.Array;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -55,4 +56,30 @@ public class ChatMessageServiceImpl implements ChatMessageService{
     public void deleteMessagesBeforeNow() {
         chatMessageRepository.deleteMessagesBeforeNow();
     }
+
+
+    @Override
+    public ArrayList<ChatMessageVo> getUserChatRooms(String userId) {
+        // Sender로 조회
+        List<ChatMessageVo> senderMessages = chatMessageRepository.findBySender(userId);
+        // Receiver로 조회
+        List<ChatMessageVo> receiverMessages = chatMessageRepository.findByReceiver(userId);
+        // 두 리스트를 합침
+        List<ChatMessageVo> allMessages = new ArrayList<>(senderMessages);
+        allMessages.addAll(receiverMessages);
+
+        // 각 채팅방별로 가장 최근 메시지를 찾음
+        Map<String, ChatMessageVo> latestMessagesByChatroom = allMessages.stream()
+                .collect(Collectors.toMap(
+                        ChatMessageVo::getChatroomId,
+                        message -> message,
+                        (existing, replacement) -> existing.getDescSendDate() > replacement.getDescSendDate() ? existing : replacement
+                ));
+
+        // 결과를 ArrayList로 반환
+        ArrayList<ChatMessageVo> result = new ArrayList<>(latestMessagesByChatroom.values());
+        result.sort(Comparator.comparingLong(ChatMessageVo::getDescSendDate));
+        return result;
+    }
+
 }

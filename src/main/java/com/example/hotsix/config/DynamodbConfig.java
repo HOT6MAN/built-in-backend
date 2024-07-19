@@ -16,4 +16,6 @@ public class DynamodbConfig {
                 .credentialsProvider(ProfileCredentialsProvider.create())
                 .build();
     }
+
+
 }

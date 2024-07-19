@@ -8,7 +8,6 @@ import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.*;
 @NoArgsConstructor
 @Setter
 @Builder
-@ToString
 @EqualsAndHashCode
 public class ChatMessageVo {
     private String chatroomId;
@@ -16,47 +15,64 @@ public class ChatMessageVo {
     private String sender;
     private String receiver;
     private String content;
-    private String date;
-    private String dateForReceiverIndex;
-    private String dateForSenderIndex;
+    private String sendDate;
+    private Long descSendDate;
+    @Getter
+    private String type;
+    public enum MessageType{
+        ENTER, TALK, QUIT
+    }
+
 
     @DynamoDbPartitionKey
     @DynamoDbAttribute("chatroom_id")
     public String getChatroomId() {
         return chatroomId;
     }
-    @DynamoDbAttribute("chatroomName")
+
+    @DynamoDbAttribute("chatroom_name")
     public String getChatroomName() {
         return chatroomName;
     }
-    @DynamoDbSecondarySortKey(indexNames = "SenderIndex")
+
+    @DynamoDbSecondaryPartitionKey(indexNames = "SenderIndex")
     @DynamoDbAttribute("sender")
     public String getSender() {
         return sender;
     }
-    @DynamoDbSecondarySortKey(indexNames = "ReceiverIndex")
+
+    @DynamoDbSecondaryPartitionKey(indexNames = "ReceiverIndex")
     @DynamoDbAttribute("receiver")
     public String getReceiver() {
         return receiver;
     }
+
     @DynamoDbAttribute("content")
     public String getContent() {
         return content;
     }
+
     @DynamoDbSortKey
-    @DynamoDbAttribute("send_date")
-    public String getDate() {
-        return date;
+    @DynamoDbAttribute("desc_send_date")
+    public Long getDescSendDate() {
+        return descSendDate;
     }
 
-    @DynamoDbSecondarySortKey(indexNames = {"ReceiverDateIndex"})
-    @DynamoDbAttribute("dateForReceiverIndex")
-    public String getDateForReceiverIndex() {
-        return this.dateForReceiverIndex;
+    @DynamoDbAttribute("send_date")
+    public String getSendDate() {
+        return sendDate;
     }
-    @DynamoDbSecondarySortKey(indexNames = {"SenderDateIndex"})
-    @DynamoDbAttribute("dateForSenderIndex")
-    public String getDateForSenderIndex(){
-        return this.dateForSenderIndex;
+
+    @Override
+    public String toString() {
+        return "ChatMessageVo{" +
+                "chatroomId='" + chatroomId + '\'' +
+                ", chatroomName='" + chatroomName + '\'' +
+                ", sender='" + sender + '\'' +
+                ", receiver='" + receiver + '\'' +
+                ", content='" + content + '\'' +
+                ", sendDate='" + sendDate + '\'' +
+                ", descSendDate='" + descSendDate + '\'' +
+                "}\n";
     }
 }
