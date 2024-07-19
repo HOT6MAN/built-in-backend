@@ -20,6 +20,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
+        log.info("[CustomOAuth2UserService loadUser]");
+
         
         //리소스 서버로 부터 받을 유저정보
         OAuth2User oAuth2User = super.loadUser(userRequest);
@@ -32,8 +34,10 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
 
         if(registrationId.equals("naver")){
+            log.info("naver 로그인");
             oAuth2Response = new NaverResponse(oAuth2User.getAttributes());
         }else if(registrationId.equals("google")){
+            log.info("google 로그인");
             oAuth2Response = new GoogleResponse(oAuth2User.getAttributes());
         }else{
 
@@ -47,9 +51,10 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         String email = oAuth2Response.getEmail();
         Member existData = memberRepository.findByEmail(email);
 
-
-        // 가입한 유저 email이 없을 경우 email DB에 등록
+        log.info("existData: {}", existData);
+        // 가입한 유저 email이 없을 경우 email DB에 등록하고 로그인
         if(existData == null){
+            log.info("신규 가입 이메일");
             Member member = new Member();
             member.setEmail(email);
             member.setNickname(oAuth2Response.getName());
@@ -65,11 +70,18 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
 
             return new CustomOAuth2User(userDTO);
-        }else{
-
+        }
+        //이미 가입한 이메일
+        else{
+            log.info("이미 가입한 이메일");
+            //직접 이메일로 가입한 경우
             if(existData.getLgnMtd().equals("builtin")){
+                log.info("이메일 가입하기로 등록된 이메일");
                 return null;
-            }else{
+            }
+            // oauth로 가입한 경우 바로 로그인 진행
+            else{
+                log.info("OAuth 가입하기로 등록된 이메일");
                 UserDTO userDTO = new UserDTO();
                 userDTO.setUsername(username);
                 userDTO.setName(oAuth2Response.getName());

@@ -1,6 +1,7 @@
 package com.example.hotsix.jwt;
 
 import io.jsonwebtoken.Jwts;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -10,6 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 @Component
+@Slf4j
 public class JWTUtil {
 
     private SecretKey secretKey;
@@ -29,13 +31,14 @@ public class JWTUtil {
     }
 
     public Boolean isExpired(String token) {
-
+        log.info("[JWTUtil] 토큰 만료 검증");
         return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().getExpiration().before(new Date());
     }
 
 
     //토큰 생성
     public String createJwt(String username, String role, Long expiredMs) {
+        log.info("[JWTUtil] JWT토큰 생성");
         return Jwts.builder()
                 .claim("username", username)
                 .claim("role", role)
