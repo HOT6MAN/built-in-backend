@@ -1,4 +1,4 @@
-package com.example.hotsix.controller;
+package com.example.hotsix.controller.test;
 
 import com.example.hotsix.dto.MemberDto;
 import com.example.hotsix.model.Member;

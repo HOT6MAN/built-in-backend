@@ -1,5 +1,6 @@
 package com.example.hotsix.dto.common;
 
+import com.example.hotsix.enums.Process;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,5 +9,5 @@ import lombok.Setter;
 @Setter
 @Builder
 public class ErrorResponse {
-    private ProcessResponse processResponse;
+    private Process process;
 }

@@ -8,6 +8,7 @@ import com.example.hotsix.exception.BuiltInException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.http.server.ServerHttpRequest;
@@ -25,7 +26,6 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 )
 @Slf4j
 public class ControllerResponseWrapper implements ResponseBodyAdvice<Object> {
-
     /**
      *
      * @param e : 발생한 사용자 정의 예외(BuiltInException)
@@ -34,7 +34,7 @@ public class ControllerResponseWrapper implements ResponseBodyAdvice<Object> {
     @ExceptionHandler(BuiltInException.class)
     private ErrorResponse handleBuiltInException(BuiltInException e) {
         return ErrorResponse.builder()
-                .processResponse(ProcessResponse.from(e.getProcess()))
+                .process(e.getProcess())
                 .build();
     }
 
@@ -48,17 +48,17 @@ public class ControllerResponseWrapper implements ResponseBodyAdvice<Object> {
     // Wrapping 실행
     // ErrorResponse 객체를 받은 경우와, 정상 응답을 받은 경우를 구분해서 실행
     @Override
-    public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType, Class<? extends HttpMessageConverter<?>> selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
-
+    public APIResponse<?> beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType, Class<? extends HttpMessageConverter<?>> selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
         if (body instanceof ErrorResponse errorResponse) {
+            response.setStatusCode(errorResponse.getProcess().getHttpStatus());
+
             return APIResponse.builder()
-                    .process(errorResponse.getProcessResponse())
+                    .process(ProcessResponse.from(errorResponse.getProcess()))
                     .build();
         }
 
         return APIResponse.builder()
                 .process(ProcessResponse.from(Process.NORMAL_RESPONSE))
-                .data(body)
                 .build();
     }
 
