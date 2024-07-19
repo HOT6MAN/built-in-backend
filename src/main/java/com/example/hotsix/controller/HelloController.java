@@ -1,5 +1,7 @@
 package com.example.hotsix.controller;
 
+import com.example.hotsix.dto.MemberDto;
+import com.example.hotsix.model.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,7 +25,13 @@ public class HelloController {
     }
 
     @GetMapping("/hot6man/hello3/member/{id}")
-    public String hello3(@PathVariable long id) {
-        return memberService.getMemberByQueryDsl(id).getNickname();
+    public MemberDto hello3(@PathVariable long id) {
+        Member member = memberService.getMember(id);
+        return MemberDto.builder()
+                .id(member.getId())
+                .email(member.getEmail())
+                .nickname(member.getNickname())
+                .deleted(member.isDeleted())
+                .build();
     }
 }

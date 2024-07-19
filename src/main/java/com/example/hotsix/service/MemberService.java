@@ -1,5 +1,7 @@
 package com.example.hotsix.service;
 
+import com.example.hotsix.enums.Process;
+import com.example.hotsix.exception.BuiltInException;
 import lombok.RequiredArgsConstructor;
 import com.example.hotsix.model.Member;
 import org.springframework.stereotype.Service;
@@ -14,7 +16,7 @@ public class MemberService {
     @Transactional(readOnly = true)
     public Member getMember(Long id) {
         return memberRepository.findById(id)
-                .orElseThrow();
+                .orElseThrow(() -> new BuiltInException(Process.USER_NOT_FOUND));
     }
 
     @Transactional(readOnly = true)
