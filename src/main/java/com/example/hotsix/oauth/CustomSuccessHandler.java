@@ -28,6 +28,9 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
     private final JWTUtil jwtUtil;
 
+    @Value("${client.host}")
+    private String clinetHost;
+
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         log.info("[CustomSuccessHandler]");
@@ -45,7 +48,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         String token = jwtUtil.createJwt(username, role, expiretime);
 
         response.addCookie(createCookie("JWT", token));
-        response.sendRedirect("http://localhost:5173/");
+        response.sendRedirect(clinetHost);
 
     }
 
