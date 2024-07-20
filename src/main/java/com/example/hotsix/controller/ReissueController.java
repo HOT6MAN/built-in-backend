@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -22,6 +23,7 @@ public class ReissueController {
 
 
     private final JWTUtil jwtUtil;
+    private final RedisTemplate<String ,String> redisTemplate;
 
     @Value("${jwt.access-token.expiretime}")
     private Long accessExpiretime;
@@ -52,6 +54,13 @@ public class ReissueController {
         if(!category.equals("refresh")){
             return new ResponseEntity<>("refresh token is invalid", HttpStatus.BAD_REQUEST);
         }
+
+        String value = redisTemplate.opsForValue().get(jwtUtil.getUsername(refresh));
+        if(value == null){
+            return new ResponseEntity<>("invalid refresh token", HttpStatus.BAD_REQUEST);
+        }
+
+
 
         String username = jwtUtil.getUsername(refresh);
         String role = jwtUtil.getRole(refresh);

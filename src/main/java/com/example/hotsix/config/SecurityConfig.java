@@ -1,20 +1,22 @@
 package com.example.hotsix.config;
 
+import com.example.hotsix.jwt.CustomLogoutFilter;
 import com.example.hotsix.jwt.JWTFilter;
 import com.example.hotsix.jwt.JWTUtil;
 import com.example.hotsix.oauth.CustomSuccessHandler;
-import com.example.hotsix.service.CustomOAuth2UserService;
+import com.example.hotsix.oauth.CustomOAuth2UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
@@ -30,6 +32,8 @@ public class SecurityConfig {
     private final CustomSuccessHandler customSuccessHandler;
 
     private final JWTUtil jwtUtil;
+
+    private final RedisTemplate<String ,String> redisTemplate;
 
     @Value("${client.host}")
     private String clinetHost;
@@ -84,6 +88,11 @@ public class SecurityConfig {
                         .userInfoEndpoint((userInfoEndpointConfig -> userInfoEndpointConfig
                                 .userService(customOAuth2UserService)))
                         .successHandler(customSuccessHandler));
+
+        //로그아웃
+        http
+                .addFilterBefore(new CustomLogoutFilter(redisTemplate, jwtUtil), LogoutFilter.class);
+
 
         //경로별 인가 작업
         http

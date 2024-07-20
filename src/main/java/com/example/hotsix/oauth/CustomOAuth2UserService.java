@@ -1,7 +1,7 @@
-package com.example.hotsix.service;
+package com.example.hotsix.oauth;
 
-import com.example.hotsix.dto.*;
 import com.example.hotsix.model.Member;
+import com.example.hotsix.oauth.dto.*;
 import com.example.hotsix.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

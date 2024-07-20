@@ -1,6 +1,6 @@
 package com.example.hotsix.oauth;
 
-import com.example.hotsix.dto.CustomOAuth2User;
+import com.example.hotsix.oauth.dto.CustomOAuth2User;
 import com.example.hotsix.jwt.JWTUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;

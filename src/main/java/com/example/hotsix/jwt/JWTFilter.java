@@ -1,7 +1,7 @@
 package com.example.hotsix.jwt;
 
-import com.example.hotsix.dto.CustomOAuth2User;
-import com.example.hotsix.dto.UserDTO;
+import com.example.hotsix.oauth.dto.CustomOAuth2User;
+import com.example.hotsix.oauth.dto.UserDTO;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

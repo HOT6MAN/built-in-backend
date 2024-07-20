@@ -1,4 +1,4 @@
-package com.example.hotsix.dto;
+package com.example.hotsix.oauth.dto;
 
 public interface OAuth2Response {
 
