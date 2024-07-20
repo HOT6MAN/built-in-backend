@@ -2,6 +2,7 @@ package com.example.hotsix.jwt;
 
 import com.example.hotsix.dto.CustomOAuth2User;
 import com.example.hotsix.dto.UserDTO;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -15,6 +16,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -30,7 +32,7 @@ public class JWTFilter extends OncePerRequestFilter {
         Cookie[] cookies = request.getCookies();
         log.info("cookies: {}", cookies);
         for (Cookie cookie : cookies) {
-            if(cookie.getName().equals("JWT")) {
+            if(cookie.getName().equals("access")) {
                 authorization = cookie.getValue();
             }
         }
@@ -48,11 +50,29 @@ public class JWTFilter extends OncePerRequestFilter {
         String token = authorization;
 
         //토큰 소멸 시간 검증
-        if(jwtUtil.isExpired(token)){
-            log.info("token is expired");
-            filterChain.doFilter(request, response);
+        try{
+            jwtUtil.isExpired(token) ;
+        }catch (ExpiredJwtException e){
+            //response body
+            PrintWriter writer = response.getWriter();
+            writer.println("access toekn is expired");
+
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
+
+        //토큰이 acceess인지 확인
+        String category = jwtUtil.getCategory(token);
+
+        if(!category.equals("access")){
+
+            PrintWriter writer = response.getWriter();
+            writer.println("invalid access token");
+
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
+        }
+
 
         //토큰에서 username과 role 획득
         String username = jwtUtil.getUsername(token);
@@ -73,8 +93,6 @@ public class JWTFilter extends OncePerRequestFilter {
         SecurityContextHolder.getContext().setAuthentication(authToken);
 
         filterChain.doFilter(request, response);
-
-
 
     }
 }

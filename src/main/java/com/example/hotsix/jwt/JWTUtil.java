@@ -35,11 +35,16 @@ public class JWTUtil {
         return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().getExpiration().before(new Date());
     }
 
+    public String getCategory(String token){
+        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("category", String.class);
+    }
+
 
     //토큰 생성
-    public String createJwt(String username, String role, Long expiredMs) {
+    public String createJwt(String category, String username, String role, Long expiredMs) {
         log.info("[JWTUtil] JWT토큰 생성");
         return Jwts.builder()
+                .claim("category",category)
                 .claim("username", username)
                 .claim("role", role)
                 .issuedAt(new Date(System.currentTimeMillis()))
@@ -47,5 +52,16 @@ public class JWTUtil {
                 .signWith(secretKey)
                 .compact();
     }
+
+    public String createAccessToken(String username, String role, Long expiredMs) {
+        return createJwt("access", username, role, expiredMs);
+    }
+
+    public String createRefreshToken(String username, String role, Long expiredMs) {
+        return createJwt("refresh",username, role, expiredMs);
+    }
+
+
+
 
 }
