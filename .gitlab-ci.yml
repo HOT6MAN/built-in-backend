@@ -18,11 +18,18 @@ build-job-1:
     paths:
       - build/libs/*.jar
     expire_in: 10 min
+  only:
+    - merge_requests
+  rules:
+    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "BE-Develop"'
 
 test-job-1:
   stage: test
-  image: openjdk:17-jdk
+  image: openjdk:17-jdk-slim
   script:
+    - apt-get update
+    - apt-get install -y findutils
+    - xargs --version
     - chmod +x ./gradlew
     - ./gradlew copySubmodule
     - ./gradlew test
@@ -44,13 +51,26 @@ package-job-1:
 
 deploy-job-1:
   stage: deploy
-  image: docker:latest
+  image: alpine:latest
   before_script:
-    - echo $DOCKER_HUB_PW | docker login -u $DOCKER_HUB_USER --password-stdin
+    - apk add --no-cache openssh
+    - mkdir -p ~/.ssh
+    - echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+    - ssh-keyscan $DEPLOY_SERVER_IP >> ~/.ssh/known_hosts
   script:
-    - docker stop hotsix || true
-    - docker rm hotsix || true
-    - docker pull noah0504/hotsix
-    - docker run -d --restart always -p 8080:8080/tcp --name hotsix noah0504/hotsix
+    - ssh $DEPLOY_USER@$DEPLOY_SERVER_IP << 'EOF'
+        docker stop hotsix
+        docker rm hotsix
+        docker pull noah0504/hotsix
+        docker run -d --restart always -p 8080:8080/tcp --name hotsix noah0504/hotsix
+      EOF
   after_script:
-    - docker logout
+    - rm ~/.ssh/id_rsa
+
+variables:
+  SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+  DEPLOY_SERVER_IP: ${{ secrets.DEPLOY_SERVER_IP }}
+  DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+  DOCKER_HUB_USER: ${{ secrets.DOCKER_HUB_USER }}
+  DOCKER_HUB_PW: ${{ secrets.DOCKER_HUB_PW }}
