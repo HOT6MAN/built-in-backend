@@ -6,7 +6,7 @@ stages:
 
 build-job-1:
   stage: build
-  image: openjdk:17-jdk
+  image: openjdk:17-jdk-slim
   script:
     - apt-get update
     - apt-get install -y findutils
