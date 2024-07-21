@@ -75,3 +75,9 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 }
+
+tasks.register('copySubmodule', Copy) {
+    from './secure'
+    include '*.yml'
+    into './src/main/resources'
+}

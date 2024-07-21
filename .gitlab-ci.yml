@@ -12,6 +12,7 @@ build-job-1:
     - apt-get install -y findutils
     - xargs --version
     - chmod +x ./gradlew
+    - ./gradlew copySubmodule
     - ./gradlew clean build
   artifacts:
     paths:
