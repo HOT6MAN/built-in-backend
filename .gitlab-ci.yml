@@ -8,6 +8,7 @@ build-job-1:
   stage: build
   image: openjdk:17.0.1-oraclelinux8
   script:
+    - chmod +x ./gradlew
     - ./gradlew clean build
   artifacts:
     paths:
