@@ -23,6 +23,8 @@ test-job-1:
   stage: test
   image: openjdk:17-jdk
   script:
+    - chmod +x ./gradlew
+    - ./gradlew copySubmodule
     - ./gradlew test
 
 package-job-1:
