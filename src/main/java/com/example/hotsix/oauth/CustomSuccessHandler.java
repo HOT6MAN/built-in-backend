@@ -64,7 +64,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         response.addCookie(createCookie("access", accessToken, accessExpiretime));
         response.addCookie(createCookie("refresh", refreshToken, refreshExpiretime));
-        response.sendRedirect(clinetHost);
+        response.sendRedirect(clinetHost+"/afterlogin");
 
     }
 

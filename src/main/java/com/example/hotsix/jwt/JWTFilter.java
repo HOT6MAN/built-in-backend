@@ -26,7 +26,9 @@ public class JWTFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-
+        log.info("JWT 필터");
+        log.info("request url: {}", request.getRequestURI());
+        log.info("request cookies: {}", request.getCookies());
         //쿠키들을 불러온뒤 Authorizaiton key에 담긴 쿠키를 찾음
         String authorization = null;
         Cookie[] cookies = request.getCookies();

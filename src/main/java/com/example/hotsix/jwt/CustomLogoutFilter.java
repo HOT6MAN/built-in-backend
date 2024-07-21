@@ -8,6 +8,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,7 @@ import org.springframework.web.filter.GenericFilterBean;
 
 import java.io.IOException;
 
+@Slf4j
 @RequiredArgsConstructor
 public class CustomLogoutFilter extends GenericFilterBean {
 
@@ -27,6 +29,9 @@ public class CustomLogoutFilter extends GenericFilterBean {
     }
 
     private void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException, ServletException {
+        log.info("로그아웃 필터");
+        log.info("request url: {}", request.getRequestURI());
+        log.info("request cookies: {}", request.getCookies());
         String requestURI = request.getRequestURI();
         if(!requestURI.matches("^\\/logout$")){
             filterChain.doFilter(request, response);
@@ -41,9 +46,12 @@ public class CustomLogoutFilter extends GenericFilterBean {
 
         String refresh = null;
         Cookie[] cookies = request.getCookies();
+        log.info("cookies: {}", cookies);
         for (Cookie cookie : cookies) {
             if(cookie.getName().equals("refresh")){
+                log.info("refresh cookies: {}", cookie.getName());
                 refresh = cookie.getValue();
+
             }
         }
 
@@ -66,6 +74,7 @@ public class CustomLogoutFilter extends GenericFilterBean {
         cookie.setMaxAge(0);
         cookie.setPath("/");
 
+        log.info("로그아웃 완료");
         response.addCookie(cookie);
         response.setStatus(HttpServletResponse.SC_OK);
     }
