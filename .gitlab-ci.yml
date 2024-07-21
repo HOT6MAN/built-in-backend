@@ -8,8 +8,8 @@ build-job-1:
   stage: build
   image: openjdk:17.0.1-oraclelinux8
   script:
-    - apt-get update
-    - apt-get install -y findutils
+    - yum update -y
+    - yum install -y findutils wget curl
     - xargs --version
     - chmod +x ./gradlew
     - ./gradlew clean build
