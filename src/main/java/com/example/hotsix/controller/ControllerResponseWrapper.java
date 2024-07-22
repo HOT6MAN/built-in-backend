@@ -59,6 +59,7 @@ public class ControllerResponseWrapper implements ResponseBodyAdvice<Object> {
 
         return APIResponse.builder()
                 .process(ProcessResponse.from(Process.NORMAL_RESPONSE))
+                .data(body)
                 .build();
     }
 

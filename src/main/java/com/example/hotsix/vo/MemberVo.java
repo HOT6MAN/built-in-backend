@@ -7,6 +7,4 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class MemberVo {
     private Long id;
-    private String nickname;
-    private boolean deleted;
 }
