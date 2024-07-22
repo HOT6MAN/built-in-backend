@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,28 +24,49 @@ import java.io.PrintWriter;
 public class JWTFilter extends OncePerRequestFilter {
 
     private final JWTUtil jwtUtil;
+    private final RedisTemplate<String, String> redisTemplate;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         log.info("JWT 필터");
         log.info("request url: {}", request.getRequestURI());
         log.info("request cookies: {}", request.getCookies());
-        //쿠키들을 불러온뒤 Authorizaiton key에 담긴 쿠키를 찾음
+
+
+
         String authorization = null;
+        //쿠키들을 불러온뒤 Authorizaiton key에 담긴 쿠키를 찾음
         Cookie[] cookies = request.getCookies();
         log.info("cookies: {}", cookies);
-        for (Cookie cookie : cookies) {
-            if(cookie.getName().equals("access")) {
-                authorization = cookie.getValue();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if(cookie.getName().equals("access")) {
+                    authorization = cookie.getValue();
+                    break;
+                }
             }
         }
+
+        // Authorizaion헤더에서 access토큰 얻어오기
+        String authorizationHeader = request.getHeader("Authorization");
+        log.info("authorizationHeader: {}", authorizationHeader);
+        if(authorizationHeader!=null && redisTemplate.hasKey(authorizationHeader)) {
+            log.info("로그아웃된 access token");
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+
+        if(authorizationHeader != null){
+            authorization = authorizationHeader;
+        }
+
 
         //Authorization 헤더 검증
         if(authorization == null){
             log.info("token is empty");
-
             filterChain.doFilter(request, response);
-
+//            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
 
@@ -56,6 +78,7 @@ public class JWTFilter extends OncePerRequestFilter {
             jwtUtil.isExpired(token) ;
         }catch (ExpiredJwtException e){
             //response body
+            log.info("Access token is expired");
             PrintWriter writer = response.getWriter();
             writer.println("access toekn is expired");
 
@@ -67,7 +90,7 @@ public class JWTFilter extends OncePerRequestFilter {
         String category = jwtUtil.getCategory(token);
 
         if(!category.equals("access")){
-
+            log.info("Access token is invalid");
             PrintWriter writer = response.getWriter();
             writer.println("invalid access token");
 

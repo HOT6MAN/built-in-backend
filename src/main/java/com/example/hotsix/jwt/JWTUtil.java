@@ -35,6 +35,17 @@ public class JWTUtil {
         return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().getExpiration().before(new Date());
     }
 
+    public long getRemainingTime(String token) {
+        Date expiration1 = Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().getExpiration();
+
+        long currentTimeMillis = System.currentTimeMillis();
+
+        // 남은 시간 계산 (밀리초 단위)
+        long remainingTimeMillis = expiration1.getTime() - currentTimeMillis;
+
+        return remainingTimeMillis;
+    }
+
     public String getCategory(String token){
         return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("category", String.class);
     }
