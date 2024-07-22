@@ -13,6 +13,8 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,N
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `ssafy`.`member` (
                                                 `id` BIGINT(20) NOT NULL AUTO_INCREMENT,
+    `email`
+
     `DEL_YN` BOOLEAN NOT NULL,
     `REG_DTTM` TIMESTAMP NOT NULL,
     `REG_USER_SEQ` BIGINT(20) NOT NULL,
@@ -27,6 +29,14 @@ CREATE TABLE IF NOT EXISTS `ssafy`.`member` (
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `ssafy`.`following` (
                                                    `id` BIGINT(20) NOT NULL AUTO_INCREMENT,
+
+    `email` VARCHAR(50) NOT NULL,
+    `nickname` VARCHAR(50) NOT NULL,
+    `profile_url` VARCHAR(255),
+    `phone` VARCHAR(20),
+    `address` VARCHAR(255),
+    `role` varchar(50) NOT NULL,
+    `lgn_mtd` varchar(50) NOT NULL,
     `follower_id` BIGINT(20) NULL,
     `followed_id` BIGINT(20) NULL,
     `DEL_YN` BOOLEAN NOT NULL,

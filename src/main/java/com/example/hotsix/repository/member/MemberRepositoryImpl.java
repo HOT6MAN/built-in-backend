@@ -2,12 +2,12 @@ package com.example.hotsix.repository.test;
 
 import com.example.hotsix.model.Member;
 import com.example.hotsix.repository.Querydsl4RepositorySupport;
-import com.example.hotsix.repository.member.MemberRepository;import com.example.hotsix.vo.MemberVo;
+import com.example.hotsix.vo.MemberVo;
 import com.querydsl.core.types.Projections;
 
 import static com.example.hotsix.model.QMember.member;
 
-public class TestRepositoryImpl extends Querydsl4RepositorySupport implements MemberRepository.TestRepositoryCustom {
+public class TestRepositoryImpl extends Querydsl4RepositorySupport implements TestRepositoryCustom {
 
     @Override
     public Member findMemberById(long id) {
