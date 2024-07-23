@@ -12,7 +12,7 @@ public class DynamodbConfig {
     @Bean
     public DynamoDbClient dynamoDbClient(){
         return DynamoDbClient.builder()
-                .region(Region.US_EAST_2)
+                .region(Region.AP_NORTHEAST_2)
                 .credentialsProvider(ProfileCredentialsProvider.create())
                 .build();
     }
