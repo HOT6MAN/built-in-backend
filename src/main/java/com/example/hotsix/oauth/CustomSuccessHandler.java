@@ -46,9 +46,12 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         log.info("[CustomSuccessHandler]");
         //OAuth2User
         CustomOAuth2User customUserDetails = (CustomOAuth2User) authentication.getPrincipal();
+        log.info("[CustomSuccessHandler] CustomUserDetails: {}", customUserDetails.toString());
 
         //JWT생성하기 위해 username, role값이 필요
         String username = customUserDetails.getUsername();
+        Long id = customUserDetails.getId();
+        String name = customUserDetails.getName();
 
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
@@ -56,8 +59,8 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         String role = auth.getAuthority();
 
         //JWT 생성
-        String accessToken = jwtUtil.createAccessToken(username, role, accessExpiretime);
-        String refreshToken = jwtUtil.createRefreshToken(username, role, refreshExpiretime);
+        String accessToken = jwtUtil.createAccessToken(id,name, username, role, accessExpiretime);
+        String refreshToken = jwtUtil.createRefreshToken(id,name, username, role, refreshExpiretime);
 
         //리프레시토큰 저장
         redisTemplate.opsForValue().set(username, refreshToken, refreshExpiretime, TimeUnit.MILLISECONDS);
