@@ -55,8 +55,8 @@ public class DynamodbTest {
             "chatroom_id 기준 어떤 사람들이 포함될 수 있는지 가져올 수 있기 때문에.")
     @Test
     public void selectByChatroomIdTest(){
-        List<ChatMessageVo>list = service.findByChatroomId("test_room_1");
-        List<ChatMessageVo>list2 = service.findByChatroomId("test_room_2");
+        List<ChatMessageVo>list = service.findByChatroomId("test_room_1", "ssafy");
+        List<ChatMessageVo>list2 = service.findByChatroomId("test_room_2", "ssafy");
         Assert.assertEquals(2, list.size());
         Assert.assertEquals(2, list2.size());
     }
@@ -64,13 +64,13 @@ public class DynamodbTest {
     @DisplayName("일정 기간(ex)현재 기준 30일)이전 메시지를 삭제하는 메서드 테스트")
     @Test
     public void deleteChatMessageTest(){
-        List<ChatMessageVo> list = service.findByChatroomId("test_room_1");
-        List<ChatMessageVo> list2 = service.findByChatroomId("test_room_2");
+        List<ChatMessageVo> list = service.findByChatroomId("test_room_1", "ssafy");
+        List<ChatMessageVo> list2 = service.findByChatroomId("test_room_2", "ssafy");
         Assert.assertEquals(2,list.size());
         Assert.assertEquals(2,list2.size());
         service.deleteMessagesBeforeNow();
-        list = service.findByChatroomId("test_room_1");
-        list2 = service.findByChatroomId("test_room_2");
+        list = service.findByChatroomId("test_room_1", "ssafy");
+        list2 = service.findByChatroomId("test_room_2", "ssafy");
         Assert.assertEquals(0, list.size());
         Assert.assertEquals(0, list2.size());
     }

@@ -2,6 +2,7 @@ package com.example.hotsix.controller.chat;
 
 import com.example.hotsix.service.chat.ChatMessageService;
 import com.example.hotsix.vo.ChatMessageVo;
+import com.example.hotsix.vo.ChatRoomVo;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -28,24 +30,24 @@ public class ChatController {
      * 카카오톡의 채팅방 목록을 생각하면 될듯.
      */
     @GetMapping("/list/{userId}")
-    public ResponseEntity<?> sendChatList(@PathVariable String userId, HttpServletResponse response){
-        List<ChatMessageVo> messages = chatMessageService.getUserChatRooms(userId);
-        return new ResponseEntity<>(messages, HttpStatus.OK);
+    public List<ChatRoomVo> sendChatList(@PathVariable String userId, HttpServletResponse response){
+        List<ChatRoomVo> messages = chatMessageService.getUserChatRooms(userId);
+        return messages;
     }
 
     /**
      *
      * @param roomId
-     * @param response
      * @return ResponseEntity
      * @Feature 특정 채팅방의 모든 메시지를 불러온다.
      */
     @GetMapping("/room/{roomId}")
-    public ResponseEntity<?> findAllMessageByChatroomId(@PathVariable String roomId, HttpServletResponse response){
-        log.error("call detail Messages");
-        List<ChatMessageVo> messages = chatMessageService.findByChatroomId(roomId);
-        return new ResponseEntity<>(messages, HttpStatus.OK);
+    public List<ChatMessageVo> findAllMessageByChatroomId(@PathVariable String roomId, String userId){
+        List<ChatMessageVo> messages = chatMessageService.findByChatroomId(roomId, userId);
+        Collections.reverse(messages);
+        return messages;
     }
+
 
 
 }

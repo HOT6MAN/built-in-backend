@@ -41,3 +41,6 @@ bin/
 
 # Ignore generated Q files by QueryDSL
 **/generated/**/Q*.java
+
+
+**/secure

@@ -24,6 +24,7 @@ public class ChatConnectController {
     private final SimpMessageSendingOperations operations;
     private final KafkaTemplate<String, Object> kafkaTemplate;
     private final ApplicationContext applicationContext;
+    
 
     @MessageMapping("/{chatroomId}")
     public void sendMessage(@DestinationVariable("chatroomId") String chatroomId, @Payload ChatMessageVo chatMessage){

@@ -4,6 +4,7 @@ import com.example.hotsix.exception.chat.ChatMessageInsertException;
 import com.example.hotsix.exception.chat.ChatMessageQueryException;
 import com.example.hotsix.repository.chat.ChatMessageRepository;
 import com.example.hotsix.vo.ChatMessageVo;
+import com.example.hotsix.vo.ChatRoomVo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,9 +41,9 @@ public class ChatMessageServiceImpl implements ChatMessageService{
     }
 
     @Override
-    public List<ChatMessageVo> findByChatroomId(String chatroomId) {
+    public List<ChatMessageVo> findByChatroomId(String chatroomId, String userId) {
         try{
-            List<ChatMessageVo> list = chatMessageRepository.findByChatroomId(chatroomId);
+            List<ChatMessageVo> list = chatMessageRepository.findByChatroomId(chatroomId, userId);
             return list;
         }
         catch(ChatMessageQueryException e){
@@ -59,27 +60,53 @@ public class ChatMessageServiceImpl implements ChatMessageService{
 
 
     @Override
-    public ArrayList<ChatMessageVo> getUserChatRooms(String userId) {
-        // Sender로 조회
+    public ArrayList<ChatRoomVo> getUserChatRooms(String userId) {
+        // Sender와 Receiver 메시지 목록을 각각 가져옴
         List<ChatMessageVo> senderMessages = chatMessageRepository.findBySender(userId);
-        // Receiver로 조회
         List<ChatMessageVo> receiverMessages = chatMessageRepository.findByReceiver(userId);
-        // 두 리스트를 합침
+
+        // 모든 메시지를 합침 (중복 제거)
         List<ChatMessageVo> allMessages = new ArrayList<>(senderMessages);
         allMessages.addAll(receiverMessages);
 
-        // 각 채팅방별로 가장 최근 메시지를 찾음
-        Map<String, ChatMessageVo> latestMessagesByChatroom = allMessages.stream()
-                .collect(Collectors.toMap(
-                        ChatMessageVo::getChatroomId,
-                        message -> message,
-                        (existing, replacement) -> existing.getDescSendDate() > replacement.getDescSendDate() ? existing : replacement
-                ));
+        // 메시지를 채팅방 ID로 그룹화
+        Map<String, List<ChatMessageVo>> messagesByChatroom = allMessages.stream()
+                .collect(Collectors.groupingBy(ChatMessageVo::getChatroomId));
 
-        // 결과를 ArrayList로 반환
-        ArrayList<ChatMessageVo> result = new ArrayList<>(latestMessagesByChatroom.values());
-        result.sort(Comparator.comparingLong(ChatMessageVo::getDescSendDate));
+        // 디버그: 메시지 그룹화 결과 출력
+        System.out.println("map = " + messagesByChatroom);
+
+        ArrayList<ChatRoomVo> result = new ArrayList<>();
+
+        for (Map.Entry<String, List<ChatMessageVo>> entry : messagesByChatroom.entrySet()) {
+            String chatroomId = entry.getKey();
+            List<ChatMessageVo> messages = entry.getValue();
+
+            // 채팅방에서 Desc_send_date가 가장 작은 메시지를 가져옴
+            ChatMessageVo latestMessage = messages.stream()
+                    .min(Comparator.comparingLong(ChatMessageVo::getDescSendDate))
+                    .orElse(null);
+
+            // 사용자가 받은 메시지 중에서 읽지 않은 메시지의 수를 셈
+            long unreadCount = messages.stream()
+                    .filter(message -> message.getReceiver().equals(userId) && !message.getIsRead())
+                    .count();
+
+            if (latestMessage != null) {
+                result.add(new ChatRoomVo(chatroomId, latestMessage, unreadCount));
+            }
+        }
+
+        // 채팅방을 Desc_send_date 값이 가장 작은 메시지를 기준으로 정렬
+        result.sort(Comparator.comparingLong(chatRoom -> chatRoom.getLatestMessage().getDescSendDate()));
+        // 디버그: 최종 결과 출력
+        System.out.println("result = " + result);
         return result;
     }
+
+
+
+
+
 
 }

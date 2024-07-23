@@ -1,6 +1,8 @@
 package com.example.hotsix.util;
 
 import com.example.hotsix.service.chat.ChatMessageService;
+import com.example.hotsix.vo.ChatMessageVo;
+import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -31,7 +33,7 @@ public class KafkaTopicProvider {
     @KafkaListener(topics = "#{__listener.chatRoomId}", groupId = "chat-group")
     public void listenToRoom(@Payload String message, @Header(KafkaHeaders.RECEIVED_TOPIC) String chatRoomId) {
         System.out.println("Received message for room " + chatRoomId + ": " + message);
-
+        service.insert(new Gson().fromJson(message, ChatMessageVo.class));
 
         messageTemplate.convertAndSend("/sub/"+chatRoomId, message);
     }

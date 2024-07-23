@@ -17,6 +17,8 @@ public class ChatMessageVo {
     private String content;
     private String sendDate;
     private Long descSendDate;
+    private boolean isRead;
+
     @Getter
     private String type;
     public enum MessageType{
@@ -63,6 +65,13 @@ public class ChatMessageVo {
         return sendDate;
     }
 
+    @DynamoDbAttribute("is_read")
+    public Boolean getIsRead(){
+        return this.isRead;
+    }
+    public void setIsRead(){
+        this.isRead = true;
+    }
     @Override
     public String toString() {
         return "ChatMessageVo{" +
