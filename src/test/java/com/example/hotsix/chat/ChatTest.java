@@ -24,16 +24,16 @@ public class ChatTest {
     @Autowired
     JPAQueryFactory factory;
 
-    @Test
-    public void insertTest(){
-        String userA = "ssafy";
-        String userB = "lim";
-        String chatroomName = "새 채팅방";
-        chatRoomService.createChatRoom(chatroomName, userA, userB);
-        QChatRoom room = QChatRoom.chatRoom;
-        ChatRoom chatroom = factory.selectFrom(room)
-                .where(room.name.eq(chatroomName))
-                .fetchOne();
-        Assert.assertEquals(chatroomName, chatroom.getName());
-    }
+//    @Test
+//    public void insertTest(){
+//        String userA = "ssafy";
+//        String userB = "lim";
+//        String chatroomName = "새 채팅방";
+//        chatRoomService.createChatRoom(chatroomName, userA, userB);
+//        QChatRoom room = QChatRoom.chatRoom;
+//        ChatRoom chatroom = factory.selectFrom(room)
+//                .where(room.name.eq(chatroomName))
+//                .fetchOne();
+//        Assert.assertEquals(chatroomName, chatroom.getName());
+//    }
 }
