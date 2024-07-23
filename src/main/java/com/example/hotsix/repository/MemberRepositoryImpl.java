@@ -1,12 +1,13 @@
 package com.example.hotsix.repository;
 
 import com.example.hotsix.model.Member;
+import com.example.hotsix.repository.member.MemberRepositoryCustom;
 import com.example.hotsix.vo.MemberVo;
 import com.querydsl.core.types.Projections;
 
 import static com.example.hotsix.model.QMember.member;
 
-public class MemberRepositoryImpl extends Querydsl4RepositorySupport implements MemberRepositoryCustom{
+public class MemberRepositoryImpl extends Querydsl4RepositorySupport implements MemberRepositoryCustom {
 
     @Override
     public Member findMemberById(long id) {

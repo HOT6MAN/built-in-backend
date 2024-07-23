@@ -1,11 +1,11 @@
-package com.example.hotsix.repository.test;
+package com.example.hotsix.repository.member;
 
 import com.example.hotsix.model.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface TestRepository extends JpaRepository<Member, Long>, TestRepositoryCustom {
+public interface MemberRepository extends JpaRepository<Member, Long>, MemberRepositoryCustom {
     Member findById(long id);
     Member findByEmail(String email);
 }

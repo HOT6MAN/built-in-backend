@@ -28,7 +28,9 @@ public class TestService {
 
     @Transactional
     public void addMember(MemberDto memberDto) {
-        Member member = new Member(memberDto.getId());
+        Member member = Member.builder()
+                .id(memberDto.getId())
+                .build();
         testRepository.save(member);
     }
 

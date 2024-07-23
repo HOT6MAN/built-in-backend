@@ -1,10 +1,10 @@
-package com.example.hotsix.repository.test;
+package com.example.hotsix.repository.member;
 
 import com.example.hotsix.model.Member;
 import com.example.hotsix.vo.MemberVo;
 
-public interface TestRepositoryCustom {
+public interface MemberRepositoryCustom {
     Member findMemberById(long id);
 
-//    MemberVo findPartialInfoById(long id);
+    MemberVo findPartialInfoById(long id);
 }

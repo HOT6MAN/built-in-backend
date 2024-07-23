@@ -2,7 +2,8 @@ package com.example.hotsix.oauth;
 
 import com.example.hotsix.model.Member;
 import com.example.hotsix.oauth.dto.*;
-import com.example.hotsix.repository.MemberRepository;
+
+import com.example.hotsix.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
