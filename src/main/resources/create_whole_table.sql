@@ -405,6 +405,8 @@ CREATE TABLE IF NOT EXISTS `ssafy`.`chatroom` (
                                                   `id` BIGINT(20) NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(30),
     `create_date` TIMESTAMP,
+    `last_message` VARCHAR(200),
+    `last_message_date` TIMESTAMP
     PRIMARY KEY (`id`)
     ) ENGINE = InnoDB;
 

@@ -3,6 +3,7 @@ package com.example.hotsix.service.chat;
 import com.example.hotsix.exception.chat.ChatMessageInsertException;
 import com.example.hotsix.exception.chat.ChatMessageQueryException;
 import com.example.hotsix.repository.chat.ChatMessageRepository;
+import com.example.hotsix.repository.chat.ChatRoomRepository;
 import com.example.hotsix.vo.ChatMessageVo;
 import com.example.hotsix.vo.ChatRoomVo;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ChatMessageServiceImpl implements ChatMessageService{
     private final ChatMessageRepository chatMessageRepository;
+    private final ChatRoomRepository chatRoomRepository;
 
     @Override
     public void insert(ChatMessageVo chatMessageVo) {
@@ -41,9 +43,9 @@ public class ChatMessageServiceImpl implements ChatMessageService{
     }
 
     @Override
-    public List<ChatMessageVo> findByChatroomId(String chatroomId, String userId) {
+    public List<ChatMessageVo> findChatMessageByChatroomId(String chatroomId, String userId) {
         try{
-            List<ChatMessageVo> list = chatMessageRepository.findByChatroomId(chatroomId, userId);
+            List<ChatMessageVo> list = chatMessageRepository.findChatMessageByChatroomId(chatroomId, userId);
             return list;
         }
         catch(ChatMessageQueryException e){
@@ -87,14 +89,6 @@ public class ChatMessageServiceImpl implements ChatMessageService{
                     .min(Comparator.comparingLong(ChatMessageVo::getDescSendDate))
                     .orElse(null);
 
-            // 사용자가 받은 메시지 중에서 읽지 않은 메시지의 수를 셈
-            long unreadCount = messages.stream()
-                    .filter(message -> message.getReceiver().equals(userId) && !message.getIsRead())
-                    .count();
-
-            if (latestMessage != null) {
-                result.add(new ChatRoomVo(chatroomId, latestMessage, unreadCount));
-            }
         }
 
         // 채팅방을 Desc_send_date 값이 가장 작은 메시지를 기준으로 정렬

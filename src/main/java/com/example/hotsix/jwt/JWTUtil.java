@@ -25,22 +25,10 @@ public class JWTUtil {
         return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("username", String.class);
     }
 
-    public String getName(String token) {
-
-        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("name", String.class);
-    }
-
     public String getRole(String token) {
 
         return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("role", String.class);
     }
-
-    public Long getId(String token) {
-
-        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("id", Long.class);
-    }
-
-
 
     public Boolean isExpired(String token) {
         log.info("[JWTUtil] 토큰 만료 검증");
@@ -64,11 +52,9 @@ public class JWTUtil {
 
 
     //토큰 생성
-    public String createJwt(Long Id,String name, String category, String username, String role, Long expiredMs) {
+    public String createJwt(String category, String username, String role, Long expiredMs) {
         log.info("[JWTUtil] JWT토큰 생성");
         return Jwts.builder()
-                .claim("name",name)
-                .claim("id", Id)
                 .claim("category",category)
                 .claim("username", username)
                 .claim("role", role)
@@ -78,12 +64,12 @@ public class JWTUtil {
                 .compact();
     }
 
-    public String createAccessToken(Long id, String name, String username, String role, Long expiredMs) {
-        return createJwt(id,name, "access", username, role, expiredMs);
+    public String createAccessToken(String username, String role, Long expiredMs) {
+        return createJwt("access", username, role, expiredMs);
     }
 
-    public String createRefreshToken(Long id,String name, String username, String role, Long expiredMs) {
-        return createJwt(id,name,"refresh",username, role, expiredMs);
+    public String createRefreshToken(String username, String role, Long expiredMs) {
+        return createJwt("refresh",username, role, expiredMs);
     }
 
 

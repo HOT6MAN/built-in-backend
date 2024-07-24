@@ -3,7 +3,7 @@ package com.example.hotsix.dto.chat;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Entity
+@Entity(name="chatroom_status")
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -18,9 +18,19 @@ public class ChatRoomStatus {
     @JoinColumn(name = "chatroom_id", nullable = false)
     private ChatRoom chatRoom;
 
-    private String userId;
+    private Long userId;
 
     private Integer unreadCount;
 
-    private Boolean isOnline;
+    private Boolean online;
+
+    @Override
+    public String toString() {
+        return "ChatRoomStatus{" +
+                "id=" + id +
+                ", userId=" + userId +
+                ", unreadCount=" + unreadCount +
+                ", online=" + online +
+                "}\n";
+    }
 }

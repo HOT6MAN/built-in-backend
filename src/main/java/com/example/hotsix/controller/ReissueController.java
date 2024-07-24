@@ -65,14 +65,12 @@ public class ReissueController {
             return new ResponseEntity<>("invalid refresh token", HttpStatus.BAD_REQUEST);
         }
 
-    
+
         log.info("Access토큰 재발행");
         String username = jwtUtil.getUsername(refresh);
         String role = jwtUtil.getRole(refresh);
-        Long id = jwtUtil.getId(refresh);
-        String name = jwtUtil.getName(refresh);
 
-        String newAccess = jwtUtil.createAccessToken(id,name,username, role, accessExpiretime);
+        String newAccess = jwtUtil.createAccessToken(username, role, accessExpiretime);
 
         //response.setHeader("access", newAccess);
         response.setHeader("Authorization", "Bearer " + newAccess);

@@ -17,7 +17,7 @@ public class ChatMessageVo {
     private String content;
     private String sendDate;
     private Long descSendDate;
-    private boolean isRead;
+    private Boolean receiverStatus;
 
     @Getter
     private String type;
@@ -65,13 +65,13 @@ public class ChatMessageVo {
         return sendDate;
     }
 
-    @DynamoDbAttribute("is_read")
-    public Boolean getIsRead(){
-        return this.isRead;
+    public Boolean getReceiverStatus() {
+        return this.receiverStatus;
     }
-    public void setIsRead(){
-        this.isRead = true;
+    public void setReceiverStatus(Boolean receiverStatus) {
+        this.receiverStatus = receiverStatus;
     }
+
     @Override
     public String toString() {
         return "ChatMessageVo{" +
@@ -82,6 +82,7 @@ public class ChatMessageVo {
                 ", content='" + content + '\'' +
                 ", sendDate='" + sendDate + '\'' +
                 ", descSendDate='" + descSendDate + '\'' +
+                ", receiverStatus='" + receiverStatus + '\'' +
                 "}\n";
     }
 }

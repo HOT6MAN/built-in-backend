@@ -10,7 +10,7 @@ import java.util.Set;
 public interface ChatMessageService {
     void insert(ChatMessageVo chatMessageVo);
     List<ChatMessageVo> findByChatroomIdAndBeforeDate(String chatroomId, String date);
-    List<ChatMessageVo> findByChatroomId(String chatroomId, String userId);
+    List<ChatMessageVo> findChatMessageByChatroomId(String chatroomId, String userId);
     void deleteMessagesBeforeNow();
     ArrayList<ChatRoomVo> getUserChatRooms(String userId);
 }

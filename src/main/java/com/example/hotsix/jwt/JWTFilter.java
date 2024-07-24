@@ -28,102 +28,103 @@ public class JWTFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        log.info("JWT 필터");
-        log.info("request url: {}", request.getRequestURI());
-        log.info("request cookies: {}", request.getCookies());
-
-
-
-        String authorization = null;
-        //쿠키들을 불러온뒤 Authorizaiton key에 담긴 쿠키를 찾음
-        Cookie[] cookies = request.getCookies();
-        log.info("cookies: {}", cookies);
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if(cookie.getName().equals("access")) {
-                    authorization = cookie.getValue();
-                    break;
-                }
-            }
-        }
-
-        // Authorizaion헤더에서 access토큰 얻어오기
-        String authorizationHeader = request.getHeader("Authorization");
-        log.info("authorizationHeader: {}", authorizationHeader);
-        if(authorizationHeader!=null && redisTemplate.hasKey(authorizationHeader)) {
-            log.info("로그아웃된 access token");
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-
-        if(authorizationHeader != null){
-            authorization = authorizationHeader;
-        }
-
-
-        //Authorization 헤더 검증
-        if(authorization == null){
-            log.info("token is empty");
-            filterChain.doFilter(request, response);
-//            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            return;
-        }
-
-        //토큰
-        String token = authorization;
-
-        //토큰 소멸 시간 검증
-        try{
-            jwtUtil.isExpired(token) ;
-        }catch (ExpiredJwtException e){
-            //response body
-            log.info("Access token is expired");
-            PrintWriter writer = response.getWriter();
-            writer.println("access toekn is expired");
-
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return;
-        }
-
-        //토큰이 acceess인지 확인
-        String category = jwtUtil.getCategory(token);
-
-        if(!category.equals("access")){
-            log.info("Access token is invalid");
-            PrintWriter writer = response.getWriter();
-            writer.println("invalid access token");
-
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return;
-        }
-
-
-        //토큰에서 id, username과 role 획득
-        String username = jwtUtil.getUsername(token);
-        String role = jwtUtil.getRole(token);
-        Long id = jwtUtil.getId(token);
-        String name = jwtUtil.getName(token);
-
-        //userDTO를 생성하여 값 set
-        UserDTO userDTO = new UserDTO();
-        userDTO.setUsername(username);
-        userDTO.setRole(role);
-        userDTO.setId(id);
-        userDTO.setName(name);
-
-        //UserDetails에 회원 정보 객체 담기
-        CustomOAuth2User customOAuth2User = new CustomOAuth2User(userDTO);
-        log.info("customOAuth2User: {}", customOAuth2User);
-        //스프링 시큐리티 인증 토큰 생성
-
-        Authentication authToken = new UsernamePasswordAuthenticationToken(customOAuth2User, null, customOAuth2User.getAuthorities());
-        log.info("authToken: {}", authToken.getPrincipal().toString());
-
-        //세션에 사용자 등록
-        SecurityContextHolder.getContext().setAuthentication(authToken);
-
-        filterChain.doFilter(request, response);
-
+//        log.info("JWT 필터");
+//        log.info("request url: {}", request.getRequestURI());
+//        log.info("request cookies: {}", request.getCookies());
+//
+//
+//
+//        String authorization = null;
+//        //쿠키들을 불러온뒤 Authorizaiton key에 담긴 쿠키를 찾음
+//        Cookie[] cookies = request.getCookies();
+//        log.info("cookies: {}", cookies);
+//        if (cookies != null) {
+//            for (Cookie cookie : cookies) {
+//                if(cookie.getName().equals("access")) {
+//                    authorization = cookie.getValue();
+//                    break;
+//                }
+//            }
+//        }
+//
+//        // Authorizaion헤더에서 access토큰 얻어오기
+//        String authorizationHeader = request.getHeader("Authorization");
+//        log.info("authorizationHeader: {}", authorizationHeader);
+//        if(authorizationHeader!=null && redisTemplate.hasKey(authorizationHeader)) {
+//            log.info("로그아웃된 access token");
+//            filterChain.doFilter(request, response);
+//            return;
+//        }
+//
+//
+//        if(authorizationHeader != null){
+//            authorization = authorizationHeader;
+//        }
+//
+//
+//        //Authorization 헤더 검증
+//        if(authorization == null){
+//            log.info("token is empty");
+//            filterChain.doFilter(request, response);
+////            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+//            return;
+//        }
+//
+//        //토큰
+//        String token = authorization;
+//
+//        //토큰 소멸 시간 검증
+//        try{
+//            jwtUtil.isExpired(token) ;
+//        }catch (ExpiredJwtException e){
+//            //response body
+//            log.info("Access token is expired");
+//            PrintWriter writer = response.getWriter();
+//            writer.println("access toekn is expired");
+//
+//            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+//            return;
+//        }
+//
+//        //토큰이 acceess인지 확인
+//        String category = jwtUtil.getCategory(token);
+//
+//        if(!category.equals("access")){
+//            log.info("Access token is invalid");
+//            PrintWriter writer = response.getWriter();
+//            writer.println("invalid access token");
+//
+//            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+//            return;
+//        }
+//
+//
+//        //토큰에서 id, username과 role 획득
+//        String username = jwtUtil.getUsername(token);
+//        String role = jwtUtil.getRole(token);
+//        Long id = jwtUtil.getId(token);
+//        String name = jwtUtil.getName(token);
+//
+//        //userDTO를 생성하여 값 set
+//        UserDTO userDTO = new UserDTO();
+//        userDTO.setUsername(username);
+//        userDTO.setRole(role);
+//        userDTO.setId(id);
+//        userDTO.setName(name);
+//
+//        //UserDetails에 회원 정보 객체 담기
+//        CustomOAuth2User customOAuth2User = new CustomOAuth2User(userDTO);
+//        log.info("customOAuth2User: {}", customOAuth2User);
+//        //스프링 시큐리티 인증 토큰 생성
+//
+//        Authentication authToken = new UsernamePasswordAuthenticationToken(customOAuth2User, null, customOAuth2User.getAuthorities());
+//        log.info("authToken: {}", authToken.getPrincipal().toString());
+//
+//        //세션에 사용자 등록
+//        SecurityContextHolder.getContext().setAuthentication(authToken);
+//
+//        filterChain.doFilter(request, response);
+//
+//    }
     }
 }

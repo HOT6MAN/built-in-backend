@@ -1,13 +1,13 @@
-package com.example.hotsix.service.chat;
+package com.example.hotsix.repository.chat;
 
 import com.example.hotsix.dto.chat.ChatRoom;
 import com.example.hotsix.dto.chat.ChatRoomStatus;
+import com.example.hotsix.dto.chat.ChatRoomStatusDto;
 
 import java.util.List;
 
-public interface ChatRoomService {
-    ChatRoom createChatRoom(String chatRoomName, Long userAId, Long userBId);
-    List<ChatRoomStatus>   findAllChatRoomByUserId(Long userId);
+public interface ChatRoomRepositoryCustom{
+    List<ChatRoomStatus>  findAllChatRoomsByUserId(Long userId);
     ChatRoomStatus findReceiver(Long chatroomId, Long userId);
     ChatRoomStatus findUser(Long chatroomId, Long userId);
     void updateOnlineStatus(Long chatroomId, Long userId);

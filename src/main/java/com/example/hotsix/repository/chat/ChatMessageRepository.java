@@ -56,20 +56,6 @@ public class ChatMessageRepository {
         }
     }
 
-    public void markMessagesAsRead(String chatroomId, String userId) {
-        // 해당 채팅방의 메시지를 읽음 처리
-        QueryConditional queryConditional = QueryConditional.keyEqualTo(k -> k.partitionValue(chatroomId));
-        SdkIterable<Page<ChatMessageVo>> results = table.query(queryConditional);
-
-        for (Page<ChatMessageVo> page : results) {
-            for (ChatMessageVo message : page.items()) {
-                if (message.getReceiver().equals(userId) && !message.getIsRead()) {
-                    message.setRead(true);
-                    table.updateItem(message);
-                }
-            }
-        }
-    }
 
     public void insert(ChatMessageVo chatMessageVo) {
         table.putItem(chatMessageVo);
@@ -126,23 +112,14 @@ public class ChatMessageRepository {
         }
     }
 
-    public List<ChatMessageVo> findByChatroomId(String chatroomId, String userId) throws ChatMessageQueryException {
+    public List<ChatMessageVo> findChatMessageByChatroomId(String chatroomId, String userId) throws ChatMessageQueryException {
         try {
             QueryConditional queryConditional = QueryConditional.keyEqualTo(k -> k.partitionValue(chatroomId));
             Iterator<ChatMessageVo> results = table.query(queryConditional).items().iterator();
             List<ChatMessageVo> messages = new ArrayList<>();
-            List<ChatMessageVo> unreadMessages = new ArrayList<>();
             while (results.hasNext()) {
                 ChatMessageVo vo = results.next();
-                if(vo.getReceiver().equals(userId) && !vo.getIsRead()){
-                    System.out.println("unread Call");
-                    unreadMessages.add(vo);
-                }
                 messages.add(vo);
-            }
-            for(ChatMessageVo unread : unreadMessages){
-                unread.setIsRead();
-                table.updateItem(unread);
             }
             return messages;
         } catch (DynamoDbException e) {
