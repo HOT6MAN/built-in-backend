@@ -1,13 +1,16 @@
 package com.example.hotsix.service.notification;
 
-import com.example.hotsix.dto.NotificationDto;
+import com.example.hotsix.dto.notification.Notification;
 import com.example.hotsix.repository.notification.NotificationRepository;
+import com.example.hotsix.repository.notification.NotificationRepositoryCustom;
+import com.example.hotsix.util.LocalTimeUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -15,12 +18,30 @@ import java.util.Map;
 public class NotificationServiceImpl implements NotificationService{
     private final NotificationRepository repository;
 
+
+    @Override
+    public Notification save(Notification notification){
+        repository.save(notification);
+        return notification;
+    }
+
+    @Override
+    public List<Notification> findAllUnreadNotificationByUserId(Long userId){
+        return repository.findAllUnreadNotificationByUserId(userId);
+    }
+
+    @Override
+    public List<Notification> findAllNotificationByUserId(Long userId) {
+        return repository.findAllNotificationByUserId(userId);
+    }
+
+
     @Override
     public SseEmitter subscribe(String userId, String lastEventId) {
         String emitterId = userId+"_"+System.currentTimeMillis();
         SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
 
-        if(repository.findAllEmitterStartWithByEmail(userId) != null){
+        if(repository.findAllNotificationByUserId(Long.parseLong(userId)) != null){
             repository.deleteAllEmitterStartWithId(userId);
         }
 
@@ -65,11 +86,26 @@ public class NotificationServiceImpl implements NotificationService{
     }
 
     @Override
-    public void send(String receiver, String content, String type, String urlValue) {
-        NotificationDto notification = new NotificationDto(receiver, content, type, urlValue, false);
-
+    public void send(Long sender, Long receiver, String type) {
+        Notification notification = Notification.builder()
+                .receiver(receiver)
+                .isRead(false)
+                .notifyDate(LocalTimeUtil.getDateTime())
+                .build();
+        if ("chat".equals(type)) {
+            notification.setType("chat");
+            notification.setUrl("chat");
+        }
+        else if("invite".equals(type)){
+            notification.setType("invite");
+            notification.setUrl("invite");
+        }
+        else if("join".equals(type)){
+            notification.setType("join");
+            notification.setType("join");
+        }
+        Map<String, SseEmitter> sseEmitters = repository.findAllEmittersByUserId(receiver);
         // 로그인 한 유저의 SseEmitter 모두 가져오기
-        Map<String, SseEmitter> sseEmitters = repository.findAllEmitterStartWithByEmail(receiver);
 
         sseEmitters.forEach(
                 (key, emitter) -> {
@@ -82,11 +118,11 @@ public class NotificationServiceImpl implements NotificationService{
     }
 
     @Override
-    public void sendToClient(SseEmitter emitter, String id, Object data) {
+    public void sendToClient(SseEmitter emitter, String id, Notification data) {
         try {
             emitter.send(SseEmitter.event()
                     .id(id)
-                    .name("sse")
+                    .name(data.getType())
                     .data(data, MediaType.APPLICATION_JSON)
                     .reconnectTime(0));
         } catch (Exception exception) {

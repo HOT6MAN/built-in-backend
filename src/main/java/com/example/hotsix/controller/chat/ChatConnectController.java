@@ -1,7 +1,9 @@
 package com.example.hotsix.controller.chat;
 
+import com.example.hotsix.dto.notification.Notification;
 import com.example.hotsix.service.chat.ChatMessageService;
 import com.example.hotsix.service.chat.ChatRoomService;
+import com.example.hotsix.service.notification.NotificationService;
 import com.example.hotsix.util.KafkaTopicProvider;
 import com.example.hotsix.util.LocalTimeUtil;
 import com.example.hotsix.vo.ChatMessageVo;
@@ -26,6 +28,7 @@ public class ChatConnectController {
     private final KafkaTemplate<String, Object> kafkaTemplate;
     private final ApplicationContext applicationContext;
     private final ChatRoomService chatRoomService;
+    private final NotificationService notificationService;
     
 
     @MessageMapping("/{chatroomId}")
@@ -39,7 +42,19 @@ public class ChatConnectController {
             chatRoomService.updateUnreadCount(Long.parseLong(chatMessage.getChatroomId()),
                     Long.parseLong(chatMessage.getReceiver()), 1);
         }
-
+        notificationService.save(Notification.builder()
+                .isRead(false)
+                .url("/")
+                .type("chat")
+                        .sender(Long.parseLong(chatMessage.getSender()))
+                .receiver(Long.parseLong(chatMessage.getReceiver()))
+                        .notifyDate(LocalTimeUtil.getDateTime())
+                .build());
+        notificationService.send(
+                Long.parseLong(chatMessage.getSender()),
+                Long.parseLong(chatMessage.getReceiver()),
+                "chat"
+        );
 
         KafkaTopicProvider provider = applicationContext.getBean(KafkaTopicProvider.class, chatroomId, operations, service);
 

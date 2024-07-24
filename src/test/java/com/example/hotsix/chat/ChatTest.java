@@ -15,14 +15,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 public class ChatTest {
-    @Autowired
-    ChatRoomService chatRoomService;
-
-    @Autowired
-    ChatRoomRepository chatRoomRepository;
-
-    @Autowired
-    JPAQueryFactory factory;
+//    @Autowired
+//    ChatRoomService chatRoomService;
+//
+//    @Autowired
+//    ChatRoomRepository chatRoomRepository;
+//
+//    @Autowired
+//    JPAQueryFactory factory;
 
 //    @Test
 //    public void insertTest(){

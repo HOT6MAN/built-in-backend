@@ -3,10 +3,12 @@ package com.example.hotsix.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Data
+
 @Entity
 @Builder
 @Table(name = "member")
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class Member extends BaseEntity{

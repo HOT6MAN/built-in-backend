@@ -391,10 +391,12 @@ CREATE TABLE IF NOT EXISTS `ssafy`.`apply_info_domain` (
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `ssafy`.`notification` (
                                                       `id` BIGINT(20) NOT NULL AUTO_INCREMENT,
-    `receiver` VARCHAR(20) NOT NULL,
+    `receiver` BIGINT NOT NULL,
+    `sender` BIGINT NOT NULL,
     `type` VARCHAR(15) NOT NULL,
-    `url` VARCHAR(30) NOT NULL,
-    `is_read` VARCHAR(5) NOT NULL,
+    `url` VARCHAR(50) NOT NULL,
+    `is_read` BOOLEAN NOT NULL,
+    `notify_date` VARCHAR(20) NOT NULL,
     PRIMARY KEY (`id`)
     ) ENGINE = InnoDB;
 
@@ -406,7 +408,7 @@ CREATE TABLE IF NOT EXISTS `ssafy`.`chatroom` (
     `name` VARCHAR(30),
     `create_date` TIMESTAMP,
     `last_message` VARCHAR(200),
-    `last_message_date` TIMESTAMP
+    `last_message_date` TIMESTAMP,
     PRIMARY KEY (`id`)
     ) ENGINE = InnoDB;
 
