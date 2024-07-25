@@ -1,4 +1,4 @@
-package com.example.hotsix.controller;
+package com.example.hotsix.controller.auth;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;

@@ -1,4 +1,4 @@
-package com.example.hotsix.controller;
+package com.example.hotsix.controller.auth;
 
 import com.example.hotsix.jwt.JWTUtil;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -11,9 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController

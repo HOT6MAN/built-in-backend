@@ -21,9 +21,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
-        log.info("[CustomOAuth2UserService loadUser]");
-
-        
         //리소스 서버로 부터 받을 유저정보
         OAuth2User oAuth2User = super.loadUser(userRequest);
         log.info("oAuth2User: {}", oAuth2User);
@@ -40,8 +37,10 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         }else if(registrationId.equals("google")){
             log.info("google 로그인");
             oAuth2Response = new GoogleResponse(oAuth2User.getAttributes());
+        }else if(registrationId.equals("github")){
+            log.info("github 로그인");
+            oAuth2Response = new GithubResponse(oAuth2User.getAttributes());
         }else{
-
             return null;
         }
 
@@ -52,7 +51,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         String email = oAuth2Response.getEmail();
         Member existData = memberRepository.findByEmail(email);
 
-        log.info("existData: {}", existData);
         // 가입한 유저 email이 없을 경우 email DB에 등록하고 로그인
         if(existData == null){
             log.info("신규 가입 이메일");
