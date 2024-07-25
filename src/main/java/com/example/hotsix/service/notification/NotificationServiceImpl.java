@@ -64,7 +64,7 @@ public class NotificationServiceImpl implements NotificationService{
         try {
             emitter.send(SseEmitter.event()
                     .id(eventId)
-                    .name("sse")
+                    .name("open")
                     .data(data, MediaType.APPLICATION_JSON));
         } catch (IOException exception) {
             repository.deleteById(emitterId);
@@ -119,6 +119,7 @@ public class NotificationServiceImpl implements NotificationService{
 
     @Override
     public void sendToClient(SseEmitter emitter, String id, Notification data) {
+        System.out.println("Before Send Event Check Type : "+data.getType());
         try {
             emitter.send(SseEmitter.event()
                     .id(id)
