@@ -1,5 +1,8 @@
-package com.example.hotsix.controller.auth;
 
+package com.example.hotsix.controller.login;
+
+
+import com.example.hotsix.enums.Process;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -11,6 +14,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+
+import static com.example.hotsix.enums.Process.*;
 
 @RestController
 @Slf4j
@@ -40,10 +45,10 @@ public class JwtHeaderController {
             response.setHeader("Authorization", "Bearer " + access);
             // 리다이렉트
             //response.sendRedirect(clinetHost);
-            return new ResponseEntity<>(HttpStatus.OK);
+            return new ResponseEntity<>(NORMAL_RESPONSE.getHttpStatus());
         } else {
             //response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(INVALID_USER.getHttpStatus());
         }
 
 

@@ -13,4 +13,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class BuiltInException extends RuntimeException {
     private final Process process;
+
+    @Override
+    public String toString() {
+        return "BuiltInException{" +
+                "process=" + process +
+                '}';
+    }
 }

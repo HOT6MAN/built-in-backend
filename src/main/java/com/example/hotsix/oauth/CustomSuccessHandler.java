@@ -39,8 +39,6 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     private final RedisTemplate<String ,String> redisTemplate;
 
 
-
-
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         log.info("[CustomSuccessHandler]");
@@ -54,10 +52,13 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
         GrantedAuthority auth = iterator.next();
         String role = auth.getAuthority();
+        Long id = customUserDetails.getId();
+        String name = customUserDetails.getName();
 
         //JWT 생성
-        String accessToken = jwtUtil.createAccessToken(username, role, accessExpiretime);
-        String refreshToken = jwtUtil.createRefreshToken(username, role, refreshExpiretime);
+        String accessToken = jwtUtil.createAccessToken(id, name, username, role, accessExpiretime);
+        String refreshToken = jwtUtil.createRefreshToken(id, name, username, role, refreshExpiretime);
+
 
         //리프레시토큰 저장
         redisTemplate.opsForValue().set(username, refreshToken, refreshExpiretime, TimeUnit.MILLISECONDS);
@@ -78,5 +79,6 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         return cookie;
     }
+
 
 }

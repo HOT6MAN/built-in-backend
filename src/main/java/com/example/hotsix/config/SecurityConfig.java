@@ -100,15 +100,16 @@ public class SecurityConfig {
                         .requestMatchers("/login","/","/join").permitAll()
                         .requestMatchers("/reissue").permitAll()
                         .requestMatchers("/convert").permitAll()
+                        .requestMatchers("/email-link").permitAll()
+                        .requestMatchers("/email-login").permitAll()
+                        .requestMatchers("/email-register").permitAll()
                         .anyRequest().authenticated());
 
         //세션 설정 : STATELESS
         http
                 .sessionManagement((session) -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-        http
-                .csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
+
         return http.build();
 
 

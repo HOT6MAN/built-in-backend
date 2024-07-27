@@ -19,10 +19,19 @@ public enum Process {
     USER_NOT_FOUND(HttpStatus.INTERNAL_SERVER_ERROR, "존재하지 않는 유저입니다"),
     DEAL_NOT_FOUND(HttpStatus.INTERNAL_SERVER_ERROR, "존재하지 않는 상품입니다"),
     INVALID_USER(HttpStatus.UNAUTHORIZED, "잘못된 JWT Token 입니다."),
+    EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, "유효기간이 만료된 Token입니다."),
 
     // 생각하지 못한 에러가 발생하였을 경우 발생하는 ProcessInfo
     UNKNOWN_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "원인 모를 에러입니다");
 
     private final HttpStatus httpStatus;
     private final String message;
+
+    @Override
+    public String toString() {
+        return "Process{" +
+                "httpStatus=" + httpStatus +
+                ", message='" + message + '\'' +
+                '}';
+    }
 }

@@ -1,4 +1,6 @@
-package com.example.hotsix.controller.auth;
+
+package com.example.hotsix.controller.login;
+
 
 import com.example.hotsix.jwt.JWTUtil;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -28,7 +30,7 @@ public class ReissueController {
 
     @PostMapping("/reissue")
     public ResponseEntity<?> reissue(HttpServletRequest request, HttpServletResponse response) {
-
+        log.info("reissue");
         String refresh = null;
         Cookie[] cookies = request.getCookies();
         for (Cookie cookie : cookies) {
@@ -67,8 +69,11 @@ public class ReissueController {
         log.info("Access토큰 재발행");
         String username = jwtUtil.getUsername(refresh);
         String role = jwtUtil.getRole(refresh);
+        Long id= jwtUtil.getId(refresh);
+        String name = jwtUtil.getUsername(refresh);
 
-        String newAccess = jwtUtil.createAccessToken(username, role, accessExpiretime);
+
+        String newAccess = jwtUtil.createAccessToken(id, name, username, role, accessExpiretime);
 
         //response.setHeader("access", newAccess);
         response.setHeader("Authorization", "Bearer " + newAccess);

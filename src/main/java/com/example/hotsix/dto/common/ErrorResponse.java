@@ -10,4 +10,11 @@ import lombok.Setter;
 @Builder
 public class ErrorResponse {
     private Process process;
+
+    @Override
+    public String toString() {
+        return "ErrorResponse{" +
+                "process=" + process +
+                '}';
+    }
 }
