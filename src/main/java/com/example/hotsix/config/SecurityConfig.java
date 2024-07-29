@@ -103,7 +103,7 @@ public class SecurityConfig {
                         .requestMatchers("/email-link").permitAll()
                         .requestMatchers("/email-login").permitAll()
                         .requestMatchers("/email-register").permitAll()
-                        .requestMatchers("/hot6man/test").permitAll()
+                        .requestMatchers("/hot6man/test/**").permitAll()
                         .requestMatchers(("/member/**")).permitAll()
                         .anyRequest().authenticated());
 
