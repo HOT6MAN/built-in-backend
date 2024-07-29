@@ -1,5 +1,8 @@
 package com.example.hotsix.model;
 
+import com.example.hotsix.dto.member.MemberDto;
+import com.example.hotsix.dto.member.MemberImageDto;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -11,11 +14,15 @@ import lombok.*;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonIgnoreProperties({"memberImage"})
 public class Member extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
+
+    @Column(name="name", nullable = false)
+    private String name;
 
     @Column(name = "email", nullable = false)
     private String email;
@@ -38,5 +45,35 @@ public class Member extends BaseEntity{
     @Column(name = "lgn_mtd", nullable = false)
     private String lgnMtd;
 
+
+    @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private MemberImage memberImage;
+
+    public void setMemberImage(MemberImage memberImage) {
+        this.memberImage = memberImage;
+        memberImage.setMember(this);
+    }
+
+    public MemberDto toDto(){
+        MemberImageDto imageDto = MemberImageDto.builder()
+                .type(memberImage.getType())
+                .fixedName(memberImage.getFixedName())
+                .originName(memberImage.getOriginName())
+                .saveFolder(memberImage.getSaveFolder())
+                .id(memberImage.getId())
+                .build();
+        MemberDto memberDto = MemberDto.builder()
+                .id(this.id)
+                .address(this.address)
+                .role(this.role)
+                .phone(this.phone)
+                .email(this.email)
+                .lgnMtd(this.lgnMtd)
+                .nickname(this.nickname)
+                .profileUrl(this.profileUrl)
+                .name(this.name)
+                .build();
+        return memberDto;
+    }
 
 }

@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS `ssafy`.`member` (
                                                 `id` BIGINT(20) NOT NULL AUTO_INCREMENT,
     `email` VARCHAR(50) NOT NULL,
     `nickname` VARCHAR(50) NOT NULL,
+    `name` VARCHAR(20) NOT NULL,
     `profile_url` VARCHAR(255),
     `phone` VARCHAR(20),
     `address` VARCHAR(255),
@@ -28,7 +29,20 @@ CREATE TABLE IF NOT EXISTS `ssafy`.`member` (
     PRIMARY KEY (`id`),
     INDEX `member_idx_01` (`DEL_YN` ASC, `REG_USER_SEQ` ASC, `MOD_USER_SEQ` ASC) VISIBLE)
     ENGINE = InnoDB;
+-- -----------------------------------------------------
+-- Table `ssafy`.`member_image`
+-- -----------------------------------------------------
 
+CREATE TABLE IF NOT EXISTS `ssafy`.`member_image` (
+                                                      `id` BIGINT(20) NOT NULL AUTO_INCREMENT,
+    `member_id` BIGINT(20) NOT NULL,
+    `origin_name` VARCHAR(255),
+    `fixed_name` VARCHAR(255),
+    `save_folder` VARCHAR(255),
+    `type` VARCHAR(50),
+    PRIMARY KEY (`id`),
+    FOREIGN KEY (`member_id`) REFERENCES `member`(`id`)
+    ) ENGINE = InnoDB;
 -- -----------------------------------------------------
 -- Table `ssafy`.`following`
 -- -----------------------------------------------------

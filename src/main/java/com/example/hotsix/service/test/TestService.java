@@ -1,7 +1,5 @@
 package com.example.hotsix.service.test;
 
-import com.example.hotsix.dto.MemberDto;
-import com.example.hotsix.vo.MemberVo;
 import com.example.hotsix.enums.Process;
 import com.example.hotsix.exception.BuiltInException;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +25,7 @@ public class TestService {
     }
 
     @Transactional
-    public void addMember(MemberDto memberDto) {
+    public void addMember(Member memberDto) {
         Member member = Member.builder()
                 .id(memberDto.getId())
                 .build();

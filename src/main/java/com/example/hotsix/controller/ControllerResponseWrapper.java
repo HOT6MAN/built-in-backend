@@ -7,6 +7,7 @@ import com.example.hotsix.enums.Process;
 import com.example.hotsix.exception.BuiltInException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;
+import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -42,6 +43,9 @@ public class ControllerResponseWrapper implements ResponseBodyAdvice<Object> {
     // 객체 형식으로 반환된 값에 대해서만 wrapping 실행
     @Override
     public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
+        if (Resource.class.isAssignableFrom(returnType.getParameterType())) {
+            return false;
+        }
         return MappingJackson2HttpMessageConverter.class.isAssignableFrom(converterType);
     }
 

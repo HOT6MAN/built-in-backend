@@ -104,6 +104,7 @@ public class SecurityConfig {
                         .requestMatchers("/email-login").permitAll()
                         .requestMatchers("/email-register").permitAll()
                         .requestMatchers("/hot6man/test").permitAll()
+                        .requestMatchers(("/member/**")).permitAll()
                         .anyRequest().authenticated());
 
         //세션 설정 : STATELESS
