@@ -103,6 +103,7 @@ public class SecurityConfig {
                         .requestMatchers("/email-link").permitAll()
                         .requestMatchers("/email-login").permitAll()
                         .requestMatchers("/email-register").permitAll()
+                        .requestMatchers("/test").permitAll()
                         .anyRequest().authenticated());
 
         //세션 설정 : STATELESS

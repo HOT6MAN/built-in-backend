@@ -13,17 +13,17 @@ public class TestController {
 
     private final TestService testService;
 
-    @GetMapping("/hot6man/hello")
+    @GetMapping("/hot6man/test/hello")
     public String hello() {
-        return "Hello, hot6Man!! - 07/25";
+        return "Hello, hot6Man!! - 07/29";
     }
 
-    @GetMapping("/hot6man/hello2/member/{id}")
+    @GetMapping("/hot6man/test/hello2/member/{id}")
     public String hello2(@PathVariable long id) {
         return testService.getMember(id).getId().toString();
     }
 
-    @GetMapping("/hot6man/hello3/member/{id}")
+    @GetMapping("/hot6man/test/hello3/member/{id}")
     public MemberDto hello3(@PathVariable long id) {
         Member member = testService.getMember(id);
         return MemberDto.fromEntity(member);
@@ -33,7 +33,7 @@ public class TestController {
 //    public MemberVo hello4(@PathVariable long id) {
 //        return testService.getPartialMemberInfoByProjections(id);
 //    }
-    @PostMapping("/hot6man/hello/member")
+    @PostMapping("/hot6man/test/hello/member")
     public String addMember(@RequestBody MemberDto memberDto) {
         testService.addMember(memberDto);
         return "add Complete!";
