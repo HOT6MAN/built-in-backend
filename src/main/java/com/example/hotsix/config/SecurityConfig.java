@@ -99,6 +99,7 @@ public class SecurityConfig {
         //경로별 인가 작업
         http
                 .authorizeHttpRequests((auth) -> auth
+                        .requestMatchers("/hot6man/**").permitAll()
                         .requestMatchers("/login","/").permitAll()
                         .requestMatchers("/reissue").permitAll()
                         .requestMatchers("/convert").permitAll()
@@ -108,7 +109,10 @@ public class SecurityConfig {
                         .requestMatchers("/signup").permitAll()
                         .requestMatchers("/email-register").permitAll()
                         .requestMatchers("/hot6man/test/**").permitAll()
-                        .requestMatchers(("/member/**")).permitAll()
+                        .requestMatchers(("/hot6man/member/**")).permitAll()
+                        .requestMatchers("/hot6man/swagger-ui.html").permitAll()
+                        .requestMatchers("/hot6man/swagger-ui/**").permitAll()
+                        .requestMatchers("/hot6man/v3/api-docs/**").permitAll()
                         .anyRequest().authenticated());
 
         //세션 설정 : STATELESS

@@ -41,6 +41,15 @@ public class JWTFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         log.info("JWT 필터");
         log.info("request url: {}", request.getRequestURI());
+        String requestURL = request.getRequestURI();
+
+
+        if (requestURL.startsWith("/hot6man/swagger-ui.html") ||
+                requestURL.startsWith("/hot6man/swagger-ui/") ||
+                requestURL.startsWith("/hot6man/v3/api-docs")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         String accessToken = null;
         String refreshToken = null;
