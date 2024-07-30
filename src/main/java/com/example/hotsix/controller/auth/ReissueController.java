@@ -1,8 +1,10 @@
 
-package com.example.hotsix.controller.login;
+package com.example.hotsix.controller.auth;
 
 
+import com.example.hotsix.dto.MemberDto;
 import com.example.hotsix.jwt.JWTUtil;
+import com.example.hotsix.service.auth.LogoutService;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,7 +25,8 @@ public class ReissueController {
 
 
     private final JWTUtil jwtUtil;
-    private final RedisTemplate<String ,String> redisTemplate;
+    private final LogoutService logoutService;
+    //private final RedisTemplate<String ,String> redisTemplate;
 
     @Value("${jwt.access-token.expiretime}")
     private Long accessExpiretime;
@@ -58,9 +61,10 @@ public class ReissueController {
             return new ResponseEntity<>("refresh token is invalid", HttpStatus.BAD_REQUEST);
         }
 
-        String value = redisTemplate.opsForValue().get(jwtUtil.getUsername(refresh));
+        //String value = redisTemplate.opsForValue().get(jwtUtil.getId(refresh).toString());
+
         // 레디스에 리프레시토큰없을때
-        if(value == null){
+        if( !logoutService.isTokenInRedis(jwtUtil.getId(refresh).toString())){
             log.info("만료된 리프레시토큰");
             return new ResponseEntity<>("invalid refresh token", HttpStatus.BAD_REQUEST);
         }
@@ -72,8 +76,14 @@ public class ReissueController {
         Long id= jwtUtil.getId(refresh);
         String name = jwtUtil.getUsername(refresh);
 
+        MemberDto memberDto = MemberDto.builder()
+                .id(id)
+                .name(name)
+                .role(role)
+                .build();
 
-        String newAccess = jwtUtil.createAccessToken(id, name, username, role, accessExpiretime);
+
+        String newAccess = jwtUtil.createAccessToken(memberDto, accessExpiretime);
 
         //response.setHeader("access", newAccess);
         response.setHeader("Authorization", "Bearer " + newAccess);

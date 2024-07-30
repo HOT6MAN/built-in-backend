@@ -8,6 +8,8 @@ import com.example.hotsix.enums.Process;
 import com.example.hotsix.exception.BuiltInException;
 import com.example.hotsix.oauth.dto.CustomOAuth2User;
 import com.example.hotsix.oauth.dto.UserDTO;
+import com.example.hotsix.service.auth.LoginService;
+import com.example.hotsix.service.auth.LogoutService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
@@ -32,111 +34,146 @@ import java.io.PrintWriter;
 public class JWTFilter extends OncePerRequestFilter {
 
     private final JWTUtil jwtUtil;
-    private final RedisTemplate<String, String> redisTemplate;
+    //private final RedisTemplate<String, String> redisTemplate;
+    private final LogoutService logoutService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         log.info("JWT 필터");
         log.info("request url: {}", request.getRequestURI());
-        log.info("request cookies: {}", request.getCookies());
-
 
         String accessToken = null;
         String refreshToken = null;
         String authorization = null;
-        //처음 로그인시 access토큰이 쿠키에 있어서 쿠키들을 불러온뒤 Authorizaiton key에 담긴 쿠키를 찾음
-        Cookie[] cookies = request.getCookies();
-        log.info("cookies: {}", cookies);
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if(cookie.getName().equals("access")) {
-                    log.info("access cookie: {}", cookie.getValue());
-                    authorization = cookie.getValue();
-                }else if(cookie.getName().equals("refresh")){
-                    refreshToken = cookie.getValue();
-                    log.info("refresh token: {}", refreshToken);
-                    filterChain.doFilter(request, response);
-                    return;
 
-                }
-            }
-
+        refreshToken = getRefreshToken(request);
+        authorization = getAccessTokenFromHeader(request);
+        log.info("refreshToken: {}", refreshToken);
+        log.info("authorization: {}", authorization);
+        // Authorizaion헤더에 토큰이 없음
+//        if(authorization==null){
+//            try{
+//                log.info("Authorizaion헤더에 토큰이 없음");
+//                //filterChain.doFilter(request, response);
+//                throw new BuiltInException(Process.INVALID_USER);
+//            }catch (BuiltInException e){
+//                jwtExceptionHandler(response, e);
+//                return;
+//            }
+//        }
+        //일반 헤더 요청
+        if(authorization!=null && refreshToken==null){
+            log.info("일반 헤더 요청");
             accessToken = authorization;
-        }
 
-        if(accessToken == null && refreshToken == null) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-
-
-        if (accessToken == null) {
-            // Authorizaion헤더에 토큰이 없음
-            if(request.getHeader("Authorization")==null){
+            // accesstoken이 있지만 로그아웃해서 블랙처리된 경우
+            if(accessToken!=null && logoutService.isTokenInRedis(accessToken)) {
+                log.info("로그아웃된 access token");
                 try{
-                    log.info("Authorizaion헤더에 토큰이 없음");
-                    //filterChain.doFilter(request, response);
                     throw new BuiltInException(Process.INVALID_USER);
                 }catch (BuiltInException e){
                     jwtExceptionHandler(response, e);
                     return;
                 }
             }
-            // Authorizaion헤더에 토큰이 있다면 access토큰 얻어오기
-            else{
-                log.info("Authorizaion헤더에 토큰이 있다면 access토큰 얻어오기");
-                authorization = request.getHeader("Authorization");
-                accessToken = authorization;
 
-                // accesstoken이 있지만 로그아웃해서 블랙처리된 경우
-                if(authorization!=null && redisTemplate.hasKey(authorization)) {
-                    log.info("로그아웃된 access token");
-                    try{
-                        //filterChain.doFilter(request, response);
-                        throw new BuiltInException(Process.INVALID_USER);
-                    }catch (BuiltInException e){
-                        jwtExceptionHandler(response, e);
-                        return;
-                    }
-                }
+            //토큰 소멸 시간 검증
+            try{
+                jwtUtil.isExpired(accessToken) ;
+            }catch (ExpiredJwtException e){
+                //response body
+                log.info("Access 토큰 만료");
 
+                PrintWriter writer = response.getWriter();
+                writer.println("access toekn is expired");
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                return;
+            }catch( IllegalArgumentException e){
+                BuiltInException exception = new BuiltInException(Process.EXPIRED_TOKEN);
+                jwtExceptionHandler(response,exception);
+                return;
+            }
 
-                //토큰 소멸 시간 검증
+            //토큰 카테고리가 acceess인지 확인
+            String category = jwtUtil.getCategory(accessToken);
+
+            if(!category.equals("access")){
+                log.info("카테고리가 access가 아니다");
                 try{
-                    jwtUtil.isExpired(accessToken) ;
-                }catch (ExpiredJwtException e){
-                    //response body
-                    log.info("Access 토큰 만료");
-//            log.info(e.getMessage());
-//            BuiltInException exception = new BuiltInException(Process.EXPIRED_TOKEN);
-//            jwtExceptionHandler(response,exception);
-
-                    PrintWriter writer = response.getWriter();
-                    writer.println("access toekn is expired");
-                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                    return;
-                }catch( IllegalArgumentException e){
-                    BuiltInException exception = new BuiltInException(Process.EXPIRED_TOKEN);
-                    jwtExceptionHandler(response,exception);
+                    throw new BuiltInException(Process.INVALID_USER);
+                }catch (BuiltInException e){
+                    jwtExceptionHandler(response, e);
                     return;
                 }
+            }
+            log.info("일반 헤더 요청 JWT 필터 끝");
+            setSecurityContext(request, response, filterChain, accessToken);
+            return;
+        }
+        // reissue요청
+        else if(refreshToken!=null && authorization==null){
+            log.info("리이슈 요청 JWT 필터 끝");
+            filterChain.doFilter(request, response);
+            return;
+        }
 
-                //토큰 카테고리가 acceess인지 확인
-                String category = jwtUtil.getCategory(accessToken);
 
-                if(!category.equals("access")){
-                    log.info("카테고리가 access가 아니다");
-                    try{
-                        throw new BuiltInException(Process.INVALID_USER);
-                    }catch (BuiltInException e){
-                        jwtExceptionHandler(response, e);
-                        return;
-                    }
+        // 처음 로그인시 access쿠키 헤더 전환
+        accessToken = getAccessToeknFromCookie(request);
+        log.info("accessToken 쿠키: {}", accessToken);
+
+        if(accessToken!=null){
+            log.info("처음 로그인 JWT 필터 끝");
+            setSecurityContext(request, response, filterChain, accessToken);
+            return;
+        }
+
+
+        // 가입, 로그인 등 처음에 아무 토큰도 없을 떄
+        if(accessToken==null && refreshToken==null){
+            log.info("가입, 로그인 JWT 필터 끝");
+            filterChain.doFilter(request, response);
+        }
+
+
+    }
+
+
+    private String getAccessTokenFromHeader(HttpServletRequest request) {
+        return request.getHeader("Authorization");
+    }
+
+
+    private String getAccessToeknFromCookie(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals("access")) {
+                    String accessToekn = cookie.getValue();
+                    log.info("accessToekn token: {}", accessToekn);
+                    return accessToekn;
                 }
             }
         }
+        return null;
+    }
 
+
+    private String getRefreshToken(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals("refresh")) {
+                    String refreshToken = cookie.getValue();
+                    return refreshToken;
+                }
+            }
+        }
+        return null;
+    }
+
+
+    private void setSecurityContext(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain, String accessToken) throws IOException, ServletException {
         //토큰에서 id, username과 role 획득
         String username = jwtUtil.getUsername(accessToken);
         String role = jwtUtil.getRole(accessToken);
@@ -161,24 +198,15 @@ public class JWTFilter extends OncePerRequestFilter {
         //세션에 사용자 등록
         SecurityContextHolder.getContext().setAuthentication(authToken);
 
-
-
         filterChain.doFilter(request, response);
-
-
-
-
-
+        return;
     }
 
     public void jwtExceptionHandler(HttpServletResponse response, BuiltInException error) {
-        log.info("error: {}", error.getProcess());
-        log.info("error: {}", error.getProcess().getMessage());
-        log.info("error: {}", error.getProcess().getHttpStatus().value());
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .process(error.getProcess())
                 .build();
-        log.info("errorResponse: {}", errorResponse.getProcess());
+
         APIResponse<Object> apiResponse = APIResponse.builder()
                 .process(ProcessResponse.from(errorResponse.getProcess()))
                 .build();

@@ -5,6 +5,7 @@ import com.example.hotsix.jwt.JWTFilter;
 import com.example.hotsix.jwt.JWTUtil;
 import com.example.hotsix.oauth.CustomSuccessHandler;
 import com.example.hotsix.oauth.CustomOAuth2UserService;
+import com.example.hotsix.service.auth.LogoutService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,7 +34,8 @@ public class SecurityConfig {
 
     private final JWTUtil jwtUtil;
 
-    private final RedisTemplate<String ,String> redisTemplate;
+    //private final RedisTemplate<String ,String> redisTemplate;
+    private final LogoutService logoutService;
 
     @Value("${client.host}")
     private String clinetHost;
@@ -79,7 +81,10 @@ public class SecurityConfig {
 
         //JWTFilter 추가   UsernamePasswordFilter 이전에 등록
         http
-                .addFilterBefore(new JWTFilter(jwtUtil, redisTemplate), UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(new JWTFilter(jwtUtil, logoutService), UsernamePasswordAuthenticationFilter.class);
+        //로그아웃
+        http
+                .addFilterBefore(new CustomLogoutFilter(jwtUtil,logoutService), LogoutFilter.class);
 
 
         //oauth2
@@ -89,19 +94,18 @@ public class SecurityConfig {
                                 .userService(customOAuth2UserService)))
                         .successHandler(customSuccessHandler));
 
-        //로그아웃
-        http
-                .addFilterBefore(new CustomLogoutFilter(redisTemplate, jwtUtil), LogoutFilter.class);
 
 
         //경로별 인가 작업
         http
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/login","/","/join").permitAll()
+                        .requestMatchers("/login","/").permitAll()
                         .requestMatchers("/reissue").permitAll()
                         .requestMatchers("/convert").permitAll()
                         .requestMatchers("/email-link").permitAll()
                         .requestMatchers("/email-login").permitAll()
+                        .requestMatchers("/register").permitAll()
+                        .requestMatchers("/signup").permitAll()
                         .requestMatchers("/email-register").permitAll()
                         .requestMatchers("/hot6man/test/**").permitAll()
                         .requestMatchers(("/member/**")).permitAll()

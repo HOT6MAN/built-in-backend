@@ -1,7 +1,9 @@
 package com.example.hotsix.oauth;
 
+import com.example.hotsix.dto.MemberDto;
 import com.example.hotsix.oauth.dto.CustomOAuth2User;
 import com.example.hotsix.jwt.JWTUtil;
+import com.example.hotsix.service.auth.LoginService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,7 +20,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.concurrent.TimeUnit;
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -34,9 +36,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     @Value("${client.host}")
     private String clinetHost;
 
-    private final JWTUtil jwtUtil;
-
-    private final RedisTemplate<String ,String> redisTemplate;
+    private final LoginService loginService;
 
 
     @Override
@@ -54,17 +54,20 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         String role = auth.getAuthority();
         Long id = customUserDetails.getId();
         String name = customUserDetails.getName();
+        String email = customUserDetails.getEmail();
 
-        //JWT 생성
-        String accessToken = jwtUtil.createAccessToken(id, name, username, role, accessExpiretime);
-        String refreshToken = jwtUtil.createRefreshToken(id, name, username, role, refreshExpiretime);
+        MemberDto memberDto = MemberDto.builder()
+                                    .id(id)
+                                    .name(name)
+                                    .role(role)
+                                    .email(email)
+                                    .build();
+
+        Map<String, Cookie> cookies = loginService.login(email);
 
 
-        //리프레시토큰 저장
-        redisTemplate.opsForValue().set(username, refreshToken, refreshExpiretime, TimeUnit.MILLISECONDS);
-
-        response.addCookie(createCookie("access", accessToken, accessExpiretime));
-        response.addCookie(createCookie("refresh", refreshToken, refreshExpiretime));
+        response.addCookie(cookies.get("access"));
+        response.addCookie(cookies.get("refresh"));
         response.sendRedirect(clinetHost+"/afterlogin");
 
     }

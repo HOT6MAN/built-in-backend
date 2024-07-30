@@ -1,5 +1,6 @@
 package com.example.hotsix.jwt;
 
+import com.example.hotsix.dto.MemberDto;
 import io.jsonwebtoken.Jwts;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -40,6 +41,11 @@ public class JWTUtil {
         return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("id", Long.class);
     }
 
+    public String getEmail(String token) {
+
+        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("email", String.class);
+    }
+
 
 
     public Boolean isExpired(String token) {
@@ -64,13 +70,16 @@ public class JWTUtil {
 
 
     //토큰 생성
-    public String createJwt(Long Id,String name, String category, String username, String role, Long expiredMs) {
+    public String createJwt(MemberDto memberDto, String category, Long expiredMs) {
         log.info("[JWTUtil] JWT토큰 생성");
+        Long id = memberDto.getId();
+        String role = memberDto.getRole();
+        String name = memberDto.getName();
+
         return Jwts.builder()
                 .claim("name",name)
-                .claim("id", Id)
+                .claim("id", id)
                 .claim("category",category)
-                .claim("username", username)
                 .claim("role", role)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expiredMs))
@@ -83,18 +92,18 @@ public class JWTUtil {
         return Jwts.builder()
                 .claim("email",email)
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 60*10*1000))
+                .expiration(new Date(System.currentTimeMillis() + 20000))
                 .signWith(secretKey)
                 .compact();
     }
 
 
-    public String createAccessToken(Long id, String name, String username, String role, Long expiredMs) {
-        return createJwt(id,name, "access", username, role, expiredMs);
+    public String createAccessToken(MemberDto memberDto, Long expiredMs) {
+        return createJwt(memberDto, "access", expiredMs);
     }
 
-    public String createRefreshToken(Long id,String name, String username, String role, Long expiredMs) {
-        return createJwt(id,name,"refresh",username, role, expiredMs);
+    public String createRefreshToken(MemberDto memberDto, Long expiredMs) {
+        return createJwt(memberDto, "refresh", expiredMs);
     }
 
 

@@ -1,4 +1,4 @@
-package com.example.hotsix.service.login;
+package com.example.hotsix.service.auth;
 
 import com.example.hotsix.jwt.JWTUtil;
 import lombok.RequiredArgsConstructor;

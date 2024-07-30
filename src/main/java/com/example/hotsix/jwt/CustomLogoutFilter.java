@@ -1,5 +1,13 @@
 package com.example.hotsix.jwt;
 
+import com.example.hotsix.dto.common.APIResponse;
+import com.example.hotsix.dto.common.ErrorResponse;
+import com.example.hotsix.dto.common.ProcessResponse;
+import com.example.hotsix.enums.Process;
+import com.example.hotsix.exception.BuiltInException;
+import com.example.hotsix.service.auth.LogoutService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
@@ -15,6 +23,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.filter.GenericFilterBean;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -23,6 +32,7 @@ public class CustomLogoutFilter extends GenericFilterBean {
 
     private final RedisTemplate<String, String> redisTemplate;
     private final JWTUtil jwtUtil;
+    private final LogoutService logoutService;
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
@@ -33,8 +43,8 @@ public class CustomLogoutFilter extends GenericFilterBean {
         log.info("로그아웃 필터");
         log.info("request url: {}", request.getRequestURI());
         String requestURI = request.getRequestURI();
-        if(!requestURI.matches("^\\/logout$") || requestURI.startsWith("/member/")){
-            System.out.println("member call");
+        if(!requestURI.matches("^\\/logout$")){
+            log.info("/logout 요청이 아님");
             filterChain.doFilter(request, response);
             return;
         }
@@ -51,9 +61,27 @@ public class CustomLogoutFilter extends GenericFilterBean {
         log.info("access: {}", access);
         if(access != null){
             log.info("access토큰 블랙리스트 처리");
-            long remainingTime = jwtUtil.getRemainingTime(access);
-            log.info("remainingTime: {}", remainingTime);
-            redisTemplate.opsForValue().set(access,"logout", remainingTime, TimeUnit.MILLISECONDS);
+            try{
+                long remainingTime = jwtUtil.getRemainingTime(access);
+                logoutService.blacklistAccessToken(access, remainingTime);
+                //redisTemplate.opsForValue().set(access,"logout", remainingTime, TimeUnit.MILLISECONDS);
+            }catch (ExpiredJwtException e){
+                //response body
+                log.info("Access 토큰 만료");
+
+//                PrintWriter writer = response.getWriter();
+//                writer.println("access toekn is expired");
+//                response.setStatus(HttpServletResponse.SC_OK);
+                BuiltInException exception = new BuiltInException(Process.NORMAL_RESPONSE);
+                jwtExceptionHandler(response,exception);
+                return;
+            }catch( IllegalArgumentException e){
+                BuiltInException exception = new BuiltInException(Process.NORMAL_RESPONSE);
+                jwtExceptionHandler(response,exception);
+                return;
+            }
+
+
         }
 
 
@@ -69,19 +97,18 @@ public class CustomLogoutFilter extends GenericFilterBean {
         }
 
         if(refresh==null){
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.setStatus(HttpServletResponse.SC_OK);
             return;
         }
 
-        String value = redisTemplate.opsForValue().get(jwtUtil.getUsername(refresh));
-        if(value == null){
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        if(!logoutService.isTokenInRedis(jwtUtil.getId(refresh).toString())){
+            response.setStatus(HttpServletResponse.SC_OK);
             return;
         }
 
         // 리프레시 토큰 삭제
         log.info("Redis refresh토큰 삭제");
-        redisTemplate.delete(jwtUtil.getUsername(refresh));
+        logoutService.deleteRefreshToken(jwtUtil.getId(refresh).toString());
 
         //리프레시 토큰 쿠키 값 0
         Cookie cookie = new Cookie("refresh",null);
@@ -91,6 +118,29 @@ public class CustomLogoutFilter extends GenericFilterBean {
         log.info("로그아웃 완료");
         response.addCookie(cookie);
         response.setStatus(HttpServletResponse.SC_OK);
+    }
+
+    public void jwtExceptionHandler(HttpServletResponse response, BuiltInException error) {
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .process(error.getProcess())
+                .build();
+        log.info("errorResponse: {}", errorResponse.getProcess());
+        APIResponse<Object> apiResponse = APIResponse.builder()
+                .process(ProcessResponse.from(errorResponse.getProcess()))
+                .build();
+
+
+        response.setStatus(errorResponse.getProcess().getHttpStatus().value());
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        try {
+            String json = new ObjectMapper().writeValueAsString(apiResponse);
+            log.info("json: {}", json);
+            response.getWriter().write(json);
+            return;
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
     }
 
 }

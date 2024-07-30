@@ -15,6 +15,8 @@ public class UserDTO {
     //사용자를 특정할 값
     private String username;
 
+    private String email;
+
     @Override
     public String toString() {
         return "UserDTO{" +
