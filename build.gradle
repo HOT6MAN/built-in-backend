@@ -79,6 +79,7 @@ dependencies {
 
 
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
+    // Swagger
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     //Test용 JUnit
     testImplementation("org.junit.vintage:junit-vintage-engine") {
