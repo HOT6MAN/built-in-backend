@@ -30,7 +30,6 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class CustomLogoutFilter extends GenericFilterBean {
 
-    private final RedisTemplate<String, String> redisTemplate;
     private final JWTUtil jwtUtil;
     private final LogoutService logoutService;
 
