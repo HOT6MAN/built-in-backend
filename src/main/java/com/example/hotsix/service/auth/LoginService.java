@@ -45,11 +45,12 @@ public class LoginService {
     }
 
     public Map<String, Cookie> login(String email) {
+        log.info("loginService email: {}", email);
         Member member = memberRepository.findByEmail(email);
 
         MemberDto memberDto = MemberDto.builder()
                 .id(member.getId())
-                .name(member.getNickname())
+                .name(member.getName())
                 .role(member.getRole())
                 .build();
 

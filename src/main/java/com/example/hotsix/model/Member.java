@@ -76,4 +76,20 @@ public class Member extends BaseEntity{
         return memberDto;
     }
 
+
+    @Override
+    public String toString() {
+        return "Member{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", nickname='" + nickname + '\'' +
+                ", profileUrl='" + profileUrl + '\'' +
+                ", phone='" + phone + '\'' +
+                ", address='" + address + '\'' +
+                ", role='" + role + '\'' +
+                ", lgnMtd='" + lgnMtd + '\'' +
+                ", memberImage=" + memberImage +
+                '}';
+    }
 }

@@ -11,9 +11,11 @@ import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 @Slf4j
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
@@ -57,6 +59,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             Member member = new Member();
             member.setEmail(email);
             member.setNickname(oAuth2Response.getName());
+            member.setName(oAuth2Response.getName());
             member.setRole("ROLE_USER");
             member.setLgnMtd(oAuth2Response.getProvider());
 

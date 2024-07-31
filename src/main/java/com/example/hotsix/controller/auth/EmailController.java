@@ -32,23 +32,27 @@ public class EmailController {
     @Value("${client.host}")
     private String clinetHost;
 
+    // 링크를 생성하고 메일로 보내줌
     @PostMapping("/email-link")
     public String emailLink(@RequestBody String email) {
         log.info(email);
-        Member exist = memberRepository.findByEmail(email);
-
+        Member exist = memberRepository.findByEmail(email.replace("\"", ""));
+        log.info("exist: {}", exist);
         String link = null;
         //이미 존재하는 이메일
         if(exist != null) {
             link = mailLinkService.createLink("email-login", email);
+            mailLinkService.sendMail(email, "login", link);
         }else{
             link = mailLinkService.createLink("register", email);
+            mailLinkService.sendMail(email, "register", link);
         }
-
+        //mailLinkService.sendMail(email, "login", link);
         return link;
     }
 
 
+    // 메일로 온 링크로 들어오면 token검증하고 유효하면 로그인 처리
     @GetMapping("/email-login")
     public void emailLogin(@RequestParam("code") String code, @CookieValue(value = "refresh", required = false) Cookie refresh, HttpServletResponse response) throws IOException {
         String email = null;
@@ -92,6 +96,7 @@ public class EmailController {
         }
     }
 
+    //메일로 온 링크로 들어와서 토큰이 유요하면 프로필 작성 페이지로 리다이렉트
     @GetMapping("/register")
     public void register(@RequestParam("code") String code, HttpServletResponse response){
         log.info("code {}",code);
@@ -100,7 +105,7 @@ public class EmailController {
             if(!isTokenExpired(code)){
                 String email = jwtUtil.getEmail(code);
                 log.info("유효한 토큰 가입페이지로");
-                response.sendRedirect(clinetHost + "/register?email=" + email);
+                response.sendRedirect(clinetHost + "/register?email=" + email.replace("\"", ""));
             }
 
         }catch (JwtException | IOException e){
@@ -114,6 +119,7 @@ public class EmailController {
 
     }
 
+    // 프로필 작성 후 가입 버튼 누를시 가입완료
     @PostMapping("/signup")
     public MemberDto signup(@RequestBody Member member){
         log.info("member {}",member.toString());
