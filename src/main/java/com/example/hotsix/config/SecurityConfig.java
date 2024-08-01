@@ -108,6 +108,7 @@ public class SecurityConfig {
                         .requestMatchers("/register").permitAll()
                         .requestMatchers("/signup").permitAll()
                         .requestMatchers("/email-register").permitAll()
+                        .requestMatchers("/teams/**").permitAll()
                         .requestMatchers("/hot6man/test/**").permitAll()
                         .requestMatchers(("/hot6man/member/**")).permitAll()
                         .requestMatchers("/swagger-ui.html").permitAll()
