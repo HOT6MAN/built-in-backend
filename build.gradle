@@ -79,10 +79,19 @@ dependencies {
     implementation 'org.springframework:spring-messaging'
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
 
-
+    // Jenkins API
+    implementation 'com.offbytwo.jenkins:jenkins-client:0.3.8'
+    implementation group: 'io.github.cdancy', name: 'jenkins-rest', version: '1.0.2'
+    implementation 'com.squareup.okhttp3:okhttp:4.10.0'
+    implementation 'org.apache.httpcomponents:httpclient:4.5.13'
+    implementation 'org.json:json:20230618'
+    implementation 'org.jsoup:jsoup:1.18.1'
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+
     // Swagger
     implementation 'org.springframework.boot:spring-boot-starter-validation'
+
     //Test용 JUnit
     testImplementation("org.junit.vintage:junit-vintage-engine") {
         exclude group: "org.hamcrest", module: "hamcrest-core"

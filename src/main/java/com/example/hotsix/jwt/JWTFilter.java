@@ -41,6 +41,11 @@ public class JWTFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         log.info("JWT 필터");
         log.info("request url: {}", request.getRequestURI());
+        log.info("request cookies: {}", request.getCookies());
+        if(request.getRequestURI().startsWith("/ws/log")){
+            filterChain.doFilter(request,response);
+            return;
+        }
         String requestURL = request.getRequestURI();
 
 

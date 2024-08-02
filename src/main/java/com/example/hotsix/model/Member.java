@@ -1,10 +1,12 @@
 package com.example.hotsix.model;
 
 import com.example.hotsix.dto.member.MemberDto;
-import com.example.hotsix.dto.member.MemberImageDto;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Entity
@@ -49,19 +51,27 @@ public class Member extends BaseEntity{
     @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private MemberImage memberImage;
 
+    @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private MemberProjectCredential memberProjectCredential;
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MemberProjectInfo> memberProjectInfos = new ArrayList<>();
+
     public void setMemberImage(MemberImage memberImage) {
         this.memberImage = memberImage;
         memberImage.setMember(this);
     }
+    public void setMemberProjectCredential(MemberProjectCredential memberProjectCredential) {
+        this.memberProjectCredential = memberProjectCredential;
+        memberProjectCredential.setMember(this);
+    }
+
+    public void setMemberProjectInfo(MemberProjectInfo projectInfo) {
+        this.memberProjectInfos.add(projectInfo);
+        projectInfo.setMember(this);
+    }
 
     public MemberDto toDto(){
-        MemberImageDto imageDto = MemberImageDto.builder()
-                .type(memberImage.getType())
-                .fixedName(memberImage.getFixedName())
-                .originName(memberImage.getOriginName())
-                .saveFolder(memberImage.getSaveFolder())
-                .id(memberImage.getId())
-                .build();
         MemberDto memberDto = MemberDto.builder()
                 .id(this.id)
                 .address(this.address)

@@ -41,6 +41,9 @@ public class MemberServiceImpl implements MemberService{
     }
     @Override
     public Path getImagePath(Member member){
+        if(member.getMemberImage() == null){
+            return Paths.get("C:/upload/img/default-profile.png");
+        }
         String UUID = member.getMemberImage().getFixedName();
         String saveFolder = member.getMemberImage().getSaveFolder();
         String basicPath = "C:/upload/img"+ File.separator+saveFolder+File.separator+UUID;

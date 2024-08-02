@@ -6,6 +6,8 @@ import com.example.hotsix.service.chat.ChatMessageService;
 import com.example.hotsix.service.chat.ChatRoomService;
 import com.example.hotsix.vo.ChatMessageVo;
 import com.example.hotsix.vo.ChatRoomVo;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

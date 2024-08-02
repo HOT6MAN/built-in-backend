@@ -22,7 +22,9 @@ public class WebSockerEventHandler {
     public void handleWebSocketSubscribeListener(SessionSubscribeEvent event) {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
         String destination = headerAccessor.getDestination();
-
+        if(destination != null && destination.startsWith("/ws/log")){
+            return;
+        }
         if (destination != null && destination.startsWith("/sub/status")) {
             Long userId = Long.parseLong(headerAccessor.getFirstNativeHeader("userId"));
             Long chatRoomId = Long.parseLong(headerAccessor.getFirstNativeHeader("chatroomId"));
@@ -36,6 +38,12 @@ public class WebSockerEventHandler {
     @EventListener
     public void handleWebSocketConnectListener(SessionConnectEvent event) {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
+        String destination = headerAccessor.getDestination();
+        System.out.println("destination: " + destination);
+        // /ws/log 경로 무시
+        if (destination != null && destination.startsWith("/ws/log")) {
+            return;
+        }
         Long userId = Long.parseLong(headerAccessor.getFirstNativeHeader("userId"));
         Long chatRoomId = Long.parseLong(headerAccessor.getFirstNativeHeader("chatroomId"));
         Long receiverId = Long.parseLong(headerAccessor.getFirstNativeHeader("receiverId"));
@@ -53,6 +61,10 @@ public class WebSockerEventHandler {
     @EventListener
     public void handleWebSocketDisconnectListener(SessionDisconnectEvent event) {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
+        String destination = headerAccessor.getDestination();
+        if (destination != null && destination.startsWith("/ws/log")) {
+            return;
+        }
         Long userId = (Long) headerAccessor.getSessionAttributes().get("userId");
         Long chatRoomId = (Long) headerAccessor.getSessionAttributes().get("chatRoomId");
         chatRoomService.updateOfflineStatus(chatRoomId, userId);

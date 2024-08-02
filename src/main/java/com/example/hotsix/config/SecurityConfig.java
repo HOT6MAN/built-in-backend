@@ -110,10 +110,14 @@ public class SecurityConfig {
                         .requestMatchers("/email-register").permitAll()
                         .requestMatchers("/teams/**").permitAll()
                         .requestMatchers("/hot6man/test/**").permitAll()
-                        .requestMatchers(("/hot6man/member/**")).permitAll()
+                        .requestMatchers(("/member/**")).permitAll()
+                        .requestMatchers(("/build/**")).permitAll()
+                        .requestMatchers("/log/**").permitAll()
                         .requestMatchers("/swagger-ui.html").permitAll()
                         .requestMatchers("/swagger-ui/**").permitAll()
                         .requestMatchers("/v3/api-docs/**").permitAll()
+                        .requestMatchers("/ws/log/**").permitAll()
+                        .requestMatchers(("/hot6man/member/**")).permitAll()
                         .anyRequest().authenticated());
 
         //세션 설정 : STATELESS

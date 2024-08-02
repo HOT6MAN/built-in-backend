@@ -43,6 +43,44 @@ CREATE TABLE IF NOT EXISTS `ssafy`.`member_image` (
     PRIMARY KEY (`id`),
     FOREIGN KEY (`member_id`) REFERENCES `member`(`id`)
     ) ENGINE = InnoDB;
+
+-- -----------------------------------------------------
+-- Table `ssafy`.`member_project_credential`
+-- -----------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS `ssafy`.`member_project_credential` (
+                                                      `id` BIGINT(20) NOT NULL AUTO_INCREMENT,
+    `member_id` BIGINT(20) NOT NULL,
+    `job_name` VARCHAR(30) NOT NULL,
+    `git_username` VARCHAR(30) NOT NULL,
+    `git_token` VARCHAR(100) NOT NULL,
+    `docker_username` VARCHAR(30) NOT NULL,
+    `docker_token` VARCHAR(100) NOT NULL,
+    `git_credential_id` VARCHAR(50),
+    `docker_credential_id` VARCHAR(50),
+    PRIMARY KEY (`id`),
+    FOREIGN KEY (`member_id`) REFERENCES `member`(`id`)
+    ) ENGINE = InnoDB;
+-- -----------------------------------------------------
+-- Table `ssafy`.`member_project_info`
+-- -----------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS `ssafy`.`member_project_info` (
+                                                      `id` BIGINT(20) NOT NULL AUTO_INCREMENT,
+    `member_id` BIGINT(20) NOT NULL,
+    `backend_git_url` VARCHAR(100) NOT NULL,
+    `backend_git_branch` VARCHAR(30) NOT NULL,
+    `backend_language` VARCHAR(30) NOT NULL,
+    `backend_framework` VARCHAR(30) NOT NULL,
+    `backend_build_tool` VARCHAR(100) NOT NULL,
+    `frontend_framework` VARCHAR(30),
+    `frontend_build_tool` VARCHAR(30),
+    `frontend_git_url` VARCHAR(100),
+    `frontend_git_branch` VARCHAR(30),
+    `database_name` VARCHAR(30),
+    PRIMARY KEY (`id`),
+    FOREIGN KEY (`member_id`) REFERENCES `member`(`id`)
+    ) ENGINE = InnoDB;
 -- -----------------------------------------------------
 -- Table `ssafy`.`following`
 -- -----------------------------------------------------
