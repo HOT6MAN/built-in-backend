@@ -1,2 +1,0 @@
-INSERT INTO member (id, email, nickname, name, profile_url, phone, address, role, lgn_mtd, DEL_YN, REG_DTTM, REG_USER_SEQ, MOD_DTTM, MOD_USER_SEQ)
-VALUES (1, 'ssafy@gmail.com', '싸피', '김싸피', 'https://asdf.com', '010-1234-5678', '역삼동', 'A', 'some_method', TRUE, '2024-04-25 00:00:00', 1, '2024-04-25 00:00:00', 1234);
