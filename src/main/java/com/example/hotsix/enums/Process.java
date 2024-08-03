@@ -18,6 +18,7 @@ public enum Process {
     // 로직 상에서 예상되는 에러가 있을 경우, 여기에 정의해서 사용
     USER_NOT_FOUND(HttpStatus.INTERNAL_SERVER_ERROR, "존재하지 않는 유저입니다"),
     DEAL_NOT_FOUND(HttpStatus.INTERNAL_SERVER_ERROR, "존재하지 않는 상품입니다"),
+    RECRUIT_NOT_FOUND(HttpStatus.BAD_REQUEST, "존재하지 않는 모집글 입니다"),
     INVALID_USER(HttpStatus.UNAUTHORIZED, "잘못된 JWT Token 입니다."),
     EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, "유효기간이 만료된 Token입니다."),
 
