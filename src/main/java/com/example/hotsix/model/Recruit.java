@@ -1,6 +1,7 @@
 package com.example.hotsix.model;
 
 import com.example.hotsix.converter.ListToJsonConverter;
+import com.example.hotsix.dto.recruit.RecruitRequest;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -33,4 +34,12 @@ public class Recruit extends Board {
     @ManyToOne
     @JoinColumn(name = "team_id")
     private Team team;
+
+    public void update(RecruitRequest request) {
+        this.thumbnail = request.thumbnail().getOriginalFilename();
+        this.introduction = request.introduction();
+        this.domain = request.domain();
+        this.desiredPosList = request.desiredPosList();
+        this.content = request.content();
+    }
 }

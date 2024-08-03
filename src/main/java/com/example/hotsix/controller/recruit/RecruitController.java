@@ -15,6 +15,7 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.inject.Provider;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -89,6 +91,24 @@ public class RecruitController {
 
         recruitService.save(newRecruit);
         storageService.store(recruitRequest.thumbnail());
+    }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PatchMapping("/teambuilding/recruit/{id}")
+    public void updateRecruit(@PathVariable("id") Recruit recruit, @ModelAttribute RecruitRequest recruitRequest) throws IOException {
+        String storedThumbnailName = recruit.getThumbnail();
+        MultipartFile uploadedThumbnail = recruitRequest.thumbnail();
+
+        if (storedThumbnailName == null && uploadedThumbnail != null) {
+            storageService.store(uploadedThumbnail);
+        } else if (storedThumbnailName != null && uploadedThumbnail == null) {
+            storageService.remove(storedThumbnailName);
+        } else if (storedThumbnailName != null && uploadedThumbnail != null) {
+            storageService.replace(storedThumbnailName, uploadedThumbnail);
+        }
+
+        recruit.update(recruitRequest);
+        recruitService.save(recruit);
     }
 
     @GetMapping("/team")
