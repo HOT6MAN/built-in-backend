@@ -12,6 +12,7 @@ import com.example.hotsix.service.storage.StorageService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -109,6 +110,14 @@ public class RecruitController {
 
         recruit.update(recruitRequest);
         recruitService.save(recruit);
+    }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @DeleteMapping("/teambuilding/recruit/{id}")
+    public void deleteRecruit(@PathVariable("id") Recruit recruit) throws IOException {
+        storageService.remove(recruit.getThumbnail());
+
+        recruitService.delete(recruit);
     }
 
     @GetMapping("/team")
