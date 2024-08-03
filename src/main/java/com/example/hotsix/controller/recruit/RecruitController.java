@@ -1,30 +1,46 @@
 package com.example.hotsix.controller.recruit;
 
+import com.example.hotsix.dto.recruit.RecruitRequest;
 import com.example.hotsix.dto.recruit.RecruitResponse;
 import com.example.hotsix.dto.recruit.RecruitShortResponse;
 import com.example.hotsix.editor.RecruitPropertyEditor;
+import com.example.hotsix.model.Member;
 import com.example.hotsix.model.Recruit;
+import com.example.hotsix.model.Team;
 import com.example.hotsix.service.recruit.RecruitService;
+import com.example.hotsix.service.storage.StorageService;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.inject.Provider;
 
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class RecruitController {
 
     private final RecruitService recruitService;
+    private final StorageService storageService;
     private final Provider<RecruitPropertyEditor> recruitPropertyEditorProvider;
 
     public RecruitController(RecruitService recruitService,
-                             Provider<RecruitPropertyEditor> recruitPropertyEditorProvider) {
+                      @Qualifier("fileSystemStorageService") StorageService storageService,
+                      Provider<RecruitPropertyEditor> recruitPropertyEditorProvider) {
         this.recruitService = recruitService;
+        this.storageService = storageService;
         this.recruitPropertyEditorProvider = recruitPropertyEditorProvider;
     }
 
@@ -58,5 +74,32 @@ public class RecruitController {
         }
 
         return recruitService.findSummaryAll();
+    }
+
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping("/teambuilding/recruit")
+    public void registerRecruit(@ModelAttribute RecruitRequest recruitRequest /*, @AuthenticationPrincipal Member author */) throws IOException {
+        // TODO: @AuthenticationPrincipal에서 받기
+        Member testMember = new Member(1L, "ssafy", "ssafy@ssafy.com", "ssafy", "X", "010-1111-2222", "addr", "X", "X", null, null, null);
+
+        // TODO: team 가져오기
+        Team recruitingTeam = new Team(1L, "hot6man", "X", "Hello hot6man", LocalDateTime.now(), LocalDateTime.now(), "X", "X");
+
+        Recruit newRecruit = recruitRequest.toEntity(testMember, recruitingTeam);
+
+        recruitService.save(newRecruit);
+        storageService.store(recruitRequest.thumbnail());
+    }
+
+    @GetMapping("/team")
+    public List<Map<Long, String>> myTeams(/*, @AuthenticationPrincipal Member me */) {
+        // TODO: 내가 속한 팀 가져오기
+
+        return Arrays.asList(
+                Map.of(1L, "hot6man"),
+                Map.of(2L, "hot6man2"),
+                Map.of(3L, "hot6man3"),
+                Map.of(4L, "hot6man4")
+        );
     }
 }
