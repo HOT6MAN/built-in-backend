@@ -1,5 +1,5 @@
-drop database if exists `ssafy`;
-create database `ssafy`;
+-- drop database if exists `ssafy`;
+create database if not exists `ssafy`;
 use `ssafy`;
 
 -- MySQL Workbench Forward Engineering
@@ -478,6 +478,33 @@ CREATE TABLE IF NOT EXISTS `ssafy`.`chatroom_status` (
     UNIQUE (`chatroom_id`, `user_id`)
     ) ENGINE = InnoDB;
 
+create table if not exists `ssafy`.`board` (
+       `id` bigint(20) not null auto_increment,
+       `title` varchar(40) not null,
+       `type` enum('RECRUIT') not null,
+       `content` varchar(500) not null,
+       `hit` int not null,
+       `author_id` bigint(20) not null,
+       `DEL_YN` BOOLEAN NOT NULL,
+       `REG_DTTM` TIMESTAMP NOT NULL,
+       `REG_USER_SEQ` BIGINT(20) NOT NULL,
+       `MOD_DTTM` TIMESTAMP NOT NULL,
+       `MOD_USER_SEQ` BIGINT(20) NOT NULL,
+       primary key (`id`),
+       foreign key (`author_id`) references `member`(`id`)
+) ENGINE = InnoDB;
+
+create table if not exists `ssafy`.`recruit` (
+     `id` bigint(20) not null,
+     `introduction` varchar(50) not null,
+     `thumbnail` varchar(100) not null,
+     `domain` varchar(20) not null,
+     `desired_pos_list` json not null,
+     `team_id` bigint(20) not null,
+     primary key (`id`),
+     foreign key (`id`) references `board`(`id`),
+     foreign key (`team_id`) references `team`(`id`)
+) ENGINE = InnoDB;
 
 
 SET SQL_MODE=@OLD_SQL_MODE;
