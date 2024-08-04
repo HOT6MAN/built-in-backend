@@ -117,3 +117,6 @@ tasks.register('copySubmodule', Copy) {
     include '*.yml'
     into './src/main/resources'
 }
+tasks.withType(Jar) {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
