@@ -35,6 +35,13 @@ dependencyManagement {
         /** =========== DynamoDB 및 AWS CLI 의존성 끝 =======================*/
     }
 }
+
+springBoot {
+    bootJar {
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    }
+}
+
 dependencies {
     implementation 'jakarta.inject:jakarta.inject-api:2.0.1'
 
