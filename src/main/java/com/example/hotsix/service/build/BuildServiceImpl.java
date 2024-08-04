@@ -1,14 +1,21 @@
 package com.example.hotsix.service.build;
 
-import com.example.hotsix.dto.build.MemberProjectCredentialDto;
-import com.example.hotsix.dto.build.MemberProjectInfoDto;
+import com.example.hotsix.dto.build.*;
 import com.example.hotsix.model.Member;
-import com.example.hotsix.model.MemberProjectCredential;
-import com.example.hotsix.model.MemberProjectInfo;
+import com.example.hotsix.model.TeamProjectCredential;
+import com.example.hotsix.model.Team;
+import com.example.hotsix.model.project.BackendConfig;
+import com.example.hotsix.model.project.DatabaseConfig;
+import com.example.hotsix.model.project.FrontendConfig;
+import com.example.hotsix.model.project.TeamProjectInfo;
 import com.example.hotsix.repository.build.BuildRepository;
+import com.example.hotsix.repository.build.ServiceScheduleRepository;
 import com.example.hotsix.repository.member.MemberRepository;
+import com.example.hotsix.repository.team.TeamProjectInfoRepository;
+import com.example.hotsix.repository.team.TeamRepository;
 import com.example.hotsix.util.LocalTimeUtil;
 import lombok.RequiredArgsConstructor;
+import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -33,12 +40,17 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class BuildServiceImpl implements BuildService{
     private final BuildRepository buildRespository;
     private final MemberRepository memberRepository;
+    private final TeamRepository teamRepository;
+    private final TeamProjectInfoRepository teamProjectInfoRepository;
+    private final ServiceScheduleRepository serviceScheduleRepository;
+
     private static final String GIT_TYPE = "git";
     private static final String DOCKER_TYPE = "docker";
     private static final String JOB_NAME = "service-deploy";
@@ -54,95 +66,117 @@ public class BuildServiceImpl implements BuildService{
     private String hostJenkinsToken;
 
     @Override
-    @Transactional
-    public boolean insertMemberBuildInfo(Long memberId,
-                                         MemberProjectCredentialDto buildDto,
-                                         MemberProjectInfoDto projectInfoDto) {
-        Member member = memberRepository.findMemberById(memberId);
-        if(member.getMemberProjectCredential() == null){
-            MemberProjectCredential memberProjectCredential = MemberProjectCredential.builder()
-                    .gitUsername(buildDto.getGitUsername())
-                    .gitToken(buildDto.getGitToken())
-                    .dockerUsername(buildDto.getDockerUsername())
-                    .dockerToken(buildDto.getDockerToken())
-                    .build();
-            member.setMemberProjectCredential(memberProjectCredential);
-        }
-        else{
-            member.getMemberProjectCredential().setPropertiesFromDto(buildDto);
-        }
-        if(member.getMemberProjectInfos().isEmpty()){
-            member.setMemberProjectInfo(projectInfoDto.toEntity());
-        }
-        else{
-            MemberProjectInfo memberProjectInfo = buildRespository.findMemberProjectInfoByMemberAndInfoId(member.getId(), projectInfoDto.getId());
-            memberProjectInfo.setPropertiesFromDto(projectInfoDto);
-        }
-        memberRepository.save(member);
-        return true;
-    }
+    public void buildStart(Long teamId, Long teamProjectInfoId){
+        TeamProjectInfo teamProjectInfo = teamProjectInfoRepository.findProjectInfoByProjectInfoId(teamProjectInfoId);
+        Long emptyServiceId = serviceScheduleRepository.findEmptyService();
 
-    @Override
-    public MemberProjectCredentialDto getMemberBuildInfo(Long memberId) {
-        return memberRepository.findMemberById(memberId).getMemberProjectCredential().toDto();
-    }
-
-    @Override
-    @Transactional
-    public boolean MemberProjectBuildStart(Long memberId, Long projectInfoId){
-        Member member = memberRepository.findMemberProfileByMemberId(memberId);
-        MemberProjectInfo memberProjectInfo = buildRespository.findMemberProjectInfoByMemberAndInfoId(memberId, projectInfoId);
-        MemberProjectCredential memberProjectCredential = member.getMemberProjectCredential();
-
-        try (CloseableHttpClient httpClient = createHttpClient(hostJenkinsUsername, hostJenkinsToken)){
+        String servicePort = "SERVICE"+emptyServiceId;
+        try(CloseableHttpClient httpClient = createHttpClient(hostJenkinsUsername, hostJenkinsToken)){
             String crumb = getCrumb(httpClient, hostJenkinsUrl, hostJenkinsUsername, hostJenkinsToken);
-
-            ensureCredentials(memberProjectCredential, GIT_TYPE);
-            ensureCredentials(memberProjectCredential, DOCKER_TYPE);
-
-            String[] crumbParts = crumb.split(":");
-            String crumbFieldName = crumbParts[0];
-            String crumbValue = crumbParts[1];
-            System.out.println();
-            HttpPost httpPost = new HttpPost(hostJenkinsUrl+BUILD_WITH_PARAMETERS_URL);
+            createJenkinsBackendInstance(teamProjectInfo.getBackendConfigs(), httpClient, crumb, servicePort);
 
 
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+
+    }
+
+    public void createJenkinsBackendInstance(List<BackendConfig> backendConfigs,
+                                             CloseableHttpClient httpClient,
+                                             String crumb,
+                                             String servicePort) throws IOException {
+        System.out.println("Crumb = "+crumb);
+        String[] crumbParts = crumb.split(":");
+        String crumbFieldName = crumbParts[0];
+        String crumbValue = crumbParts[1];
+
+        for(BackendConfig config : backendConfigs){
+            String hostJobName = "";
+            if("Java/Spring".equals(config.getLanguage())){
+                hostJobName = hostJenkinsUrl+"job/built_in_backend_docker/buildWithParameters";
+            }
+            HttpPost httpPost = new HttpPost(hostJobName);
             httpPost.setHeader(crumbFieldName, crumbValue);
-            System.out.println("crumb = "+crumb);
             httpPost.setHeader("Authorization", "Basic " + Base64.getEncoder().encodeToString((hostJenkinsUsername + ":" + hostJenkinsToken).getBytes()));
 
-            setParametersToHttpPost(httpPost, memberProjectInfo, memberProjectCredential);
-
-            CloseableHttpResponse response = httpClient.execute(httpPost);
-            String responseBody = EntityUtils.toString(response.getEntity());
-            int statusCode = response.getStatusLine().getStatusCode();
-            System.out.println("Response Status: " + statusCode);
-            System.out.println("Response Body: " + responseBody);
-            return true;
-        }catch(Exception e){
-            e.printStackTrace();
-            return false;
-        }
-    }
-    private void ensureCredentials(MemberProjectCredential credential, String type) throws Exception {
-        String credentialId = GIT_TYPE.equals(type) ? credential.getGitCredentialId() : credential.getDockerCredentialId();
-        if (credentialId == null) {
-            JSONObject newCredential = createCredentials(credential, "", type);
-            addCredentials(newCredential);
-            memberRepository.save(credential.getMember());
+            String eigenServiceName = UUID.randomUUID().toString();
+            List<NameValuePair> params = new ArrayList<>();
+            // JDK 17 이런식으로 jdk하는건 아직 구현 안함.
+            // Gradle 같이 Build 도구도 아직 구현 안함.
+            params.add(new BasicNameValuePair("GIT_URL", config.getGitUrl()));
+            params.add(new BasicNameValuePair("GIT_BRANCH", config.getGitBranch()));
+            params.add(new BasicNameValuePair("GIT_USERNAME", config.getGitUsername()));
+            params.add(new BasicNameValuePair("GIT_ACCESS_TOKEN", config.getGitAccessToken()));
+            params.add(new BasicNameValuePair("SAVE_DIRECTORY", servicePort));
+            params.add(new BasicNameValuePair("SERVICE_ID", eigenServiceName));
+            UrlEncodedFormEntity entity = new UrlEncodedFormEntity(params, StandardCharsets.UTF_8);
+            httpPost.setEntity(entity);
+            System.out.println("Call HttpClient execute");
+            HttpResponse response = httpClient.execute(httpPost);
+            System.out.println("Response status: " + response.getStatusLine().getStatusCode());
+            System.out.println("Response body: " + EntityUtils.toString(response.getEntity()));
         }
     }
 
-    public void setParametersToHttpPost(HttpPost httpPost, MemberProjectInfo projectInfo
-                                                        ,MemberProjectCredential credential){
-        List<NameValuePair> params = new ArrayList<>();
-        params.add(new BasicNameValuePair("GIT_URL", projectInfo.getBackendGitUrl()));
-        params.add(new BasicNameValuePair("GIT_BRANCH", projectInfo.getBackendGitBranch()));
-        params.add(new BasicNameValuePair("GIT_CREDENTIAL", credential.getGitCredentialId()));
-        params.add(new BasicNameValuePair("DOCKER_CREDENTIAL", credential.getDockerCredentialId()));
-        UrlEncodedFormEntity entity = new UrlEncodedFormEntity(params, StandardCharsets.UTF_8);
-        httpPost.setEntity(entity);
+
+    @Override
+    @Transactional
+    public boolean MemberProjectBuildStart(Long teamId, Long projectInfoId){
+//        TeamProjectInfo memberProjectInfo = buildRespository.findTeamProjectInfoByMemberAndInfoId(memberId, projectInfoId);
+//        TeamProjectCredential memberProjectCredential = member.getMemberProjectCredential();
+//
+//        try (CloseableHttpClient httpClient = createHttpClient(hostJenkinsUsername, hostJenkinsToken)){
+//            String crumb = getCrumb(httpClient, hostJenkinsUrl, hostJenkinsUsername, hostJenkinsToken);
+//
+//            ensureCredentials(memberProjectCredential, GIT_TYPE);
+//            ensureCredentials(memberProjectCredential, DOCKER_TYPE);
+//
+//            String[] crumbParts = crumb.split(":");
+//            String crumbFieldName = crumbParts[0];
+//            String crumbValue = crumbParts[1];
+//            System.out.println();
+//            HttpPost httpPost = new HttpPost(hostJenkinsUrl+BUILD_WITH_PARAMETERS_URL);
+//
+//
+//            httpPost.setHeader(crumbFieldName, crumbValue);
+//            System.out.println("crumb = "+crumb);
+//            httpPost.setHeader("Authorization", "Basic " + Base64.getEncoder().encodeToString((hostJenkinsUsername + ":" + hostJenkinsToken).getBytes()));
+//
+//            setParametersToHttpPost(httpPost, memberProjectInfo, memberProjectCredential);
+//
+//            CloseableHttpResponse response = httpClient.execute(httpPost);
+//            String responseBody = EntityUtils.toString(response.getEntity());
+//            int statusCode = response.getStatusLine().getStatusCode();
+//            System.out.println("Response Status: " + statusCode);
+//            System.out.println("Response Body: " + responseBody);
+//            return true;
+//        }catch(Exception e){
+//            e.printStackTrace();
+//            return false;
+//        }
+        return true;
     }
+//    private void ensureCredentials(TeamProjectCredential credential, String type) throws Exception {
+//        String credentialId = GIT_TYPE.equals(type) ? credential.getGitCredentialId() : credential.getDockerCredentialId();
+//        if (credentialId == null) {
+//            JSONObject newCredential = createCredentials(credential, "", type);
+//            addCredentials(newCredential);
+//            memberRepository.save(credential.getMember());
+//        }
+//    }
+//
+//    public void setParametersToHttpPost(HttpPost httpPost, TeamProjectInfo projectInfo
+//                                                        , TeamProjectCredential credential){
+//        List<NameValuePair> params = new ArrayList<>();
+//        params.add(new BasicNameValuePair("GIT_URL", projectInfo.getBackendGitUrl()));
+//        params.add(new BasicNameValuePair("GIT_BRANCH", projectInfo.getBackendGitBranch()));
+//        params.add(new BasicNameValuePair("GIT_CREDENTIAL", credential.getGitCredentialId()));
+//        params.add(new BasicNameValuePair("DOCKER_CREDENTIAL", credential.getDockerCredentialId()));
+//        UrlEncodedFormEntity entity = new UrlEncodedFormEntity(params, StandardCharsets.UTF_8);
+//        httpPost.setEntity(entity);
+//    }
     /**
      *
      * @param username
@@ -198,7 +232,7 @@ public class BuildServiceImpl implements BuildService{
      * 현재는 무조건 UsernamePasswordCredential을 생성함.
      * Parameter는 모두 Jenkins의 add credential시 필요한 변수들
      */
-    public JSONObject createCredentials(MemberProjectCredential credential,
+    public JSONObject createCredentials(TeamProjectCredential credential,
                                         String description, String credentialType) {
         JSONObject credentials = new JSONObject();
         JSONObject credentialsData = new JSONObject();

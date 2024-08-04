@@ -20,7 +20,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.Arrays;
 import java.util.Collections;
 
 @Configuration
@@ -38,69 +40,45 @@ public class SecurityConfig {
     private final LogoutService logoutService;
 
     @Value("${client.host}")
-    private String clinetHost;
+    private String clientHost;
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws  Exception{
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-        //CORS
+        // CORS
         http
-                .cors(corsCustomizer -> corsCustomizer.configurationSource(new CorsConfigurationSource() {
+                .cors(corsCustomizer -> corsCustomizer.configurationSource(corsConfigurationSource()));
 
-                    @Override
-                    public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
-
-                        CorsConfiguration configuration = new CorsConfiguration();
-
-                        configuration.setAllowedOrigins(Collections.singletonList(clinetHost));
-                        configuration.setAllowedMethods(Collections.singletonList("*")); //GET, POSt, PUT 등 모든 요청 허용
-                        configuration.setAllowCredentials(true);
-                        configuration.setAllowedHeaders(Collections.singletonList("*")); //받을 헤더값 세팅
-                        configuration.setMaxAge(3600L);
-
-                        configuration.setExposedHeaders(Collections.singletonList("Set-Cookie"));
-                        configuration.setExposedHeaders(Collections.singletonList("Authorization"));
-
-                        return configuration;
-                    }
-                }));
-
-
-        //csrf disable
+        // CSRF disable
         http
                 .csrf((auth) -> auth.disable());
 
-        //From 로그인 방식 disable
+        // Form 로그인 방식 disable
         http
                 .formLogin((auth) -> auth.disable());
 
-        //HTTP Basic 인증 방식 disable
+        // HTTP Basic 인증 방식 disable
         http
                 .httpBasic((auth) -> auth.disable());
 
-
-        //JWTFilter 추가   UsernamePasswordFilter 이전에 등록
+        // JWTFilter 추가   UsernamePasswordFilter 이전에 등록
         http
                 .addFilterBefore(new JWTFilter(jwtUtil, logoutService), UsernamePasswordAuthenticationFilter.class);
-        //로그아웃
+        // 로그아웃
         http
-                .addFilterBefore(new CustomLogoutFilter(jwtUtil,logoutService), LogoutFilter.class);
+                .addFilterBefore(new CustomLogoutFilter(jwtUtil, logoutService), LogoutFilter.class);
 
-
-        //oauth2
+        // oauth2
         http
                 .oauth2Login((oauth2) -> oauth2
                         .userInfoEndpoint((userInfoEndpointConfig -> userInfoEndpointConfig
                                 .userService(customOAuth2UserService)))
                         .successHandler(customSuccessHandler));
 
-
-
-        //경로별 인가 작업
+        // 경로별 인가 작업
         http
                 .authorizeHttpRequests((auth) -> auth
-//                        .requestMatchers("/**").permitAll()
-                        .requestMatchers("/login","/").permitAll()
+                        .requestMatchers("/login", "/").permitAll()
                         .requestMatchers("/reissue").permitAll()
                         .requestMatchers("/convert").permitAll()
                         .requestMatchers("/email-link").permitAll()
@@ -120,14 +98,28 @@ public class SecurityConfig {
                         .requestMatchers(("/hot6man/member/**")).permitAll()
                         .anyRequest().authenticated());
 
-        //세션 설정 : STATELESS
+        // 세션 설정 : STATELESS
         http
                 .sessionManagement((session) -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         return http.build();
-
-
     }
 
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+//        configuration.setAllowedOrigins(Collections.singletonList(clientHost));
+        configuration.setAllowedOrigins(Arrays.asList(clientHost, "http://localhost:5173"));
+        configuration.setAllowedMethods(Collections.singletonList("*")); // GET, POST, PUT 등 모든 요청 허용
+        configuration.setAllowCredentials(true);
+        configuration.setAllowedHeaders(Collections.singletonList("*")); // 받을 헤더값 세팅
+        configuration.setMaxAge(3600L);
+        configuration.addExposedHeader("Set-Cookie");
+        configuration.addExposedHeader("Authorization");
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
 }

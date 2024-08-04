@@ -5,5 +5,6 @@ import com.example.hotsix.model.Team;
 public interface TeamRepositoryCustom {
 
     Team findAllTeamByMemberId(Long id);
+    Team findTeamByTeamId(Long teamId);
 
 }

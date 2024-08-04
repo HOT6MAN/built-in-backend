@@ -1,7 +1,7 @@
 package com.example.hotsix.repository.build;
 
-import com.example.hotsix.model.MemberProjectInfo;
+import com.example.hotsix.model.project.TeamProjectInfo;
 
 public interface BuildRepositoryCustom {
-    MemberProjectInfo findMemberProjectInfoByMemberAndInfoId(Long memberId, Long projectId);
+    TeamProjectInfo findTeamProjectInfoByMemberAndInfoId(Long memberId, Long projectId);
 }

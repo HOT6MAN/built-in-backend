@@ -1,14 +1,14 @@
 package com.example.hotsix.model;
 
+import com.example.hotsix.model.project.TeamProjectInfo;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -47,11 +47,27 @@ public class Team extends BaseEntity{
     @Column(name="jira_url")
     private String jiraUrl;
 
-//    @OneToMany
-//    @JoinColumn(name = "team_id")
-//    private List<MemberTeam> memberTeams = new ArrayList<>();
+    @OneToMany(mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ServiceSchedule> schedules = new ArrayList<>();
+    @JsonManagedReference
+    @OneToMany(mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TeamProjectInfo> teamProjectInfos = new ArrayList<>();
+
+    @OneToOne(mappedBy = "team", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private TeamProjectCredential teamProjectCredential;
 
 
+    public void addTeamProjectInfo(TeamProjectInfo teamProjectInfo) {
+        teamProjectInfos.add(teamProjectInfo);
+        teamProjectInfo.setTeam(this);
+    }
 
-
+    public void removeTeamProjectInfo(TeamProjectInfo teamProjectInfo) {
+        teamProjectInfos.remove(teamProjectInfo);
+        teamProjectInfo.setTeam(null);
+    }
+    public void setMemberProjectCredential(TeamProjectCredential teamProjectCredential) {
+        this.teamProjectCredential = teamProjectCredential;
+        teamProjectCredential.setTeam(this);
+    }
 }

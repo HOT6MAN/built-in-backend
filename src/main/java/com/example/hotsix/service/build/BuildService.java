@@ -1,12 +1,10 @@
 package com.example.hotsix.service.build;
 
-import com.example.hotsix.dto.build.MemberProjectCredentialDto;
-import com.example.hotsix.dto.build.MemberProjectInfoDto;
-
-import java.io.IOException;
+import com.example.hotsix.dto.build.ProjectInfoDto;
+import com.example.hotsix.dto.build.TeamProjectCredentialDto;
+import com.example.hotsix.dto.build.TeamProjectInfoDto;
 
 public interface BuildService {
-    boolean insertMemberBuildInfo(Long memberId, MemberProjectCredentialDto buildDto, MemberProjectInfoDto projectInfoDto);
-    MemberProjectCredentialDto getMemberBuildInfo(Long memberId);
     boolean MemberProjectBuildStart(Long memberId, Long projectInfoId);
+    void buildStart(Long teamId, Long teamProjectInfoId);
 }

@@ -5,6 +5,8 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import static com.example.hotsix.model.QTeam.team;
+
 @Repository
 @RequiredArgsConstructor
 public class TeamRepositoryImpl implements TeamRepositoryCustom {
@@ -14,5 +16,12 @@ public class TeamRepositoryImpl implements TeamRepositoryCustom {
     @Override
     public Team findAllTeamByMemberId(Long id) {
         return null;
+    }
+
+    @Override
+    public Team findTeamByTeamId(Long teamId) {
+        return queryFactory.selectFrom(team)
+                .where(team.id.eq(teamId))
+                .fetchOne();
     }
 }

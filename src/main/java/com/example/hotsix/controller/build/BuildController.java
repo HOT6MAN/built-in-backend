@@ -1,24 +1,14 @@
 package com.example.hotsix.controller.build;
 
 
-import com.example.hotsix.dto.build.MemberProjectCredentialDto;
-import com.example.hotsix.dto.build.MemberProjectInfoDto;
+import com.example.hotsix.dto.build.*;
+import com.example.hotsix.model.project.TeamProjectInfo;
 import com.example.hotsix.service.build.BuildService;
-import com.example.hotsix.service.build.BuildServiceImpl;
+import com.example.hotsix.service.team.TeamProjectInfoService;
 import lombok.RequiredArgsConstructor;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 
 @RestController
@@ -26,21 +16,65 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BuildController {
     private final BuildService buildService;
+    private final TeamProjectInfoService teamProjectInfoService;
 
-    @PostMapping("/{memberId}")
-    public String insertMemberProjectCredential(@PathVariable("memberId") Long memberId,
-                                                @RequestBody MemberProjectCredentialDto credential,
-                                                @RequestBody MemberProjectInfoDto info){
-        boolean result = buildService.insertMemberBuildInfo(memberId, credential, info);
-        if(result){
-            return "success";
+    @PostMapping("/{teamId}/{projectInfoId}")
+    public String insertTeamProjectCredential(@PathVariable("teamId") Long teamId,
+                                                @PathVariable("projectInfoId") Long projectInfoId,
+                                                @RequestBody ProjectInfoDto projectInfoDto)
+    {
+        teamProjectInfoService.insertAllTeamProjectInfo(teamId, projectInfoId, projectInfoDto);
+        System.out.println("dtos = "+projectInfoDto);
+        return null;
+    }
+    @PostMapping("/project/{teamId}")
+    public String insertTeamProjectInfo(@PathVariable("teamId")Long teamId){
+        teamProjectInfoService.insertEmptyTeamProjectInfo(teamId);
+        return "success";
+    }
+    @PostMapping("/project/backend/{projectInfoId}")
+    public String saveBackendConfigs(@PathVariable("projectInfoId")Long projectInfoId,
+                                     @RequestBody BackendConfigDto[] dtos){
+        for(BackendConfigDto dto : dtos){
+            System.out.println(dto);
         }
-        return "fail";
+        Boolean flag = teamProjectInfoService.saveBackendConfigs(projectInfoId, dtos);
+        if(flag) return "success";
+        else return "fail";
     }
-    @GetMapping("/{memberId}")
-    public MemberProjectCredentialDto findMemberProjectCredential(@PathVariable("memberId") Long memberId){
-        return buildService.getMemberBuildInfo(memberId);
+    @PostMapping("/project/frontend/{projectInfoId}")
+    public String saveFrontendConfigs(@PathVariable("projectInfoId")Long projectInfoId,
+                                      @RequestBody FrontendConfigDto[] dtos){
+        for(FrontendConfigDto dto : dtos){
+            System.out.println(dto);
+        }
+        Boolean flag = teamProjectInfoService.saveFrontendConfigs(projectInfoId, dtos);
+        if(flag) return "success";
+        else return "fail";
     }
+    @PostMapping("/project/database/{projectInfoId}")
+    public String saveDatabaseConfigs(@PathVariable("projectInfoId")Long projectInfoId,
+                                      @RequestBody DatabaseConfigDto[] dtos){
+        for(DatabaseConfigDto dto : dtos){
+            System.out.println(dto);
+        }
+        Boolean flag = teamProjectInfoService.saveDatabaseConfigs(projectInfoId, dtos);
+        if(flag) return "success";
+        else return "fail";
+    }
+    @GetMapping("/project/{teamId}")
+    public List<TeamProjectInfoDto> findAllProjectInfosByTeamId(@PathVariable("teamId")Long teamId){
+        List<TeamProjectInfo> list = teamProjectInfoService.findAllProjectInfosByTeamId(teamId);
+        List<TeamProjectInfoDto> returnList = new ArrayList<>();
+        for(TeamProjectInfo entity: list){
+            returnList.add(entity.toDto());
+        }
+        for(TeamProjectInfo teamProjectInfo : list){
+            System.out.println(teamProjectInfo);
+        }
+        return returnList;
+    }
+
 
     @GetMapping("/deploy/{memberId}/{projectId}")
     public void deployMemberProject(@PathVariable("memberId")Long memberId, @PathVariable("projectId")Long projectId){
@@ -48,4 +82,9 @@ public class BuildController {
         buildService.MemberProjectBuildStart(memberId, projectId);
     }
 
+    @PostMapping("/deploy/{teamId}/{projectInfoId}")
+    public void buildStart(@PathVariable("teamId")Long teamId, @PathVariable("projectInfoId")Long projectInfoId){
+        System.out.println("call build start");
+        buildService.buildStart(teamId, projectInfoId);
+    }
 }

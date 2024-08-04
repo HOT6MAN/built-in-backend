@@ -45,6 +45,18 @@ CREATE TABLE IF NOT EXISTS `ssafy`.`member_image` (
     ) ENGINE = InnoDB;
 
 -- -----------------------------------------------------
+-- Table `ssafy`.`service_schedule`
+-- -----------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS `ssafy`.`service_schedule` (
+                                                      `id` BIGINT(20) NOT NULL AUTO_INCREMENT,
+    `team_id` BIGINT(20) ,
+    `is_used` VARCHAR(255),
+    PRIMARY KEY (`id`),
+    FOREIGN KEY (`team_id`) REFERENCES `team`(`id`)
+    ) ENGINE = InnoDB;
+
+-- -----------------------------------------------------
 -- Table `ssafy`.`member_project_credential`
 -- -----------------------------------------------------
 
@@ -62,24 +74,74 @@ CREATE TABLE IF NOT EXISTS `ssafy`.`member_project_credential` (
     FOREIGN KEY (`member_id`) REFERENCES `member`(`id`)
     ) ENGINE = InnoDB;
 -- -----------------------------------------------------
--- Table `ssafy`.`member_project_info`
+-- Table `ssafy`.`team_project_info`
 -- -----------------------------------------------------
-
-CREATE TABLE IF NOT EXISTS `ssafy`.`member_project_info` (
-                                                      `id` BIGINT(20) NOT NULL AUTO_INCREMENT,
-    `member_id` BIGINT(20) NOT NULL,
-    `backend_git_url` VARCHAR(100) NOT NULL,
-    `backend_git_branch` VARCHAR(30) NOT NULL,
-    `backend_language` VARCHAR(30) NOT NULL,
-    `backend_framework` VARCHAR(30) NOT NULL,
-    `backend_build_tool` VARCHAR(100) NOT NULL,
-    `frontend_framework` VARCHAR(30),
-    `frontend_build_tool` VARCHAR(30),
-    `frontend_git_url` VARCHAR(100),
-    `frontend_git_branch` VARCHAR(30),
-    `database_name` VARCHAR(30),
+CREATE TABLE IF NOT EXISTS `ssafy`.`team_project_info` (
+                                                           `id` BIGINT(20) NOT NULL AUTO_INCREMENT,
+    `team_id` BIGINT(20),
+    `title` VARCHAR(30),
     PRIMARY KEY (`id`),
-    FOREIGN KEY (`member_id`) REFERENCES `member`(`id`)
+    CONSTRAINT `fk_team_project_info_team`
+    FOREIGN KEY (`team_id`)
+    REFERENCES `ssafy`.`team` (`id`)
+    ON DELETE CASCADE
+    ) ENGINE = InnoDB;
+
+-- -----------------------------------------------------
+-- Table `ssafy`.`backend_config`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ssafy`.`backend_config` (
+                                                        `id` BIGINT(20) NOT NULL AUTO_INCREMENT,
+    `project_info_id` BIGINT(20),
+    `git_url` VARCHAR(255),
+    `git_branch` VARCHAR(255),
+    `git_username` VARCHAR(255),
+    `git_access_token` VARCHAR(255),
+    `language` VARCHAR(255),
+    `language_version` VARCHAR(255),
+    `framework` VARCHAR(255),
+    `build_tool` VARCHAR(255),
+    PRIMARY KEY (`id`),
+    CONSTRAINT `fk_backend_config_project_info`
+    FOREIGN KEY (`project_info_id`)
+    REFERENCES `ssafy`.`team_project_info` (`id`)
+    ON DELETE CASCADE
+    ) ENGINE = InnoDB;
+
+-- -----------------------------------------------------
+-- Table `ssafy`.`frontend_config`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ssafy`.`frontend_config` (
+                                                         `id` BIGINT(20) NOT NULL AUTO_INCREMENT,
+    `project_info_id` BIGINT(20),
+    `framework` VARCHAR(255),
+    `version` VARCHAR(255),
+    `git_url` VARCHAR(255),
+    `git_branch` VARCHAR(255),
+    `git_username` VARCHAR(255),
+    `git_access_token` VARCHAR(255),
+    PRIMARY KEY (`id`),
+    CONSTRAINT `fk_frontend_config_project_info`
+    FOREIGN KEY (`project_info_id`)
+    REFERENCES `ssafy`.`team_project_info` (`id`)
+    ON DELETE CASCADE
+    ) ENGINE = InnoDB;
+
+-- -----------------------------------------------------
+-- Table `ssafy`.`database_config`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ssafy`.`database_config` (
+                                                         `id` BIGINT(20) NOT NULL AUTO_INCREMENT,
+    `project_info_id` BIGINT(20),
+    `url` VARCHAR(255),
+    `schema_name` VARCHAR(255),
+    `username` VARCHAR(255),
+    `password` VARCHAR(255),
+    PRIMARY KEY (`id`),
+    CONSTRAINT `fk_database_config_project_info`
+    FOREIGN KEY (`project_info_id`)
+    REFERENCES `ssafy`.`team_project_info` (`id`)
+    ON DELETE CASCADE
     ) ENGINE = InnoDB;
 -- -----------------------------------------------------
 -- Table `ssafy`.`following`

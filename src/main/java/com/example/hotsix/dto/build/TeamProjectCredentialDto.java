@@ -12,7 +12,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class MemberProjectCredentialDto {
+public class TeamProjectCredentialDto {
     private Long id;
     private Member member;
     private String jobName;
