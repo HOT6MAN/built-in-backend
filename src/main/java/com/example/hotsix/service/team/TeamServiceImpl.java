@@ -60,4 +60,18 @@ public class TeamServiceImpl implements TeamService{
                 .map(Team::toDto)
                 .orElse(null);
     }
+
+    @Override
+    public TeamDto updateJiraUrl(String jiraUrl, Long teamId) {
+        Team team = teamRepository.findTeamById(teamId);
+        team.setJiraUrl(jiraUrl);
+        return team.toDto();
+    }
+
+    @Override
+    public TeamDto updateGitUrl(String gitUrl, Long teamId) {
+        Team team = teamRepository.findTeamById(teamId);
+        team.setGitUrl(gitUrl);
+        return team.toDto();
+    }
 }

@@ -51,4 +51,16 @@ public class TeamController {
         return teamDto;
     }
 
+    @PatchMapping("/teams/jira")
+    public TeamDto updateJiraUrl(@RequestBody TeamDto teamDto){
+        teamDto = teamService.updateJiraUrl(teamDto.getJiraUrl(), teamDto.getId());
+        return teamDto;
+    }
+
+    @PatchMapping("/teams/git")
+    public TeamDto updateGitUrl(@RequestBody TeamDto teamDto){
+        teamDto = teamService.updateGitUrl(teamDto.getGitUrl(), teamDto.getId());
+        return teamDto;
+    }
+
 }
