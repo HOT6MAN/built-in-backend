@@ -1,5 +1,6 @@
 package com.example.hotsix.model;
 
+import com.example.hotsix.enums.TeamStatus;
 import com.example.hotsix.model.project.TeamProjectInfo;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.example.hotsix.dto.team.TeamDto;
@@ -30,7 +31,8 @@ public class Team extends BaseEntity{
     private String name;
 
     @Column(name="status", nullable = false)
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private TeamStatus status;
 
     @Column(name="content")
     private String content;
@@ -64,7 +66,7 @@ public class Team extends BaseEntity{
         return TeamDto.builder()
                 .id(id)
                 .name(name)
-                .status(status)
+                .status(String.valueOf(status))
                 .content(content)
                 .startTime(startTime)
                 .endTime(endTime)

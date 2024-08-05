@@ -1,6 +1,7 @@
 package com.example.hotsix.service.team;
 
 import com.example.hotsix.dto.team.TeamDto;
+import com.example.hotsix.enums.TeamStatus;
 import com.example.hotsix.model.Member;
 import com.example.hotsix.model.MemberTeam;
 import com.example.hotsix.model.Team;
@@ -15,6 +16,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.example.hotsix.enums.TeamStatus.FINISH;
+import static com.example.hotsix.enums.TeamStatus.RECRUIT;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -26,6 +30,7 @@ public class TeamServiceImpl implements TeamService{
 
     @Override
     public void createTeam(Team team, Long memberId) {
+        team.setStatus(RECRUIT);
         teamRepository.save(team);
 
         Member member = Member.builder().
@@ -35,6 +40,7 @@ public class TeamServiceImpl implements TeamService{
                 .member(member)
                 .team(team)
                 .leader(true)
+
                 .build();
         memberTeamRepository.save(memberTeam);
     }
@@ -72,6 +78,17 @@ public class TeamServiceImpl implements TeamService{
     public TeamDto updateGitUrl(String gitUrl, Long teamId) {
         Team team = teamRepository.findTeamById(teamId);
         team.setGitUrl(gitUrl);
+        return team.toDto();
+    }
+
+    @Override
+    public TeamDto updateStatus(Long teamId) {
+        Team team = teamRepository.findTeamById(teamId);
+        if(team.getStatus().equals(RECRUIT)) {
+            team.setStatus(FINISH);
+        }else{
+            team.setStatus(RECRUIT);
+        }
         return team.toDto();
     }
 }

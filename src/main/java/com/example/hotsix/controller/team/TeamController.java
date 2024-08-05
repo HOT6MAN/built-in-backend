@@ -63,4 +63,9 @@ public class TeamController {
         return teamDto;
     }
 
+    @PatchMapping("/teams/status")
+    public TeamDto updateStatus(@RequestBody TeamDto teamDto){
+        return teamService.updateStatus(teamDto.getId());
+    }
+
 }

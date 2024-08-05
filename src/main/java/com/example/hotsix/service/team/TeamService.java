@@ -15,4 +15,5 @@ public interface TeamService {
     TeamDto getTeamById(Long teamId);
     TeamDto updateJiraUrl(String jiraUrl, Long teamId);
     TeamDto updateGitUrl(String gitUrl, Long teamId);
+    TeamDto updateStatus(Long teamId);
 }
