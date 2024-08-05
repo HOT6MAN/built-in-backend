@@ -30,7 +30,7 @@ public class TeamProjectInfoServiceImpl implements TeamProjectInfoService{
         TeamProjectInfo teamProjectInfo = TeamProjectInfo.builder()
                 .title("default config")
                 .build();
-        Team team = teamRepository.findTeamByTeamId(teamId);
+        Team team = teamRepository.findTeamById(teamId);
 
         team.addTeamProjectInfo(teamProjectInfo);
         teamProjectInfo.setTeam(team);
@@ -41,7 +41,7 @@ public class TeamProjectInfoServiceImpl implements TeamProjectInfoService{
     @Override
     @Transactional
     public boolean insertAllTeamProjectInfo(Long teamId, Long projectInfoId, ProjectInfoDto projectInfoDto) {
-        Team team = teamRepository.findTeamByTeamId(teamId);
+        Team team = teamRepository.findTeamById(teamId);
         TeamProjectInfo teamProjectInfo = buildRepository.findTeamProjectInfoByMemberAndInfoId(teamId, projectInfoId);
 
         updateBackendConfigs(teamProjectInfo, projectInfoDto.getBackendConfigDtos());
