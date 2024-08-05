@@ -1,18 +1,24 @@
 package com.example.hotsix.service.team;
 
+import com.example.hotsix.dto.team.TeamDto;
+import com.example.hotsix.model.Member;
 import com.example.hotsix.model.MemberTeam;
 import com.example.hotsix.model.Team;
 import com.example.hotsix.repository.team.MemberTeamRepository;
 import com.example.hotsix.repository.team.TeamRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class TeamServiceImpl implements TeamService{
 
     private final TeamRepository teamRepository;
@@ -21,23 +27,37 @@ public class TeamServiceImpl implements TeamService{
     @Override
     public void createTeam(Team team, Long memberId) {
         teamRepository.save(team);
-        Long teamId = team.getId();
+
+        Member member = Member.builder().
+                id(memberId).build();
 
         MemberTeam memberTeam = MemberTeam.builder()
-                .memberId(memberId)
-                .teamId(teamId)
+                .member(member)
+                .team(team)
                 .leader(true)
                 .build();
         memberTeamRepository.save(memberTeam);
     }
 
     @Override
-    public List<Team> getAllMyTeams() {
-        return List.of();
+    public List<TeamDto> getAllMyTeams(Long memberId) {
+        List<Team> allTeamByMemberId = teamRepository.findAllTeamByMemberId(memberId);
+        List<TeamDto> teamDtos=
+                allTeamByMemberId.stream()
+                .map(Team::toDto)
+                .collect(Collectors.toList());
+
+        log.info("allTeamByMemberId: {}", teamDtos.toString());
+
+        return teamDtos;
     }
 
     @Override
-    public Team getTeamById(int id) {
-        return null;
+    public TeamDto getTeamById(Long teamId) {
+        Optional<Team> team = teamRepository.findById(teamId);
+
+        return team
+                .map(Team::toDto)
+                .orElse(null);
     }
 }

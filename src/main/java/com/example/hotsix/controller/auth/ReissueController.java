@@ -2,7 +2,7 @@
 package com.example.hotsix.controller.auth;
 
 
-import com.example.hotsix.dto.MemberDto;
+import com.example.hotsix.dto.member.MemberDto;
 import com.example.hotsix.jwt.JWTUtil;
 import com.example.hotsix.service.auth.LogoutService;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -12,7 +12,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -74,10 +73,12 @@ public class ReissueController {
         String username = jwtUtil.getUsername(refresh);
         String role = jwtUtil.getRole(refresh);
         Long id= jwtUtil.getId(refresh);
-        String name = jwtUtil.getUsername(refresh);
+        String name = jwtUtil.getName(refresh);
+        String email = jwtUtil.getEmail(refresh);
 
         MemberDto memberDto = MemberDto.builder()
                 .id(id)
+                .email(email)
                 .name(name)
                 .role(role)
                 .build();

@@ -1,6 +1,6 @@
 package com.example.hotsix.service.auth;
 
-import com.example.hotsix.dto.MemberDto;
+import com.example.hotsix.dto.member.MemberDto;
 import com.example.hotsix.jwt.JWTUtil;
 import com.example.hotsix.model.Member;
 import com.example.hotsix.repository.member.MemberRepository;
@@ -50,6 +50,7 @@ public class LoginService {
 
         MemberDto memberDto = MemberDto.builder()
                 .id(member.getId())
+                .email(member.getEmail())
                 .name(member.getName())
                 .role(member.getRole())
                 .build();

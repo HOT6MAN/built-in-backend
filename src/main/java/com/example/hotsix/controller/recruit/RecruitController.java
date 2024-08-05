@@ -83,14 +83,14 @@ public class RecruitController {
     @PostMapping("/teambuilding/recruit")
     public void registerRecruit(@ModelAttribute RecruitRequest recruitRequest /*, @AuthenticationPrincipal Member author */) throws IOException {
         // TODO: @AuthenticationPrincipal에서 받기
-        Member testMember = new Member(1L, "ssafy", "ssafy@ssafy.com", "ssafy", "X", "010-1111-2222", "addr", "X", "X", null);
+        //Member testMember = new Member(1L, "ssafy", "ssafy@ssafy.com", "ssafy", "X", "010-1111-2222", "addr", "X", "X", null);
 
         // TODO: team 가져오기
-        Team recruitingTeam = new Team(1L, "hot6man", "X", "Hello hot6man", LocalDateTime.now(), LocalDateTime.now(), "X", "X", null, null, null);
+        //Team recruitingTeam = new Team(1L, "hot6man", "X", "Hello hot6man", LocalDateTime.now(), LocalDateTime.now(), "X", "X", null, null, null);
 
-        Recruit newRecruit = recruitRequest.toEntity(testMember, recruitingTeam);
+        //Recruit newRecruit = recruitRequest.toEntity(testMember, recruitingTeam);
 
-        recruitService.save(newRecruit);
+        //recruitService.save(newRecruit);
         storageService.store(recruitRequest.thumbnail());
     }
 

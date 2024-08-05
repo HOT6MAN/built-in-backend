@@ -1,8 +1,7 @@
 package com.example.hotsix.oauth;
 
-import com.example.hotsix.dto.MemberDto;
+import com.example.hotsix.dto.member.MemberDto;
 import com.example.hotsix.oauth.dto.CustomOAuth2User;
-import com.example.hotsix.jwt.JWTUtil;
 import com.example.hotsix.service.auth.LoginService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -11,7 +10,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;

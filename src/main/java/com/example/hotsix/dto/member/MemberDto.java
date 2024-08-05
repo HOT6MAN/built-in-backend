@@ -18,4 +18,19 @@ public class MemberDto {
     private String address;
     private String role;
     private String lgnMtd;
+
+    @Override
+    public String toString() {
+        return "MemberDto{" +
+                "id=" + id +
+                ", email='" + email + '\'' +
+                ", name='" + name + '\'' +
+                ", nickname='" + nickname + '\'' +
+                ", profileUrl='" + profileUrl + '\'' +
+                ", phone='" + phone + '\'' +
+                ", address='" + address + '\'' +
+                ", role='" + role + '\'' +
+                ", lgnMtd='" + lgnMtd + '\'' +
+                '}';
+    }
 }

@@ -5,6 +5,10 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
+
 @Entity
 @Builder
 @Table(name = "member")
@@ -46,6 +50,9 @@ public class Member extends BaseEntity {
     @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private MemberImage memberImage;
 
+    @OneToMany(mappedBy = "member")
+    private List<MemberTeam> memberTeams = new ArrayList<>();
+
     public void setMemberImage(MemberImage memberImage) {
         this.memberImage = memberImage;
         memberImage.setMember(this);
@@ -64,6 +71,23 @@ public class Member extends BaseEntity {
                 .name(this.name)
                 .build();
     }
+
+    public MemberDto toDtoForMemberTeam(){
+        MemberDto memberDto = MemberDto.builder()
+                .id(this.id)
+                .address(this.address)
+                .role(this.role)
+                .phone(this.phone)
+                .email(this.email)
+                .lgnMtd(this.lgnMtd)
+                .nickname(this.nickname)
+                .profileUrl(this.profileUrl)
+                .name(this.name)
+                .build();
+        return memberDto;
+    }
+
+
 
     @Override
     public String toString() {

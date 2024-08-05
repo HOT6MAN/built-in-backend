@@ -1,6 +1,6 @@
 package com.example.hotsix.jwt;
 
-import com.example.hotsix.dto.MemberDto;
+import com.example.hotsix.dto.member.MemberDto;
 import io.jsonwebtoken.Jwts;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -76,9 +76,11 @@ public class JWTUtil {
         Long id = memberDto.getId();
         String role = memberDto.getRole();
         String name = memberDto.getName();
+        String email = memberDto.getEmail();
 
         return Jwts.builder()
                 .claim("name",name)
+                .claim("email",email)
                 .claim("id", id)
                 .claim("category",category)
                 .claim("role", role)

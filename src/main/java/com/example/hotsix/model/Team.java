@@ -2,6 +2,7 @@ package com.example.hotsix.model;
 
 import com.example.hotsix.model.project.TeamProjectInfo;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.example.hotsix.dto.team.TeamDto;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -10,6 +11,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Builder
@@ -52,10 +54,27 @@ public class Team extends BaseEntity{
     @JsonManagedReference
     @OneToMany(mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TeamProjectInfo> teamProjectInfos = new ArrayList<>();
+    @OneToMany(mappedBy = "team")
+    private List<MemberTeam> memberTeams = new ArrayList<>();
 
     @OneToOne(mappedBy = "team", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private TeamProjectCredential teamProjectCredential;
 
+    public TeamDto toDto(){
+        return TeamDto.builder()
+                .id(id)
+                .name(name)
+                .status(status)
+                .content(content)
+                .startTime(startTime)
+                .endTime(endTime)
+                .gitUrl(gitUrl)
+                .jiraUrl(jiraUrl)
+                .memberTeams(memberTeams.stream()
+                        .map(MemberTeam::toDto)
+                        .collect(Collectors.toList()))
+                .build();
+    }
 
     public void addTeamProjectInfo(TeamProjectInfo teamProjectInfo) {
         teamProjectInfos.add(teamProjectInfo);
@@ -69,5 +88,20 @@ public class Team extends BaseEntity{
     public void setMemberProjectCredential(TeamProjectCredential teamProjectCredential) {
         this.teamProjectCredential = teamProjectCredential;
         teamProjectCredential.setTeam(this);
+    }
+
+    @Override
+    public String toString() {
+        return "Team{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", status='" + status + '\'' +
+                ", content='" + content + '\'' +
+                ", startTime=" + startTime +
+                ", endTime=" + endTime +
+                ", gitUrl='" + gitUrl + '\'' +
+                ", jiraUrl='" + jiraUrl + '\'' +
+                ", memberTeams=" + memberTeams +
+                '}';
     }
 }
