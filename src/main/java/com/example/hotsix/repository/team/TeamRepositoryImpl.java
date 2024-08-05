@@ -43,4 +43,11 @@ public class TeamRepositoryImpl implements TeamRepositoryCustom {
 
         return teams;
     }
+
+    @Override
+    public Team findTeamById(Long id) {
+        return queryFactory.selectFrom(team)
+                .where(team.id.eq(id))
+                .fetchOne();
+    }
 }

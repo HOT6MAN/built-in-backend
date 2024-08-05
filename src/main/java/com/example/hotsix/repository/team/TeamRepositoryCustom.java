@@ -7,5 +7,5 @@ import java.util.List;
 public interface TeamRepositoryCustom {
 
     List<Team> findAllTeamByMemberId(Long id);
-    //Team findTeamById(Long id);
+    Team findTeamById(Long id);
 }
