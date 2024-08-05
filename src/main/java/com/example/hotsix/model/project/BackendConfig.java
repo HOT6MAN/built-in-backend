@@ -1,6 +1,7 @@
 package com.example.hotsix.model.project;
 
 import com.example.hotsix.dto.build.BackendConfigDto;
+import com.example.hotsix.enums.BackendJobName;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
@@ -20,6 +21,10 @@ public class BackendConfig {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_info_id")
     private TeamProjectInfo projectInfo;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "backend_job_name")
+    private BackendJobName backendJobName;
 
     @Column(name = "git_url")
     private String gitUrl;

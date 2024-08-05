@@ -1,6 +1,8 @@
 package com.example.hotsix.model.project;
 
 import com.example.hotsix.dto.build.FrontendConfigDto;
+import com.example.hotsix.enums.BackendJobName;
+import com.example.hotsix.enums.FrontendJobName;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
@@ -20,6 +22,10 @@ public class FrontendConfig {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_info_id")
     private TeamProjectInfo projectInfo;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "frontend_job_name")
+    private FrontendJobName frontendJobName;
 
     @Column(name = "framework")
     private String framework;

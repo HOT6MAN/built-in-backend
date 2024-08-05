@@ -93,6 +93,7 @@ CREATE TABLE IF NOT EXISTS `ssafy`.`team_project_info` (
 CREATE TABLE IF NOT EXISTS `ssafy`.`backend_config` (
                                                         `id` BIGINT(20) NOT NULL AUTO_INCREMENT,
     `project_info_id` BIGINT(20),
+    `backend_job_name` VARCHAR(255),
     `git_url` VARCHAR(255),
     `git_branch` VARCHAR(255),
     `git_username` VARCHAR(255),
@@ -114,6 +115,7 @@ CREATE TABLE IF NOT EXISTS `ssafy`.`backend_config` (
 CREATE TABLE IF NOT EXISTS `ssafy`.`frontend_config` (
                                                          `id` BIGINT(20) NOT NULL AUTO_INCREMENT,
     `project_info_id` BIGINT(20),
+    `frontend_job_name` VARCHAR(255),
     `framework` VARCHAR(255),
     `version` VARCHAR(255),
     `git_url` VARCHAR(255),
@@ -133,6 +135,7 @@ CREATE TABLE IF NOT EXISTS `ssafy`.`frontend_config` (
 CREATE TABLE IF NOT EXISTS `ssafy`.`database_config` (
                                                          `id` BIGINT(20) NOT NULL AUTO_INCREMENT,
     `project_info_id` BIGINT(20),
+    `database_job_name` VARCHAR(255),
     `url` VARCHAR(255),
     `schema_name` VARCHAR(255),
     `username` VARCHAR(255),
