@@ -574,8 +574,8 @@ create table if not exists `ssafy`.`recruit` (
 -- build_result table 생성
 CREATE TABLE if not exists `ssafy`.`build_result` (
                                                       `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
-                                                      `build_result_id` BIGINT,
-                                                      `build_num` BIGINT,
+                                                      `team_project_info_id` BIGINT,
+                                                      `deploy_num` BIGINT,
                                                       `status` VARCHAR(255),
     `build_time` TIMESTAMP,
     `DEL_YN` BOOLEAN NOT NULL,
@@ -583,13 +583,14 @@ CREATE TABLE if not exists `ssafy`.`build_result` (
     `REG_USER_SEQ` BIGINT(20) NOT NULL,
     `MOD_DTTM` TIMESTAMP NOT NULL,
     `MOD_USER_SEQ` BIGINT(20) NOT NULL,
-    FOREIGN KEY (build_result_id) REFERENCES team_project_info(id),
+    FOREIGN KEY (team_project_info_id) REFERENCES team_project_info(id),
     INDEX `build_result_idx_01` (`DEL_YN` ASC, `REG_USER_SEQ` ASC, `MOD_USER_SEQ` ASC) VISIBLE) ENGINE = InnoDB;
 
 CREATE TABLE if not exists `ssafy`.`build_stage` (
-                                                     `id` BIGINT NOT NULL,
+                                                     `id` BIGINT AUTO_INCREMENT NOT NULL,
                                                      `build_result_id` BIGINT,
                                                      `name` VARCHAR(255),
+    `stage_id` BIGINT,
     `status` VARCHAR(255),
     `duration` INT,
     `DEL_YN` BOOLEAN NOT NULL,
@@ -602,7 +603,7 @@ CREATE TABLE if not exists `ssafy`.`build_stage` (
     INDEX `build_stage_idx_01` (`DEL_YN` ASC, `REG_USER_SEQ` ASC, `MOD_USER_SEQ` ASC) VISIBLE) ENGINE = InnoDB;
 
 CREATE TABLE if not exists `ssafy`.`build_log` (
-                                                   `id` BIGINT NOT NULL,
+                                                   `id` BIGINT AUTO_INCREMENT NOT NULL,
                                                    `build_stage_id` BIGINT,
                                                    `title` VARCHAR(255),
     `description` TEXT,
@@ -621,5 +622,15 @@ SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 
+-- member dummy data 생성
 INSERT INTO member (id, email, nickname, name, profile_url, phone, address, role, lgn_mtd, DEL_YN, REG_DTTM, REG_USER_SEQ, MOD_DTTM, MOD_USER_SEQ)
-VALUES (1, 'ssafy@gmail.com', '싸피', '김싸피', 'https://asdf.com', '010-1234-5678', '역삼동', 'A', 'some_method', TRUE, '2024-04-25 00:00:00', 1, '2024-04-25 00:00:00', 1234);
+VALUES (1, 'ssafy@gmail.com', '싸피', '김싸피', 'https://asdf.com', '010-1234-5678', '역삼동', 'A', 'some_method', FALSE, '2024-04-25 00:00:00', 1, '2024-04-25 00:00:00', 1234);
+
+-- team dummy data 생성
+INSERT INTO team (id, name, status, content, start_time, end_time, git_url, jira_url, DEL_YN, REG_DTTM, REG_USER_SEQ, MOD_DTTM, MOD_USER_SEQ)
+values (1, '김싸피와 아이들', 'FINISH', '인공지능 서비스를 개발하고 있습니다', '2024-04-25 00:00:00', '2024-04-25 00:00:00', 'https://www.naver.com', 'https://www.naver.com', FALSE, '2024-04-25 00:00:00', 1, '2024-04-25 00:00:00', 1234);
+
+-- team_project_info dummy data 생성
+INSERT INTO team_project_info (id, team_id, title)
+values (1, 1, '1번 세팅');
+

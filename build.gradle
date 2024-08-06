@@ -43,6 +43,7 @@ springBoot {
 }
 
 dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation 'jakarta.inject:jakarta.inject-api:2.0.1'
 
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
@@ -58,7 +59,9 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt-impl:0.12.3'
     implementation 'io.jsonwebtoken:jjwt-jackson:0.12.3'
 
+
     compileOnly 'org.projectlombok:lombok'
+
     implementation 'com.google.code.gson:gson:2.8.9'
 //    developmentOnly 'org.springframework.boot:spring-boot-devtools'
     /** =========== DynamoDB 및 AWS CLI 의존성 시작 =======================*/

@@ -8,6 +8,7 @@ import com.example.hotsix.service.team.TeamProjectInfoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -86,5 +87,22 @@ public class BuildController {
     public void buildStart(@PathVariable("teamId")Long teamId, @PathVariable("projectInfoId")Long projectInfoId){
         System.out.println("call build start");
         buildService.buildStart(teamId, projectInfoId);
+    }
+
+
+    // Jenkins Build 결과를 DB에 저장하는 API
+    @PostMapping("/deploy/result")
+    public String saveBuildResult(@RequestBody BuildResultDto buildResultDto) throws URISyntaxException {
+        System.out.println("save build start");
+        buildService.addWholeBuildResult(buildResultDto);
+
+        // jobName, buildNum, deployNum
+        return "success";
+    }
+
+    // Jenkins Build 결과를 불러오는 API
+    @GetMapping("/deploy/result/team_project_info/{teamProjectInfoId}")
+    public List<BuildResultInfoDto> getBuildResultInfo(@PathVariable("teamProjectInfoId") Long teamProjectInfoId) {
+        return buildService.getBuildResultInfo(teamProjectInfoId);
     }
 }

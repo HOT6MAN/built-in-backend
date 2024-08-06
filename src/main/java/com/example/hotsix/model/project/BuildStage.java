@@ -13,6 +13,7 @@ import lombok.*;
 @Builder
 public class BuildStage extends BaseEntity {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -21,6 +22,9 @@ public class BuildStage extends BaseEntity {
 
     @Column(name = "name")
     private String name;
+
+    @Column(name = "stage_id")
+    private Long stageId;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status")

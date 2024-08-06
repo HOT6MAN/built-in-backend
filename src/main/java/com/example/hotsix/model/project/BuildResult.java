@@ -5,6 +5,7 @@ import com.example.hotsix.model.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity(name = "build_result")
@@ -18,12 +19,12 @@ public class BuildResult extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "build_num")
-    private Long buildNum;
-
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "build_result_id", referencedColumnName = "id")
+    @JoinColumn(name = "team_project_info_id", referencedColumnName = "id")
     private TeamProjectInfo teamProjectInfo;
+
+    @Column(name = "deploy_num")
+    private Long deployNum;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
@@ -31,5 +32,5 @@ public class BuildResult extends BaseEntity {
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "build_time")
-    private Date buildTime;
+    private LocalDateTime buildTime;
 }
