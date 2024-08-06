@@ -70,8 +70,10 @@ CREATE TABLE IF NOT EXISTS `ssafy`.`member_project_credential` (
     `docker_token` VARCHAR(100) NOT NULL,
     `git_credential_id` VARCHAR(50),
     `docker_credential_id` VARCHAR(50),
+    `team_id` BIGINT(20) NOT NULL,
     PRIMARY KEY (`id`),
-    FOREIGN KEY (`member_id`) REFERENCES `member`(`id`)
+    FOREIGN KEY (`member_id`) REFERENCES `member`(`id`),
+    FOREIGN KEY (`team_id`) REFERENCES `team`(`id`)
     ) ENGINE = InnoDB;
 -- -----------------------------------------------------
 -- Table `ssafy`.`team_project_info`
@@ -287,12 +289,14 @@ CREATE TABLE IF NOT EXISTS `ssafy`.`team` (
     `end_time` TIMESTAMP NULL,
     `git_url` VARCHAR(255) NULL,
     `jira_url` VARCHAR(255) NULL,
+    `team_project_credential_id` BIGINT(20) NOT NULL,
     `DEL_YN` BOOLEAN NOT NULL,
     `REG_DTTM` TIMESTAMP NOT NULL,
     `REG_USER_SEQ` BIGINT(20) NOT NULL,
     `MOD_DTTM` TIMESTAMP NOT NULL,
     `MOD_USER_SEQ` BIGINT(20) NOT NULL,
     PRIMARY KEY (`id`),
+    FOREIGN KEY (`team_project_credential_id`) REFERENCES member_project_credential(`id`),
     INDEX `team_idx_01` (`DEL_YN` ASC, `REG_USER_SEQ` ASC, `MOD_USER_SEQ` ASC) VISIBLE)
     ENGINE = InnoDB;
 
