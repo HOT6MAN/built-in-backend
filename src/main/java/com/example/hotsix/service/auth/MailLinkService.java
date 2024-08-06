@@ -28,6 +28,8 @@ public class MailLinkService {
     public String createLink(String type, String email){
         String code = jwtUtil.createEmailJwt(email);
         log.info(code);
+        //링크는 서버주소로 해야함. 서버의 /register나 /email-login api로 들어와서 code의 토큰을 검증해줘야
+        // 클라이언트의 /afterlogin이나 /register 페이지로 보냄.
         String link = hostUrl+"/hot6man/"+ type + "?code="+code;
 
         return link;
