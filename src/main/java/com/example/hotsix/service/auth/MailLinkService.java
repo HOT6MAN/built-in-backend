@@ -28,7 +28,7 @@ public class MailLinkService {
     public String createLink(String type, String email){
         String code = jwtUtil.createEmailJwt(email);
         log.info(code);
-        String link = hostUrl+"/"+ type + "?code="+code;
+        String link = hostUrl+"/hot6man/"+ type + "?code="+code;
 
         return link;
     }
