@@ -4,6 +4,7 @@ import com.example.hotsix.jwt.JWTUtil;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -21,11 +22,13 @@ public class MailLinkService {
     private final JavaMailSender javaMailSender;
     private final SpringTemplateEngine templateEngine;
 
+    @Value("${client.host}")
+    private String hostUrl;
 
     public String createLink(String type, String email){
         String code = jwtUtil.createEmailJwt(email);
         log.info(code);
-        String link = "http://localhost:8080/"+ type + "?code="+code;
+        String link = hostUrl+"/"+ type + "?code="+code;
 
         return link;
     }
