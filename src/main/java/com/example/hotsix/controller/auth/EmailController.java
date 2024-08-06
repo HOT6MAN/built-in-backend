@@ -105,7 +105,7 @@ public class EmailController {
             if(!isTokenExpired(code)){
                 String email = jwtUtil.getEmail(code);
                 log.info("유효한 토큰 가입페이지로");
-                response.sendRedirect(clinetHost + "/register?email=" + email.replace("\"", ""));
+                response.sendRedirect(clinetHost + "/hot6man/register?email=" + email.replace("\"", ""));
             }
 
         }catch (JwtException | IOException e){
