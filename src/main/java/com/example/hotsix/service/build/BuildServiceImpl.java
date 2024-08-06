@@ -42,7 +42,6 @@ import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -211,17 +210,22 @@ public class BuildServiceImpl implements BuildService{
     }
 
     @Override
-    public List<BuildResultInfoDto> getBuildResultInfo(Long teamProjectInfoId) {
+    public BuildWholeDto getBuildResultInfo(Long teamProjectInfoId) {
         List<BuildResult> buildResults = buildRespository.findByTeamProjectInfoId(teamProjectInfoId);
         System.out.println("buildResults = " + buildResults.size());
 
-        return buildResults.stream()
+        List<BuildResultInfoDto> buildResultInfoDtos = buildResults.stream()
                 .map(buildResult -> {
                     BuildResultInfoDto buildResultInfoDto = BuildResultInfoDto.from(buildResult);
-                    buildResultInfoDto.setBuildStageInfoDtoList(getBuildStageInfoList(buildResultInfoDto.getId()));
+                    buildResultInfoDto.setBuildStages(getBuildStageInfoList(buildResultInfoDto.getBuildId()));
                     return buildResultInfoDto;
                 })
                 .toList();
+
+        return BuildWholeDto.builder()
+                .totalCount(buildResultInfoDtos.size())
+                .buildResults(buildResultInfoDtos)
+                .build();
     }
 
     private List<BuildStageInfoDto> getBuildStageInfoList(Long buildResultId) {
@@ -229,7 +233,7 @@ public class BuildServiceImpl implements BuildService{
         return buildStageList.stream()
                 .map(buildStage -> {
                     BuildStageInfoDto buildStageInfoDto = BuildStageInfoDto.from(buildStage);
-                    buildStageInfoDto.setBuildLogInfoDtoList(getBuildLogInfoList(buildStageInfoDto.getId()));
+                    buildStageInfoDto.setBuildLogs(getBuildLogInfoList(buildStageInfoDto.getStageId()));
                     return buildStageInfoDto;
                 })
                 .toList();

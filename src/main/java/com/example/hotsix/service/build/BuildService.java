@@ -2,6 +2,7 @@ package com.example.hotsix.service.build;
 
 import com.example.hotsix.dto.build.BuildResultDto;
 import com.example.hotsix.dto.build.BuildResultInfoDto;
+import com.example.hotsix.dto.build.BuildWholeDto;
 import com.example.hotsix.model.project.BuildResult;
 
 import java.net.URISyntaxException;
@@ -13,5 +14,5 @@ public interface BuildService {
 
     BuildResult addWholeBuildResult(BuildResultDto buildResultDto) throws URISyntaxException;
 
-    List<BuildResultInfoDto> getBuildResultInfo(Long teamProjectInfoId);
+    BuildWholeDto getBuildResultInfo(Long teamProjectInfoId);
 }

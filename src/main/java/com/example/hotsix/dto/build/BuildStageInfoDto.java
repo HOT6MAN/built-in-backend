@@ -12,16 +12,16 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BuildStageInfoDto {
-    private Long id;
+    private Long stageId;
     private String name;
     private String status;
     private Integer duration;
 
-    private List<BuildLogInfoDto> buildLogInfoDtoList;
+    private List<BuildLogInfoDto> buildLogs;
 
     public static BuildStageInfoDto from(BuildStage buildStage) {
         return BuildStageInfoDto.builder()
-                .id(buildStage.getId())
+                .stageId(buildStage.getId())
                 .name(buildStage.getName())
                 .status(buildStage.getStatus().name())
                 .duration(buildStage.getDuration())

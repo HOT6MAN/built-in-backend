@@ -102,7 +102,7 @@ public class BuildController {
 
     // Jenkins Build 결과를 불러오는 API
     @GetMapping("/deploy/result/team_project_info/{teamProjectInfoId}")
-    public List<BuildResultInfoDto> getBuildResultInfo(@PathVariable("teamProjectInfoId") Long teamProjectInfoId) {
+    public BuildWholeDto getBuildResultInfo(@PathVariable("teamProjectInfoId") Long teamProjectInfoId) {
         return buildService.getBuildResultInfo(teamProjectInfoId);
     }
 }

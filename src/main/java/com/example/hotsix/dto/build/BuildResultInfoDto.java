@@ -13,17 +13,17 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BuildResultInfoDto {
-    private Long id;
+    private Long buildId;
     private Long teamProjectInfoId;
     private Long deployNum;
     private String status;
     private LocalDateTime buildTime;
 
-    private List<BuildStageInfoDto> buildStageInfoDtoList;
+    private List<BuildStageInfoDto> buildStages;
 
     public static BuildResultInfoDto from(BuildResult buildResult) {
         return BuildResultInfoDto.builder()
-                .id(buildResult.getId())
+                .buildId(buildResult.getId())
                 .teamProjectInfoId(buildResult.getTeamProjectInfo().getId())
                 .deployNum(buildResult.getDeployNum())
                 .status(buildResult.getStatus().name())
