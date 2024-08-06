@@ -51,9 +51,12 @@ CREATE TABLE IF NOT EXISTS `ssafy`.`member_image` (
 CREATE TABLE IF NOT EXISTS `ssafy`.`service_schedule` (
                                                           `id` BIGINT(20) NOT NULL AUTO_INCREMENT,
     `team_id` BIGINT(20) ,
+    `team_project_info_id` BIGINT(20),
     `is_used` VARCHAR(255),
+    `is_pendding` VARCHAR(20),
     PRIMARY KEY (`id`),
-    FOREIGN KEY (`team_id`) REFERENCES `team`(`id`)
+    FOREIGN KEY (`team_id`) REFERENCES `team`(`id`),
+    FOREIGN KEY (`team_project_info_id`) REFERENCES `team_project_info`(`id`)
     ) ENGINE = InnoDB;
 
 -- -----------------------------------------------------

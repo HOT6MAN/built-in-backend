@@ -51,8 +51,9 @@ public class Team extends BaseEntity{
     @Column(name="jira_url")
     private String jiraUrl;
 
-    @OneToMany(mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ServiceSchedule> schedules = new ArrayList<>();
+    @OneToOne(mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true)
+    private ServiceSchedule schedules;
+
     @JsonManagedReference
     @OneToMany(mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TeamProjectInfo> teamProjectInfos = new ArrayList<>();

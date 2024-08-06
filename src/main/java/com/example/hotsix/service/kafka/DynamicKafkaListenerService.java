@@ -1,6 +1,9 @@
 package com.example.hotsix.service.kafka;
 
+import com.example.hotsix.dto.build.TeamProjectInfoDto;
 import com.example.hotsix.dto.logs.LogEntryDto;
+import com.example.hotsix.model.project.TeamProjectInfo;
+import com.example.hotsix.repository.team.TeamProjectInfoRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -35,9 +38,12 @@ public class DynamicKafkaListenerService {
     private final ConcurrentKafkaListenerContainerFactory<String, String> factory;
     private final SimpMessagingTemplate messagingTemplate;
     private final KafkaProperties kafkaProperties;
+    private final TeamProjectInfoRepository teamProjectInfoRepository;
     @Value("${kafka.bootstrap.server.config}")
     private String serverConfig;
-    public void createDynamicListener(Long teamId, String topic, String groupId){
+    public void createDynamicListener(Long projectInfoId,Long configId, String topic, String groupId){
+        TeamProjectInfo teamProjectInfo = teamProjectInfoRepository.findProjectInfoByProjectInfoId(projectInfoId);
+        Long teamId = teamProjectInfo.getTeam().getId();
         Map<String, Object> consumerProps = new HashMap<>(kafkaProperties.buildConsumerProperties());
         consumerProps.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
         consumerProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
@@ -72,19 +78,19 @@ public class DynamicKafkaListenerService {
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }
-            sendLogToTeam(teamId, log);
+            sendLogToTeam(projectInfoId,configId, log);
         });
         container.start();
-        listeners.put(teamId, container);
+        listeners.put(configId, container);
     }
-    public void removeDynamicListener(Long teamId, String topic){
-        ConcurrentMessageListenerContainer<String, String> container = listeners.remove(teamId);
+    public void removeDynamicListener(Long configId, String topic){
+        ConcurrentMessageListenerContainer<String, String> container = listeners.remove(configId);
         if (container != null) {
             container.stop();
         }
     }
-    private void sendLogToTeam(Long teamId, LogEntryDto log) {
-        System.out.println("A new Log Create and Send to Client // " + teamId);
-        messagingTemplate.convertAndSend("/sub/" + teamId, log);
+    private void sendLogToTeam(Long projectInfoId, Long configId, LogEntryDto log) {
+        System.out.println("A new Log Create and Send to Client // /sub/log/" + projectInfoId+"/"+configId);
+        messagingTemplate.convertAndSend("/sub/log/" + projectInfoId+"/"+configId, log);
     }
 }

@@ -1,6 +1,8 @@
 package com.example.hotsix.service.build;
 
 import com.example.hotsix.dto.build.*;
+import com.example.hotsix.model.Member;
+import com.example.hotsix.model.ServiceSchedule;
 import com.example.hotsix.enums.BuildStatus;
 import com.example.hotsix.model.TeamProjectCredential;
 import com.example.hotsix.model.project.*;
@@ -35,6 +37,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import java.io.IOException;
 import java.net.URI;
@@ -69,15 +72,20 @@ public class BuildServiceImpl implements BuildService{
     private String hostJenkinsToken;
 
     @Override
+    @Transactional
     public void buildStart(Long teamId, Long teamProjectInfoId){
         TeamProjectInfo teamProjectInfo = teamProjectInfoRepository.findProjectInfoByProjectInfoId(teamProjectInfoId);
-        Long emptyServiceId = serviceScheduleRepository.findEmptyService();
-
-        String servicePort = "SERVICE"+emptyServiceId;
+        ServiceSchedule emptyServiceId = serviceScheduleRepository.findEmptyService();
+        System.out.println("empty Schedule = "+emptyServiceId);
+        emptyServiceId.setIsUsed(true);
+        emptyServiceId.setIsPendding(true);
+        emptyServiceId.setTeam(teamProjectInfo.getTeam());
+        emptyServiceId.setTeamProjectInfo(teamProjectInfo);
+        serviceScheduleRepository.save(emptyServiceId);
+        String servicePort = String.valueOf(emptyServiceId.getId());
         try(CloseableHttpClient httpClient = createHttpClient(hostJenkinsUsername, hostJenkinsToken)){
             String crumb = getCrumb(httpClient, hostJenkinsUrl, hostJenkinsUsername, hostJenkinsToken);
-            createJenkinsBackendInstance(teamProjectInfo.getBackendConfigs(), httpClient, crumb, servicePort);
-
+            createJenkinsBackendInstance(teamProjectInfo.getBackendConfigs(), httpClient, crumb, servicePort, teamId);
 
         }
         catch(Exception e){
@@ -271,7 +279,9 @@ public class BuildServiceImpl implements BuildService{
     public void createJenkinsBackendInstance(List<BackendConfig> backendConfigs,
                                              CloseableHttpClient httpClient,
                                              String crumb,
-                                             String servicePort) throws IOException {
+                                             String servicePort,
+                                             Long teamId) throws IOException {
+        Integer serviceIndex = 0;
         System.out.println("Crumb = "+crumb);
         String[] crumbParts = crumb.split(":");
         String crumbFieldName = crumbParts[0];
@@ -294,14 +304,19 @@ public class BuildServiceImpl implements BuildService{
             params.add(new BasicNameValuePair("GIT_BRANCH", config.getGitBranch()));
             params.add(new BasicNameValuePair("GIT_USERNAME", config.getGitUsername()));
             params.add(new BasicNameValuePair("GIT_ACCESS_TOKEN", config.getGitAccessToken()));
-            params.add(new BasicNameValuePair("SAVE_DIRECTORY", servicePort));
+            params.add(new BasicNameValuePair("SERVICE_NUM", servicePort));
             params.add(new BasicNameValuePair("SERVICE_ID", eigenServiceName));
+            params.add(new BasicNameValuePair("TEAM_ID", String.valueOf(teamId)));
+            System.out.println("configs id = "+config.getId());
+            params.add(new BasicNameValuePair("CONFIG_ID", String.valueOf(config.getId())));
+            params.add(new BasicNameValuePair("SERVICE_INDEX", String.valueOf(serviceIndex)));
             UrlEncodedFormEntity entity = new UrlEncodedFormEntity(params, StandardCharsets.UTF_8);
             httpPost.setEntity(entity);
             System.out.println("Call HttpClient execute");
             HttpResponse response = httpClient.execute(httpPost);
             System.out.println("Response status: " + response.getStatusLine().getStatusCode());
             System.out.println("Response body: " + EntityUtils.toString(response.getEntity()));
+            serviceIndex++;
         }
     }
 

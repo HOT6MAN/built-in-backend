@@ -12,6 +12,7 @@ import java.util.List;
 public class TeamProjectInfoDto {
     private Long id;
     private String title;
+    private Long serviceScheduleId;
     private List<BackendConfigDto> backendConfigs;
     private List<FrontendConfigDto> frontendConfigs;
     private List<DatabaseConfigDto> databaseConfigs;

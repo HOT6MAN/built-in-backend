@@ -4,8 +4,10 @@ package com.example.hotsix.controller.build;
 import com.example.hotsix.dto.build.*;
 import com.example.hotsix.model.project.TeamProjectInfo;
 import com.example.hotsix.service.build.BuildService;
+import com.example.hotsix.service.build.ServiceScheduleServiceImpl;
 import com.example.hotsix.service.team.TeamProjectInfoService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URISyntaxException;
@@ -18,6 +20,7 @@ import java.util.List;
 public class BuildController {
     private final BuildService buildService;
     private final TeamProjectInfoService teamProjectInfoService;
+    private final ServiceScheduleServiceImpl serviceScheduleServiceImpl;
 
     @PostMapping("/{teamId}/{projectInfoId}")
     public String insertTeamProjectCredential(@PathVariable("teamId") Long teamId,
@@ -75,12 +78,16 @@ public class BuildController {
         }
         return returnList;
     }
-
-
-    @GetMapping("/deploy/{memberId}/{projectId}")
-    public void deployMemberProject(@PathVariable("memberId")Long memberId, @PathVariable("projectId")Long projectId){
-        System.out.println("call deploy start");
-        buildService.MemberProjectBuildStart(memberId, projectId);
+    @GetMapping("/project/use/{teamId}")
+    public List<TeamProjectInfoDto> findUsedProjectInfosByTeamId(@PathVariable("teamId")Long teamId){
+        List<TeamProjectInfo> list = serviceScheduleServiceImpl.findUsedProjectInfoIdByTeamId(teamId);
+        List<TeamProjectInfoDto> returnList = new ArrayList<>();
+        for(TeamProjectInfo entity: list){
+            TeamProjectInfoDto dto = entity.toDto();
+            dto.setServiceScheduleId(entity.getServiceSchedule().getId());
+            returnList.add(dto);
+        }
+        return returnList;
     }
 
     @PostMapping("/deploy/{teamId}/{projectInfoId}")

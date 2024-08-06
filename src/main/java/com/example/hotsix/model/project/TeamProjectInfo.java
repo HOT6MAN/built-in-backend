@@ -1,6 +1,7 @@
 package com.example.hotsix.model.project;
 
 import com.example.hotsix.dto.build.TeamProjectInfoDto;
+import com.example.hotsix.model.ServiceSchedule;
 import com.example.hotsix.model.Team;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -28,6 +29,10 @@ public class TeamProjectInfo {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "team_id", referencedColumnName = "id")
     private Team team;
+
+    @JsonBackReference
+    @OneToOne(mappedBy = "teamProjectInfo", cascade = CascadeType.ALL, orphanRemoval = true)
+    private ServiceSchedule serviceSchedule;
 
     @JsonManagedReference
     @OneToMany(mappedBy = "projectInfo", cascade = CascadeType.ALL, orphanRemoval = true)

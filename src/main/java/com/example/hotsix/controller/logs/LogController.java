@@ -5,36 +5,40 @@ import com.example.hotsix.service.kafka.DynamicKafkaListenerService;
 import com.example.hotsix.service.kafka.KafkaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.parameters.P;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/log")
+@CrossOrigin(origins = "http://localhost:5173")
 public class LogController {
     private final KafkaService kafkaService;
     private final DynamicKafkaListenerService dynamicKafkaListenerService;
 
-    @GetMapping("/{projectId}")
-    public List<LogEntryDto> find400LogsByProjectId(@PathVariable("projectId") Long projectId){
+    @GetMapping("{serviceScheduleId}/{projectInfoId}/{configId}")
+    public List<LogEntryDto> find400LogsByProjectId(@PathVariable("serviceScheduleId") Long serviceScheduleId,
+                                                    @PathVariable("projectInfoId")Long projectInfoId,
+                                                    @PathVariable("configId")Long configId,
+                                                    @RequestParam("type") String type){
         System.out.println("call find 400 log");
-        String topic = "vector-test";
+        String topic = "vector-container-"+serviceScheduleId+"-"+projectInfoId+"-"+configId;
+        System.out.println("topic = "+topic);
         List<LogEntryDto> list = kafkaService.getRecentLogs(topic, 1L,"log-group");
-        for(LogEntryDto log : list){
-            System.out.println(log);
-        }
         return list;
     }
 
-    @GetMapping("/active/{teamId}")
-    public void readTimeLogging(@PathVariable("teamId")Long teamId){
-        String topic = "vector-test";
+    @GetMapping("/active/{serviceScheduleId}/{projectInfoId}/{configId}")
+    public void readTimeLogging(@PathVariable("serviceScheduleId")Long serviceScheduleId,
+                                @PathVariable("projectInfoId")Long projectInfoId,
+                                @PathVariable("configId")Long configId,
+                                @RequestParam String type){
+        String topic = "vector-container-"+serviceScheduleId+"-"+projectInfoId+"-"+configId;
         String groupId = "log-group";
-        dynamicKafkaListenerService.createDynamicListener(teamId, topic, groupId);
+        System.out.println("topic = "+topic);
+        System.out.println("type= "+type);
+        dynamicKafkaListenerService.createDynamicListener(projectInfoId, configId, topic, groupId);
     }
 
     @GetMapping("/inactive/{teamId}")
