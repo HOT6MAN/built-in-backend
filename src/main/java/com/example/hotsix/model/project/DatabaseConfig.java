@@ -1,6 +1,8 @@
 package com.example.hotsix.model.project;
 
 import com.example.hotsix.dto.build.DatabaseConfigDto;
+import com.example.hotsix.enums.DatabaseJobName;
+import com.example.hotsix.enums.FrontendJobName;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
@@ -20,6 +22,10 @@ public class DatabaseConfig {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_info_id")
     private TeamProjectInfo projectInfo;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "database_job_name")
+    private DatabaseJobName databaseJobName;
 
     @Column(name = "url")
     private String url;

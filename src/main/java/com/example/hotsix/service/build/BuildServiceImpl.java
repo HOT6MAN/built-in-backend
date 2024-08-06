@@ -1,19 +1,20 @@
 package com.example.hotsix.service.build;
 
 import com.example.hotsix.dto.build.*;
-import com.example.hotsix.model.Member;
+import com.example.hotsix.enums.BuildStatus;
 import com.example.hotsix.model.TeamProjectCredential;
-import com.example.hotsix.model.Team;
-import com.example.hotsix.model.project.BackendConfig;
-import com.example.hotsix.model.project.DatabaseConfig;
-import com.example.hotsix.model.project.FrontendConfig;
-import com.example.hotsix.model.project.TeamProjectInfo;
+import com.example.hotsix.model.project.*;
+import com.example.hotsix.repository.build.BuildLogRepository;
 import com.example.hotsix.repository.build.BuildRepository;
+import com.example.hotsix.repository.build.BuildStageRepository;
 import com.example.hotsix.repository.build.ServiceScheduleRepository;
 import com.example.hotsix.repository.member.MemberRepository;
 import com.example.hotsix.repository.team.TeamProjectInfoRepository;
 import com.example.hotsix.repository.team.TeamRepository;
 import com.example.hotsix.util.LocalTimeUtil;
+import com.example.hotsix.util.TimeUtil;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import lombok.RequiredArgsConstructor;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -33,14 +34,15 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -50,11 +52,13 @@ public class BuildServiceImpl implements BuildService{
     private final TeamRepository teamRepository;
     private final TeamProjectInfoRepository teamProjectInfoRepository;
     private final ServiceScheduleRepository serviceScheduleRepository;
+    private final BuildStageRepository buildStageRepository;
 
     private static final String GIT_TYPE = "git";
     private static final String DOCKER_TYPE = "docker";
     private static final String JOB_NAME = "service-deploy";
     private static final String BUILD_WITH_PARAMETERS_URL = "job/"+JOB_NAME+"/buildWithParameters";
+    private final BuildLogRepository buildLogRepository;
 
     @Value("${jenkins.url}")
     private String hostJenkinsUrl;
@@ -81,6 +85,183 @@ public class BuildServiceImpl implements BuildService{
             e.printStackTrace();
         }
 
+    }
+
+    @Override
+    @Transactional
+    public BuildResult addWholeBuildResult(BuildResultDto buildResultDto) throws URISyntaxException {
+        Long deployNum = buildResultDto.getDeployNum();
+        Long teamProjectInfoId = buildResultDto.getTeamProjectInfoId();
+
+        // 1. deployNum 에 해당하는 BuildResult 가 없을경우, 새로 생성
+        BuildResult buildResult = buildRespository.findByDeployNum(deployNum)
+                .orElseGet(() -> addBuildResult(deployNum, teamProjectInfoId));
+
+        // 2. Build 결과를 받아오기 위한 Jenkins API 호출
+        String jobName = buildResultDto.getJobName();
+        Long buildNum = buildResultDto.getBuildNum();
+        String targetUrl = String.format("%sjob/%s/%d/wfapi/describe", hostJenkinsUrl, jobName, buildNum);
+
+        System.out.println("targetUrl = " + targetUrl);
+
+        WebClient client = WebClient.builder()
+                .baseUrl(targetUrl)
+                .build();
+
+        // 3. API 응답 결과를 JsonNode 형식으로 변환
+        JsonNode jsonNode = client.get()
+                .headers(headers -> headers.setBasicAuth(hostJenkinsUsername, hostJenkinsToken))
+                .retrieve()
+                .bodyToMono(JsonNode.class)
+                .block();
+
+        // 4. BuildResult의 Status 변경
+        String wholeStatus = jsonNode.get("status").asText();
+        buildResult.setStatus(BuildStatus.valueOf(wholeStatus.toUpperCase()));
+
+        // 5. Stages 추가
+        JsonNode stageNode = jsonNode.get("stages");
+
+        if (stageNode != null && stageNode.isArray()) {
+            ArrayNode stagesArrayNode = (ArrayNode) stageNode;
+            ArrayList<BuildStage> buildStages = new ArrayList<>();
+            ArrayList<BuildLog> buildLogs = new ArrayList<>();
+
+            for (JsonNode stage : stagesArrayNode) {
+                long stageId = stage.get("id").asLong();
+                String name = stage.get("name").asText();
+                int duration = stage.get("durationMillis").asInt();
+                String status = stage.get("status").asText();
+
+                BuildStage buildStage = BuildStage.builder()
+                        .buildResult(buildResult)
+                        .stageId(stageId)
+                        .name(name)
+                        .duration(duration)
+                        .status(BuildStatus.valueOf(status.toUpperCase()))
+                        .build();
+
+                buildStages.add(buildStage);
+
+                // 6. 각 stage에 대해, log 결과 저장
+                // /job/:job-name/:run-id/execution/node/:node-id/wfapi/log
+                String describeUrl = String.format("%sjob/%s/%d/execution/node/%s/wfapi/describe", hostJenkinsUrl, jobName, buildNum, stageId);
+
+                System.out.println("describeUrl = " + describeUrl);
+
+                WebClient describeClient = WebClient.builder()
+                        .baseUrl(describeUrl)
+                        .build();
+
+                JsonNode describeNode = describeClient.get()
+                        .headers(headers -> headers.setBasicAuth(hostJenkinsUsername, hostJenkinsToken))
+                        .retrieve()
+                        .bodyToMono(JsonNode.class)
+                        .block();
+
+                JsonNode logNodes = describeNode.get("stageFlowNodes");
+                if (logNodes != null && logNodes.isArray()) {
+                    ArrayNode logArrayNode = (ArrayNode) logNodes;
+
+                    for (JsonNode log : logArrayNode) {
+                        String title = log.get("name").asText();
+
+                        BuildLog buildLog = BuildLog.builder()
+                                .buildStage(buildStage)
+                                .title(title)
+                                .build();
+
+                        System.out.println("log = " + log);
+
+                        String href = log.get("_links").get("self").get("href").asText();
+                        String logUrl = concatenateUrls(hostJenkinsUrl, href);
+
+                        System.out.println("logUrl = " + logUrl);
+
+                        WebClient logClient = WebClient.builder()
+                                .baseUrl(logUrl)
+                                .build();
+
+                        JsonNode logNode = logClient.get()
+                                .headers(headers -> headers.setBasicAuth(hostJenkinsUsername, hostJenkinsToken))
+                                .retrieve()
+                                .bodyToMono(JsonNode.class)
+                                .block();
+
+                        System.out.println("logNode = " + logNode);
+
+                        JsonNode text = logNode.get("text");
+                        if (text != null) {
+                            String description = text.asText();
+                            buildLog.setDescription(description);
+                        }
+
+                        buildLogs.add(buildLog);
+                    }
+                }
+            }
+
+            // stages와 logs를 한 번에 저장
+            buildStageRepository.saveAll(buildStages);
+            buildLogRepository.saveAll(buildLogs);
+        }
+
+        buildRespository.save(buildResult);
+        return buildResult;
+    }
+
+    @Override
+    public List<BuildResultInfoDto> getBuildResultInfo(Long teamProjectInfoId) {
+        List<BuildResult> buildResults = buildRespository.findByTeamProjectInfoId(teamProjectInfoId);
+        System.out.println("buildResults = " + buildResults.size());
+
+        return buildResults.stream()
+                .map(buildResult -> {
+                    BuildResultInfoDto buildResultInfoDto = BuildResultInfoDto.from(buildResult);
+                    buildResultInfoDto.setBuildStageInfoDtoList(getBuildStageInfoList(buildResultInfoDto.getId()));
+                    return buildResultInfoDto;
+                })
+                .toList();
+    }
+
+    private List<BuildStageInfoDto> getBuildStageInfoList(Long buildResultId) {
+        List<BuildStage> buildStageList = buildStageRepository.findByBuildResultId(buildResultId);
+        return buildStageList.stream()
+                .map(buildStage -> {
+                    BuildStageInfoDto buildStageInfoDto = BuildStageInfoDto.from(buildStage);
+                    buildStageInfoDto.setBuildLogInfoDtoList(getBuildLogInfoList(buildStageInfoDto.getId()));
+                    return buildStageInfoDto;
+                })
+                .toList();
+    }
+
+    private List<BuildLogInfoDto> getBuildLogInfoList(Long buildStageId) {
+        List<BuildLog> buildLogs = buildLogRepository.findByBuildStageId(buildStageId);
+        return buildLogs.stream()
+                .map(BuildLogInfoDto::from)
+                .toList();
+    }
+
+
+    private String concatenateUrls(String baseUrl, String path) throws URISyntaxException {
+        URI baseUri = new URI(baseUrl);
+        URI resolvedUri = baseUri.resolve(path);
+        return resolvedUri.toString();
+    }
+
+    @Transactional
+    public BuildResult addBuildResult(Long deployNum, Long teamProjectInfoId) {
+        TeamProjectInfo teamProjectInfo = teamProjectInfoRepository.findProjectInfoByProjectInfoId(teamProjectInfoId);
+
+        BuildResult buildResult = BuildResult.builder()
+                .deployNum(deployNum)
+                .teamProjectInfo(teamProjectInfo)
+                .buildTime(TimeUtil.getCurrentTimeMillisSeoul())
+                .status(BuildStatus.SUCCESS)
+                .build();
+
+        buildRespository.save(buildResult);
+        return buildResult;
     }
 
     public void createJenkinsBackendInstance(List<BackendConfig> backendConfigs,

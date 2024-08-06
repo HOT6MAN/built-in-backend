@@ -1,7 +1,15 @@
 package com.example.hotsix.repository.build;
 
+import com.example.hotsix.model.project.BuildResult;
 import com.example.hotsix.model.project.TeamProjectInfo;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface BuildRepository extends JpaRepository<TeamProjectInfo, Long>, BuildRepositoryCustom {
+import java.util.List;
+import java.util.Optional;
+
+public interface BuildRepository extends JpaRepository<BuildResult, Long>, BuildRepositoryCustom {
+    Optional<BuildResult> findByDeployNum(Long deployNum);
+
+    List<BuildResult> findByTeamProjectInfoId(Long teamProjectInfoId);
+
 }

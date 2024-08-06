@@ -1,4 +1,4 @@
--- drop database if exists `ssafy`;
+drop database if exists `ssafy`;
 create database if not exists `ssafy`;
 use `ssafy`;
 
@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS `ssafy`.`member_image` (
 -- -----------------------------------------------------
 
 CREATE TABLE IF NOT EXISTS `ssafy`.`service_schedule` (
-                                                      `id` BIGINT(20) NOT NULL AUTO_INCREMENT,
+                                                          `id` BIGINT(20) NOT NULL AUTO_INCREMENT,
     `team_id` BIGINT(20) ,
     `is_used` VARCHAR(255),
     PRIMARY KEY (`id`),
@@ -61,7 +61,7 @@ CREATE TABLE IF NOT EXISTS `ssafy`.`service_schedule` (
 -- -----------------------------------------------------
 
 CREATE TABLE IF NOT EXISTS `ssafy`.`member_project_credential` (
-                                                      `id` BIGINT(20) NOT NULL AUTO_INCREMENT,
+                                                                   `id` BIGINT(20) NOT NULL AUTO_INCREMENT,
     `member_id` BIGINT(20) NOT NULL,
     `job_name` VARCHAR(30) NOT NULL,
     `git_username` VARCHAR(30) NOT NULL,
@@ -93,6 +93,7 @@ CREATE TABLE IF NOT EXISTS `ssafy`.`team_project_info` (
 CREATE TABLE IF NOT EXISTS `ssafy`.`backend_config` (
                                                         `id` BIGINT(20) NOT NULL AUTO_INCREMENT,
     `project_info_id` BIGINT(20),
+    `backend_job_name` VARCHAR(255),
     `git_url` VARCHAR(255),
     `git_branch` VARCHAR(255),
     `git_username` VARCHAR(255),
@@ -114,6 +115,7 @@ CREATE TABLE IF NOT EXISTS `ssafy`.`backend_config` (
 CREATE TABLE IF NOT EXISTS `ssafy`.`frontend_config` (
                                                          `id` BIGINT(20) NOT NULL AUTO_INCREMENT,
     `project_info_id` BIGINT(20),
+    `frontend_job_name` VARCHAR(255),
     `framework` VARCHAR(255),
     `version` VARCHAR(255),
     `git_url` VARCHAR(255),
@@ -133,6 +135,7 @@ CREATE TABLE IF NOT EXISTS `ssafy`.`frontend_config` (
 CREATE TABLE IF NOT EXISTS `ssafy`.`database_config` (
                                                          `id` BIGINT(20) NOT NULL AUTO_INCREMENT,
     `project_info_id` BIGINT(20),
+    `database_job_name` VARCHAR(255),
     `url` VARCHAR(255),
     `schema_name` VARCHAR(255),
     `username` VARCHAR(255),
@@ -541,37 +544,93 @@ CREATE TABLE IF NOT EXISTS `ssafy`.`chatroom_status` (
     ) ENGINE = InnoDB;
 
 create table if not exists `ssafy`.`board` (
-       `id` bigint(20) not null auto_increment,
-       `title` varchar(40) not null,
-       `type` enum('RECRUIT') not null,
-       `content` varchar(500) not null,
-       `hit` int not null,
-       `author_id` bigint(20) not null,
-       `DEL_YN` BOOLEAN NOT NULL,
-       `REG_DTTM` TIMESTAMP NOT NULL,
-       `REG_USER_SEQ` BIGINT(20) NOT NULL,
-       `MOD_DTTM` TIMESTAMP NOT NULL,
-       `MOD_USER_SEQ` BIGINT(20) NOT NULL,
-       primary key (`id`),
-       foreign key (`author_id`) references `member`(`id`)
-) ENGINE = InnoDB;
+                                               `id` bigint(20) not null auto_increment,
+    `title` varchar(40) not null,
+    `type` enum('RECRUIT') not null,
+    `content` varchar(500) not null,
+    `hit` int not null,
+    `author_id` bigint(20) not null,
+    `DEL_YN` BOOLEAN NOT NULL,
+    `REG_DTTM` TIMESTAMP NOT NULL,
+    `REG_USER_SEQ` BIGINT(20) NOT NULL,
+    `MOD_DTTM` TIMESTAMP NOT NULL,
+    `MOD_USER_SEQ` BIGINT(20) NOT NULL,
+    primary key (`id`),
+    foreign key (`author_id`) references `member`(`id`)
+    ) ENGINE = InnoDB;
 
 create table if not exists `ssafy`.`recruit` (
-     `id` bigint(20) not null,
-     `introduction` varchar(50) not null,
-     `thumbnail` varchar(100) not null,
-     `domain` varchar(20) not null,
-     `desired_pos_list` json not null,
-     `team_id` bigint(20) not null,
-     primary key (`id`),
-     foreign key (`id`) references `board`(`id`),
-     foreign key (`team_id`) references `team`(`id`)
-) ENGINE = InnoDB;
+                                                 `id` bigint(20) not null,
+    `introduction` varchar(50) not null,
+    `thumbnail` varchar(100) not null,
+    `domain` varchar(20) not null,
+    `desired_pos_list` json not null,
+    `team_id` bigint(20) not null,
+    primary key (`id`),
+    foreign key (`id`) references `board`(`id`),
+    foreign key (`team_id`) references `team`(`id`)
+    ) ENGINE = InnoDB;
+
+-- build_result table 생성
+CREATE TABLE if not exists `ssafy`.`build_result` (
+                                                      `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+                                                      `team_project_info_id` BIGINT,
+                                                      `deploy_num` BIGINT,
+                                                      `status` VARCHAR(255),
+    `build_time` TIMESTAMP,
+    `DEL_YN` BOOLEAN NOT NULL,
+    `REG_DTTM` TIMESTAMP NOT NULL,
+    `REG_USER_SEQ` BIGINT(20) NOT NULL,
+    `MOD_DTTM` TIMESTAMP NOT NULL,
+    `MOD_USER_SEQ` BIGINT(20) NOT NULL,
+    FOREIGN KEY (team_project_info_id) REFERENCES team_project_info(id),
+    INDEX `build_result_idx_01` (`DEL_YN` ASC, `REG_USER_SEQ` ASC, `MOD_USER_SEQ` ASC) VISIBLE) ENGINE = InnoDB;
+
+CREATE TABLE if not exists `ssafy`.`build_stage` (
+                                                     `id` BIGINT AUTO_INCREMENT NOT NULL,
+                                                     `build_result_id` BIGINT,
+                                                     `name` VARCHAR(255),
+    `stage_id` BIGINT,
+    `status` VARCHAR(255),
+    `duration` INT,
+    `DEL_YN` BOOLEAN NOT NULL,
+    `REG_DTTM` TIMESTAMP NOT NULL,
+    `REG_USER_SEQ` BIGINT(20) NOT NULL,
+    `MOD_DTTM` TIMESTAMP NOT NULL,
+    `MOD_USER_SEQ` BIGINT(20) NOT NULL,
+    PRIMARY KEY (id),
+    FOREIGN KEY (build_result_id) REFERENCES build_result(id),
+    INDEX `build_stage_idx_01` (`DEL_YN` ASC, `REG_USER_SEQ` ASC, `MOD_USER_SEQ` ASC) VISIBLE) ENGINE = InnoDB;
+
+CREATE TABLE if not exists `ssafy`.`build_log` (
+                                                   `id` BIGINT AUTO_INCREMENT NOT NULL,
+                                                   `build_stage_id` BIGINT,
+                                                   `title` VARCHAR(255),
+    `description` TEXT,
+    `DEL_YN` BOOLEAN NOT NULL,
+    `REG_DTTM` TIMESTAMP NOT NULL,
+    `REG_USER_SEQ` BIGINT(20) NOT NULL,
+    `MOD_DTTM` TIMESTAMP NOT NULL,
+    `MOD_USER_SEQ` BIGINT(20) NOT NULL,
+    PRIMARY KEY (id),
+    FOREIGN KEY (build_stage_id) REFERENCES build_stage(id),
+    INDEX `build_log_idx_01` (`DEL_YN` ASC, `REG_USER_SEQ` ASC, `MOD_USER_SEQ` ASC) VISIBLE) ENGINE = InnoDB;
+
 
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 
+-- member dummy data 생성
 INSERT INTO member (id, email, nickname, name, profile_url, phone, address, role, lgn_mtd, DEL_YN, REG_DTTM, REG_USER_SEQ, MOD_DTTM, MOD_USER_SEQ)
-VALUES (1, 'ssafy@gmail.com', '싸피', '김싸피', 'https://asdf.com', '010-1234-5678', '역삼동', 'A', 'some_method', TRUE, '2024-04-25 00:00:00', 1, '2024-04-25 00:00:00', 1234);
+VALUES (1, 'ssafy@gmail.com', '싸피', '김싸피', 'https://asdf.com', '010-1234-5678', '역삼동', 'A', 'some_method', FALSE, '2024-04-25 00:00:00', 1, '2024-04-25 00:00:00', 1234);
+
+-- team dummy data 생성
+INSERT INTO team (id, name, status, content, start_time, end_time, git_url, jira_url, DEL_YN, REG_DTTM, REG_USER_SEQ, MOD_DTTM, MOD_USER_SEQ)
+values (1, '김싸피와 아이들', 'FINISH', '인공지능 서비스를 개발하고 있습니다', '2024-04-25 00:00:00', '2024-04-25 00:00:00', 'https://www.naver.com', 'https://www.naver.com', FALSE, '2024-04-25 00:00:00', 1, '2024-04-25 00:00:00', 1234);
+
+-- team_project_info dummy data 생성
+INSERT INTO team_project_info (id, team_id, title)
+values (1, 1, '1번 세팅');
+
