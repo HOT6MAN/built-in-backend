@@ -630,11 +630,11 @@ SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 INSERT INTO member (id, email, nickname, name, profile_url, phone, address, role, lgn_mtd, DEL_YN, REG_DTTM, REG_USER_SEQ, MOD_DTTM, MOD_USER_SEQ)
 VALUES (1, 'ssafy@gmail.com', '싸피', '김싸피', 'https://asdf.com', '010-1234-5678', '역삼동', 'A', 'some_method', FALSE, '2024-04-25 00:00:00', 1, '2024-04-25 00:00:00', 1234);
 
--- team dummy data 생성
-INSERT INTO team (id, name, status, content, start_time, end_time, git_url, jira_url, DEL_YN, REG_DTTM, REG_USER_SEQ, MOD_DTTM, MOD_USER_SEQ)
-values (1, '김싸피와 아이들', 'FINISH', '인공지능 서비스를 개발하고 있습니다', '2024-04-25 00:00:00', '2024-04-25 00:00:00', 'https://www.naver.com', 'https://www.naver.com', FALSE, '2024-04-25 00:00:00', 1, '2024-04-25 00:00:00', 1234);
-
--- team_project_info dummy data 생성
-INSERT INTO team_project_info (id, team_id, title)
-values (1, 1, '1번 세팅');
-
+-- -- team dummy data 생성
+-- INSERT INTO team (id, name, status, content, start_time, end_time, git_url, jira_url, DEL_YN, REG_DTTM, REG_USER_SEQ, MOD_DTTM, MOD_USER_SEQ)
+-- values (1, '김싸피와 아이들', 'FINISH', '인공지능 서비스를 개발하고 있습니다', '2024-04-25 00:00:00', '2024-04-25 00:00:00', 'https://www.naver.com', 'https://www.naver.com', FALSE, '2024-04-25 00:00:00', 1, '2024-04-25 00:00:00', 1234);
+--
+-- -- team_project_info dummy data 생성
+-- INSERT INTO team_project_info (id, team_id, title)
+-- values (1, 1, '1번 세팅');
+--
