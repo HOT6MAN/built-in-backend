@@ -46,7 +46,7 @@ public class JwtHeaderController {
             return new ResponseEntity<>(NORMAL_RESPONSE.getHttpStatus());
         } else {
             //response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return new ResponseEntity<>(INVALID_USER.getHttpStatus());
+            return new ResponseEntity<>(INVALID_TOKEN.getHttpStatus());
         }
 
 

@@ -84,7 +84,7 @@ public class JWTFilter extends OncePerRequestFilter {
             if(accessToken!=null && logoutService.isTokenInRedis(accessToken)) {
                 log.info("로그아웃된 access token");
                 try{
-                    throw new BuiltInException(Process.INVALID_USER);
+                    throw new BuiltInException(Process.INVALID_TOKEN);
                 }catch (BuiltInException e){
                     jwtExceptionHandler(response, e);
                     return;
@@ -98,9 +98,11 @@ public class JWTFilter extends OncePerRequestFilter {
                 //response body
                 log.info("Access 토큰 만료");
 
-                PrintWriter writer = response.getWriter();
-                writer.println("access toekn is expired");
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+//                PrintWriter writer = response.getWriter();
+//                writer.println("access toekn is expired");
+//                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                BuiltInException exception = new BuiltInException(Process.EXPIRED_TOKEN);
+                jwtExceptionHandler(response,exception);
                 return;
             }catch( IllegalArgumentException e){
                 BuiltInException exception = new BuiltInException(Process.EXPIRED_TOKEN);
@@ -114,7 +116,7 @@ public class JWTFilter extends OncePerRequestFilter {
             if(!category.equals("access")){
                 log.info("카테고리가 access가 아니다");
                 try{
-                    throw new BuiltInException(Process.INVALID_USER);
+                    throw new BuiltInException(Process.INVALID_TOKEN);
                 }catch (BuiltInException e){
                     jwtExceptionHandler(response, e);
                     return;
@@ -188,6 +190,7 @@ public class JWTFilter extends OncePerRequestFilter {
 
 
     private void setSecurityContext(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain, String accessToken) throws IOException, ServletException {
+        log.info("인증완료 SecurityContextHolder 설정");
         //토큰에서 id, username과 role 획득
         String username = jwtUtil.getUsername(accessToken);
         String role = jwtUtil.getRole(accessToken);

@@ -1,5 +1,6 @@
 package com.example.hotsix.config;
 
+import com.example.hotsix.jwt.CustomAuthenticationEntryPoint;
 import com.example.hotsix.jwt.CustomLogoutFilter;
 import com.example.hotsix.jwt.JWTFilter;
 import com.example.hotsix.jwt.JWTUtil;
@@ -35,6 +36,8 @@ public class SecurityConfig {
     private final CustomSuccessHandler customSuccessHandler;
 
     private final JWTUtil jwtUtil;
+
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
     //private final RedisTemplate<String ,String> redisTemplate;
     private final LogoutService logoutService;
@@ -75,6 +78,12 @@ public class SecurityConfig {
                                 .userService(customOAuth2UserService)))
                         .successHandler(customSuccessHandler));
 
+        //인증실패시
+        http.
+                exceptionHandling(exceptionHandling -> exceptionHandling
+                        .authenticationEntryPoint(customAuthenticationEntryPoint));
+
+
         // 경로별 인가 작업
         http
                 .authorizeHttpRequests((auth) -> auth
@@ -86,7 +95,7 @@ public class SecurityConfig {
                         .requestMatchers("/register").permitAll()
                         .requestMatchers("/signup").permitAll()
                         .requestMatchers("/email-register").permitAll()
-                        .requestMatchers("/teams/**").permitAll()
+                        //.requestMatchers("/teams/**").permitAll()
                         .requestMatchers("/hot6man/test/**").permitAll()
                         .requestMatchers(("/member/**")).permitAll()
                         .requestMatchers(("/build/**")).permitAll()

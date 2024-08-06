@@ -101,7 +101,6 @@ public class Member extends BaseEntity {
                 ", address='" + address + '\'' +
                 ", role='" + role + '\'' +
                 ", lgnMtd='" + lgnMtd + '\'' +
-                ", memberImage=" + memberImage +
                 '}';
     }
 }

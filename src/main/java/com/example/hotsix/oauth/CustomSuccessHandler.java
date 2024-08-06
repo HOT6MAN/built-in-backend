@@ -66,20 +66,10 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         response.addCookie(cookies.get("access"));
         response.addCookie(cookies.get("refresh"));
-        response.sendRedirect(clinetHost+"/afterlogin");
+        response.sendRedirect(clinetHost+"/hot6man/afterlogin");
 
     }
 
-    private Cookie createCookie(String key, String value, Long expiretime){
-        log.info("JWT 담을 쿠키 생성");
-        Cookie cookie = new Cookie(key, value);
-        cookie.setMaxAge(expiretime.intValue());
-        //cookie.setSecure(true);   //https 프로토골
-        cookie.setPath("/");
-        cookie.setHttpOnly(true);
-
-        return cookie;
-    }
 
 
 }

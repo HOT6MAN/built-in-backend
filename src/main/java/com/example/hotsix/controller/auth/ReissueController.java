@@ -3,6 +3,8 @@ package com.example.hotsix.controller.auth;
 
 
 import com.example.hotsix.dto.member.MemberDto;
+import com.example.hotsix.enums.Process;
+import com.example.hotsix.exception.BuiltInException;
 import com.example.hotsix.jwt.JWTUtil;
 import com.example.hotsix.service.auth.LogoutService;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -43,29 +45,31 @@ public class ReissueController {
 
         if(refresh ==null){
             log.info("refresh is null");
-            return new ResponseEntity<>("refresh token is null", HttpStatus.BAD_REQUEST);
+            throw new BuiltInException(Process.INVALID_TOKEN);
+            //return new ResponseEntity<>("refresh token is null", HttpStatus.BAD_REQUEST);
         }
 
         try {
             jwtUtil.isExpired(refresh);
         }catch (ExpiredJwtException e){
             log.info("refresh token is expired");
-            return new ResponseEntity<>("refresh token is expired", HttpStatus.BAD_REQUEST);
+            throw new BuiltInException(Process.EXPIRED_TOKEN);
+            //return new ResponseEntity<>("refresh token is expired", HttpStatus.BAD_REQUEST);
         }
 
         String category = jwtUtil.getCategory(refresh);
 
         if(!category.equals("refresh")){
             log.info("refresh token is invalid");
-            return new ResponseEntity<>("refresh token is invalid", HttpStatus.BAD_REQUEST);
+            throw new BuiltInException(Process.INVALID_TOKEN);
+            //return new ResponseEntity<>("refresh token is invalid", HttpStatus.BAD_REQUEST);
         }
-
-        //String value = redisTemplate.opsForValue().get(jwtUtil.getId(refresh).toString());
 
         // 레디스에 리프레시토큰없을때
         if( !logoutService.isTokenInRedis(jwtUtil.getId(refresh).toString())){
             log.info("만료된 리프레시토큰");
-            return new ResponseEntity<>("invalid refresh token", HttpStatus.BAD_REQUEST);
+            throw new BuiltInException(Process.EXPIRED_TOKEN);
+            //return new ResponseEntity<>("invalid refresh token", HttpStatus.BAD_REQUEST);
         }
 
 
