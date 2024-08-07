@@ -92,7 +92,7 @@ public class EmailController {
 
         response.addCookie(cookies.get("access"));
         response.addCookie(cookies.get("refresh"));
-        response.sendRedirect(clinetHost+"/hot6man/afterlogin");
+        response.sendRedirect(clinetHost+"/afterlogin");
         }
     }
 
