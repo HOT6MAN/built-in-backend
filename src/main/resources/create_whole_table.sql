@@ -175,46 +175,6 @@ CREATE TABLE IF NOT EXISTS `ssafy`.`apply_info_position` (
     COLLATE = utf8mb4_0900_ai_ci;
 
 
--- -----------------------------------------------------
--- Table `ssafy`.`tech`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `ssafy`.`tech` (
-                                              `id` BIGINT NOT NULL AUTO_INCREMENT,
-                                              `name` VARCHAR(50) NULL DEFAULT NULL,
-    `DEL_YN` TINYINT(1) NOT NULL,
-    `REG_DTTM` TIMESTAMP NOT NULL,
-    `REG_USER_SEQ` BIGINT NOT NULL,
-    `MOD_DTTM` TIMESTAMP NOT NULL,
-    `MOD_USER_SEQ` BIGINT NOT NULL,
-    PRIMARY KEY (`id`),
-    INDEX `tech_idx_01` (`DEL_YN` ASC, `REG_USER_SEQ` ASC, `MOD_USER_SEQ` ASC) VISIBLE)
-    ENGINE = InnoDB
-    DEFAULT CHARACTER SET = utf8mb4
-    COLLATE = utf8mb4_0900_ai_ci;
-
-
--- -----------------------------------------------------
--- Table `ssafy`.`apply_info_tech`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `ssafy`.`apply_info_tech` (
-                                                         `id` BIGINT NOT NULL AUTO_INCREMENT,
-                                                         `tech_id` BIGINT NULL DEFAULT NULL,
-                                                         `apply_info_id` BIGINT NULL DEFAULT NULL,
-                                                         `created_at` TIMESTAMP NOT NULL,
-                                                         `updated_at` TIMESTAMP NOT NULL,
-                                                         PRIMARY KEY (`id`),
-    INDEX `apply_info_tech_idx_01` (`created_at` ASC, `updated_at` ASC) VISIBLE,
-    INDEX `fk_tech_apply_info_tech_id_tech_id_idx` (`tech_id` ASC) VISIBLE,
-    INDEX `fk_apply_info_apply_info_tech_id_apply_info_id_idx` (`apply_info_id` ASC) VISIBLE,
-    CONSTRAINT `fk_apply_info_apply_info_tech_id_apply_info_id`
-    FOREIGN KEY (`apply_info_id`)
-    REFERENCES `ssafy`.`apply_info` (`id`),
-    CONSTRAINT `fk_tech_apply_info_tech_id_tech_id`
-    FOREIGN KEY (`tech_id`)
-    REFERENCES `ssafy`.`tech` (`id`))
-    ENGINE = InnoDB
-    DEFAULT CHARACTER SET = utf8mb4
-    COLLATE = utf8mb4_0900_ai_ci;
 
 
 -- -----------------------------------------------------
@@ -592,28 +552,6 @@ CREATE TABLE IF NOT EXISTS `ssafy`.`member_team` (
     COLLATE = utf8mb4_0900_ai_ci;
 
 
--- -----------------------------------------------------
--- Table `ssafy`.`member_tech`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `ssafy`.`member_tech` (
-                                                     `id` BIGINT NOT NULL AUTO_INCREMENT,
-                                                     `member_id` BIGINT NULL DEFAULT NULL,
-                                                     `tech_id` BIGINT NULL DEFAULT NULL,
-                                                     `DEL_YN` TINYINT(1) NOT NULL,
-    `REG_DTTM` TIMESTAMP NOT NULL,
-    `REG_USER_SEQ` BIGINT NOT NULL,
-    `MOD_DTTM` TIMESTAMP NOT NULL,
-    `MOD_USER_SEQ` BIGINT(20) NOT NULL,
-    PRIMARY KEY (`id`),
-    INDEX `project_idx_01` (`DEL_YN` ASC, `REG_USER_SEQ` ASC, `MOD_USER_SEQ` ASC) VISIBLE,
-    INDEX `fk_team_project_id_team_id_idx` (`team_id` ASC) VISIBLE,
-    CONSTRAINT `fk_team_project_id_team_id`
-    FOREIGN KEY (`team_id`)
-    REFERENCES `ssafy`.`team` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-    ENGINE = InnoDB;
-
 
 -- -----------------------------------------------------
 -- Table `ssafy`.`build_setting`
@@ -635,33 +573,6 @@ CREATE TABLE IF NOT EXISTS `ssafy`.`build_setting` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
     ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `ssafy`.`meeting`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `ssafy`.`meeting` (
-                                                 `id` BIGINT(20) NOT NULL AUTO_INCREMENT,
-    `team_id` BIGINT(20) NULL,
-    `name` VARCHAR(20) NULL,
-    `user_count` INT NULL,
-    `max_user_count` INT NULL,
-    `secret` TINYINT NULL,
-    `created_at` TIMESTAMP NOT NULL,
-    `updated_at` TIMESTAMP NOT NULL,
-    PRIMARY KEY (`id`),
-    INDEX `member_tech_idx_01` (`DEL_YN` ASC, `REG_USER_SEQ` ASC, `MOD_USER_SEQ` ASC) VISIBLE,
-    INDEX `fk_member_member_tech_id_member_id_idx` (`member_id` ASC) VISIBLE,
-    INDEX `fk_tech_member_tech_id_tech_id_idx` (`tech_id` ASC) VISIBLE,
-    CONSTRAINT `fk_member_member_tech_id_member_id`
-    FOREIGN KEY (`member_id`)
-    REFERENCES `ssafy`.`member` (`id`),
-    CONSTRAINT `fk_tech_member_tech_id_tech_id`
-    FOREIGN KEY (`tech_id`)
-    REFERENCES `ssafy`.`tech` (`id`))
-    ENGINE = InnoDB
-    DEFAULT CHARACTER SET = utf8mb4
-    COLLATE = utf8mb4_0900_ai_ci;
 
 
 -- -----------------------------------------------------
