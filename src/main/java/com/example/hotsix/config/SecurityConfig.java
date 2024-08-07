@@ -99,6 +99,7 @@ public class SecurityConfig {
                         .requestMatchers("/hot6man/test/**").permitAll()
                         .requestMatchers(("/member/**")).permitAll()
                         .requestMatchers(("/build/**")).permitAll()
+                        .requestMatchers(("/hot6man/teambuilding/**")).permitAll()
                         .requestMatchers("/log/**").permitAll()
                         .requestMatchers("/swagger-ui.html").permitAll()
                         .requestMatchers("/swagger-ui/**").permitAll()
