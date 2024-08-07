@@ -639,6 +639,31 @@ CREATE TABLE IF NOT EXISTS `ssafy`.`recruit` (
     DEFAULT CHARACTER SET = utf8mb4
     COLLATE = utf8mb4_0900_ai_ci;
 
+create table if not exists `ssafy`.`resume` (
+    `id` bigint(20) not null auto_increment,
+    `title` varchar(40) not null,
+    `profile` varchar(100) not null,
+    `position` varchar(40) not null,
+    `tech_stack` json not null,
+    `comment` varchar(40) not null,
+    `author_id` bigint(20) not null,
+    `DEL_YN` BOOLEAN NOT NULL,
+    `REG_DTTM` TIMESTAMP NOT NULL,
+    `REG_USER_SEQ` BIGINT(20) NOT NULL,
+    `MOD_DTTM` TIMESTAMP NOT NULL,
+    `MOD_USER_SEQ` BIGINT(20) NOT NULL,
+    primary key (`id`),
+    foreign key (`author_id`) references `member`(`id`)
+) ENGINE = InnoDB;
+
+create table if not exists `ssafy`.`resume_experience` (
+    `id` bigint(20) not null auto_increment,
+    `title` varchar(40) not null,
+    `description` varchar(500) not null,
+    `resume_id` bigint(20) not null,
+    primary key (`id`),
+    foreign key (`resume_id`) references `resume`(`id`)
+) ENGINE = InnoDB;
 
 -- -----------------------------------------------------
 -- Table `ssafy`.`service_schedule`

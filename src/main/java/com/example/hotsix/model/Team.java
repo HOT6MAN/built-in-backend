@@ -58,11 +58,11 @@ public class Team extends BaseEntity{
     private ServiceSchedule schedules;
 
     @JsonManagedReference
-    @OneToMany(mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<TeamProjectInfo> teamProjectInfos = new ArrayList<>();
-    @OneToMany(mappedBy = "team")
+    @OneToMany(mappedBy = "team", fetch = FetchType.LAZY)
     private List<MemberTeam> memberTeams = new ArrayList<>();
-    @OneToMany(mappedBy = "team")
+    @OneToMany(mappedBy = "team", fetch = FetchType.LAZY)
     private List<Meeting> meetings;
 
 
