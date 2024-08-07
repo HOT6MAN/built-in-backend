@@ -48,17 +48,17 @@ public class MemberServiceImpl implements MemberService{
     @Override
     public Path getImagePath(Member member){
         if(member.getMemberImage() == null){
-            return Paths.get("C:/upload/img/default-profile.png");
+            return Paths.get("/spring/image/defaultImage.png");
         }
         String UUID = member.getMemberImage().getFixedName();
         String saveFolder = member.getMemberImage().getSaveFolder();
-        String basicPath = "C:/upload/img"+ File.separator+saveFolder+File.separator+UUID;
+        String basicPath = "/spring/image"+ File.separator+saveFolder+File.separator+UUID;
         return Paths.get(basicPath);
     }
     @Override
     public Resource getImagePath(){
         try{
-            String basicPath = "C:/upload/img/default-profile.png";
+            String basicPath = "/spring/image/defaultImage.png";
             Path path = Paths.get(basicPath);
             Resource resource = new UrlResource(path.toUri());
             return resource;
