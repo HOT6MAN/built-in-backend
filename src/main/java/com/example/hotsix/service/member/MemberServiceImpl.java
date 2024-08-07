@@ -8,6 +8,7 @@ import com.example.hotsix.repository.member.MemberImageRepository;
 import com.example.hotsix.repository.member.MemberRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ import java.nio.file.Paths;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class MemberServiceImpl implements MemberService{
     private final MemberRepository memberRepository;
     private final MemberImageRepository memberImageRepository;
@@ -48,6 +50,7 @@ public class MemberServiceImpl implements MemberService{
     @Override
     public Path getImagePath(Member member){
         if(member.getMemberImage() == null){
+            log.info("member image is null");
             return Paths.get("/spring/image/defaultImage.png");
         }
         String UUID = member.getMemberImage().getFixedName();
@@ -71,6 +74,7 @@ public class MemberServiceImpl implements MemberService{
     public String getContentType(Member member){
         try{
             Path path = getImagePath(member);
+            log.info("get Image Path of Member = {}", path.toString());
             Resource resource = new UrlResource(path.toUri());
             if(resource.exists() || resource.isReadable()){
                 String contentType = Files.probeContentType(path);
