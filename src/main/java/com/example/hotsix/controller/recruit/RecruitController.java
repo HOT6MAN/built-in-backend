@@ -23,7 +23,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-@RequestMapping("/hot6man")
 @RestController
 public class RecruitController {
 
