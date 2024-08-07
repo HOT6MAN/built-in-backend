@@ -61,7 +61,8 @@ public class ResumeController {
 
         Member memberMe = memberService.findById(me.getId());
 
-        return Objects.nonNull(memberMe.getResumeList()) ? convertToShortResponse(memberMe.getResumeList()) : null;
+//        return Objects.nonNull(memberMe.getResumeList()) ? convertToShortResponse(memberMe.getResumeList()) : null;
+        return null;
     }
 
     @ResponseStatus(HttpStatus.CREATED)
