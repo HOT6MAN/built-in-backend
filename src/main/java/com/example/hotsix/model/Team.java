@@ -70,8 +70,8 @@ public class Team extends BaseEntity{
 //    @JoinColumn(name = "team_id")
 //    private List<MemberTeam> memberTeams = new ArrayList<>();
 
-    @OneToOne(mappedBy = "team", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private TeamProjectCredential teamProjectCredential;
+//    @OneToOne(mappedBy = "team", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+//    private TeamProjectCredential teamProjectCredential;
 
     public TeamDto toDto(){
         return TeamDto.builder()
@@ -99,10 +99,10 @@ public class Team extends BaseEntity{
         teamProjectInfos.remove(teamProjectInfo);
         teamProjectInfo.setTeam(null);
     }
-    public void setMemberProjectCredential(TeamProjectCredential teamProjectCredential) {
-        this.teamProjectCredential = teamProjectCredential;
-        teamProjectCredential.setTeam(this);
-    }
+//    public void setMemberProjectCredential(TeamProjectCredential teamProjectCredential) {
+//        this.teamProjectCredential = teamProjectCredential;
+//        teamProjectCredential.setTeam(this);
+//    }
 
     @Override
     public String toString() {

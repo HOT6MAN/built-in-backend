@@ -46,30 +46,6 @@ CREATE TABLE IF NOT EXISTS `ssafy`.`member` (
 -- -----------------------------------------------------
 -- Table `ssafy`.`member_project_credential`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `ssafy`.`member_project_credential` (
-                                                                   `id` BIGINT NOT NULL AUTO_INCREMENT,
-                                                                   `member_id` BIGINT NOT NULL,
-                                                                   `job_name` VARCHAR(30) NOT NULL,
-    `git_username` VARCHAR(30) NOT NULL,
-    `git_token` VARCHAR(100) NOT NULL,
-    `docker_username` VARCHAR(30) NOT NULL,
-    `docker_token` VARCHAR(100) NOT NULL,
-    `git_credential_id` VARCHAR(50) NULL DEFAULT NULL,
-    `docker_credential_id` VARCHAR(50) NULL DEFAULT NULL,
-    `team_id` BIGINT NOT NULL,
-    PRIMARY KEY (`id`),
-    INDEX `member_id` (`member_id` ASC) VISIBLE,
-    INDEX `team_id` (`team_id` ASC) VISIBLE,
-    CONSTRAINT `member_project_credential_ibfk_1`
-    FOREIGN KEY (`member_id`)
-    REFERENCES `ssafy`.`member` (`id`),
-    CONSTRAINT `member_project_credential_ibfk_2`
-    FOREIGN KEY (`team_id`)
-    REFERENCES `ssafy`.`team` (`id`))
-    ENGINE = InnoDB
-    DEFAULT CHARACTER SET = utf8mb4
-    COLLATE = utf8mb4_0900_ai_ci;
-
 
 -- -----------------------------------------------------
 -- Table `ssafy`.`team`
@@ -84,18 +60,13 @@ CREATE TABLE IF NOT EXISTS `ssafy`.`team` (
     `git_url` VARCHAR(255) NULL DEFAULT NULL,
     `jira_url` VARCHAR(255) NULL DEFAULT NULL,
     `session_id` VARCHAR(255) NULL,
-    `team_project_credential_id` BIGINT NOT NULL,
     `DEL_YN` TINYINT(1) NOT NULL,
     `REG_DTTM` TIMESTAMP NOT NULL,
     `REG_USER_SEQ` BIGINT NOT NULL,
     `MOD_DTTM` TIMESTAMP NOT NULL,
     `MOD_USER_SEQ` BIGINT NOT NULL,
     PRIMARY KEY (`id`),
-    INDEX `team_project_credential_id` (`team_project_credential_id` ASC) VISIBLE,
-    INDEX `team_idx_01` (`DEL_YN` ASC, `REG_USER_SEQ` ASC, `MOD_USER_SEQ` ASC) VISIBLE,
-    CONSTRAINT `team_ibfk_1`
-    FOREIGN KEY (`team_project_credential_id`)
-    REFERENCES `ssafy`.`member_project_credential` (`id`))
+    INDEX `team_idx_01` (`DEL_YN` ASC, `REG_USER_SEQ` ASC, `MOD_USER_SEQ` ASC) VISIBLE)
     ENGINE = InnoDB
     DEFAULT CHARACTER SET = utf8mb4
     COLLATE = utf8mb4_0900_ai_ci;
@@ -710,11 +681,11 @@ VALUES (1, 'ssafy@gmail.com', '싸피', '김싸피', 'https://asdf.com', '010-12
 --
 -- -- team dummy data 생성
 INSERT INTO `ssafy`.`team` (
-    `name`, `status`, `content`, `start_time`, `end_time`, `git_url`, `jira_url`, `session_id`, `team_project_credential_id`, `DEL_YN`, `REG_DTTM`, `REG_USER_SEQ`, `MOD_DTTM`, `MOD_USER_SEQ`
+    `name`, `status`, `content`, `start_time`, `end_time`, `git_url`, `jira_url`, `session_id`, `DEL_YN`, `REG_DTTM`, `REG_USER_SEQ`, `MOD_DTTM`, `MOD_USER_SEQ`
 ) VALUES
-    ('Team Alpha', 'active', 'Content for team alpha', '2024-01-01 10:00:00', '2024-12-31 18:00:00', 'https://github.com/team-alpha', 'https://jira.team-alpha.com', NULL, 1, 0, NOW(), 1, NOW(), 1),
-    ('Team Beta', 'inactive', 'Content for team beta', '2024-02-01 11:00:00', '2024-11-30 17:00:00', 'https://github.com/team-beta', 'https://jira.team-beta.com', NULL, 2, 0, NOW(), 2, NOW(), 2),
-    ('Team Gamma', 'active', 'Content for team gamma', '2024-03-01 12:00:00', '2024-10-31 16:00:00', 'https://github.com/team-gamma', 'https://jira.team-gamma.com', NULL, 3, 0, NOW(), 3, NOW(), 3),
-    ('Team Delta', 'inactive', 'Content for team delta', '2024-04-01 13:00:00', '2024-09-30 15:00:00', 'https://github.com/team-delta', 'https://jira.team-delta.com', NULL, 4, 0, NOW(), 4, NOW(), 4),
-    ('Team Epsilon', 'active', 'Content for team epsilon', '2024-05-01 14:00:00', '2024-08-31 14:00:00', 'https://github.com/team-epsilon', 'https://jira.team-epsilon.com', 'session_5', 5, 0, NOW(), 5, NOW(), 5);
+      ('Team Alpha', 'active', 'Content for team alpha', '2024-01-01 10:00:00', '2024-12-31 18:00:00', 'https://github.com/team-alpha', 'https://jira.team-alpha.com', NULL,  0, NOW(), 1, NOW(), 1),
+      ('Team Beta', 'inactive', 'Content for team beta', '2024-02-01 11:00:00', '2024-11-30 17:00:00', 'https://github.com/team-beta', 'https://jira.team-beta.com', NULL,  0, NOW(), 2, NOW(), 2),
+      ('Team Gamma', 'active', 'Content for team gamma', '2024-03-01 12:00:00', '2024-10-31 16:00:00', 'https://github.com/team-gamma', 'https://jira.team-gamma.com', NULL,  0, NOW(), 3, NOW(), 3),
+      ('Team Delta', 'inactive', 'Content for team delta', '2024-04-01 13:00:00', '2024-09-30 15:00:00', 'https://github.com/team-delta', 'https://jira.team-delta.com', NULL,  0, NOW(), 4, NOW(), 4),
+      ('Team Epsilon', 'active', 'Content for team epsilon', '2024-05-01 14:00:00', '2024-08-31 14:00:00', 'https://github.com/team-epsilon', 'https://jira.team-epsilon.com', 'session_5',  0, NOW(), 5, NOW(), 5);
 --

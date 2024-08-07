@@ -4,7 +4,7 @@ import com.example.hotsix.dto.build.*;
 import com.example.hotsix.model.Member;
 import com.example.hotsix.model.ServiceSchedule;
 import com.example.hotsix.enums.BuildStatus;
-import com.example.hotsix.model.TeamProjectCredential;
+//import com.example.hotsix.model.TeamProjectCredential;
 import com.example.hotsix.model.project.*;
 import com.example.hotsix.repository.build.BuildLogRepository;
 import com.example.hotsix.repository.build.BuildRepository;
@@ -432,31 +432,31 @@ public class BuildServiceImpl implements BuildService{
      * 현재는 무조건 UsernamePasswordCredential을 생성함.
      * Parameter는 모두 Jenkins의 add credential시 필요한 변수들
      */
-    public JSONObject createCredentials(TeamProjectCredential credential,
-                                        String description, String credentialType) {
-        JSONObject credentials = new JSONObject();
-        JSONObject credentialsData = new JSONObject();
-        String credentialDescription = "Credential of "+credentialType+" for "+credential.getGitUsername();
-        String credentialId = credential.getGitUsername()+ "("+LocalTimeUtil.getDateTime()+")("+credentialType+")";
-        if("git".equals(credentialType)){
-            credential.setGitCredentialId(credentialId);
-            credentialsData.put("username", credential.getGitUsername());
-            credentialsData.put("password", credential.getGitToken());
-        }
-        else{
-            credential.setDockerCredentialId(credentialId);
-            credentialsData.put("username", credential.getDockerUsername());
-            credentialsData.put("password", credential.getDockerToken());
-        }
-        credentialsData.put("scope", "GLOBAL");
-        credentialsData.put("id", credentialId);
-        credentialsData.put("description", credentialDescription);
-        credentialsData.put("$class", "com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl");
-
-        credentials.put("credentials", credentialsData);
-
-        return credentials;
-    }
+//    public JSONObject createCredentials(TeamProjectCredential credential,
+//                                        String description, String credentialType) {
+//        JSONObject credentials = new JSONObject();
+//        JSONObject credentialsData = new JSONObject();
+//        String credentialDescription = "Credential of "+credentialType+" for "+credential.getGitUsername();
+//        String credentialId = credential.getGitUsername()+ "("+LocalTimeUtil.getDateTime()+")("+credentialType+")";
+//        if("git".equals(credentialType)){
+//            credential.setGitCredentialId(credentialId);
+//            credentialsData.put("username", credential.getGitUsername());
+//            credentialsData.put("password", credential.getGitToken());
+//        }
+//        else{
+//            credential.setDockerCredentialId(credentialId);
+//            credentialsData.put("username", credential.getDockerUsername());
+//            credentialsData.put("password", credential.getDockerToken());
+//        }
+//        credentialsData.put("scope", "GLOBAL");
+//        credentialsData.put("id", credentialId);
+//        credentialsData.put("description", credentialDescription);
+//        credentialsData.put("$class", "com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl");
+//
+//        credentials.put("credentials", credentialsData);
+//
+//        return credentials;
+//    }
 
     /**
      *
