@@ -51,6 +51,9 @@ public class Team extends BaseEntity{
     @Column(name="jira_url")
     private String jiraUrl;
 
+    @Column(name="session_id")
+    private String sessionId;
+
     @OneToOne(mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true)
     private ServiceSchedule schedules;
 
@@ -59,6 +62,13 @@ public class Team extends BaseEntity{
     private List<TeamProjectInfo> teamProjectInfos = new ArrayList<>();
     @OneToMany(mappedBy = "team")
     private List<MemberTeam> memberTeams = new ArrayList<>();
+    @OneToMany(mappedBy = "team")
+    private List<Meeting> meetings;
+
+
+//    @OneToMany
+//    @JoinColumn(name = "team_id")
+//    private List<MemberTeam> memberTeams = new ArrayList<>();
 
     @OneToOne(mappedBy = "team", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private TeamProjectCredential teamProjectCredential;
@@ -73,6 +83,7 @@ public class Team extends BaseEntity{
                 .endTime(endTime)
                 .gitUrl(gitUrl)
                 .jiraUrl(jiraUrl)
+                .sessionId(sessionId)
                 .memberTeams(memberTeams.stream()
                         .map(MemberTeam::toDto)
                         .collect(Collectors.toList()))
@@ -104,7 +115,9 @@ public class Team extends BaseEntity{
                 ", endTime=" + endTime +
                 ", gitUrl='" + gitUrl + '\'' +
                 ", jiraUrl='" + jiraUrl + '\'' +
+                ", sessionId='" + sessionId + '\'' +
                 ", memberTeams=" + memberTeams +
                 '}';
     }
+
 }

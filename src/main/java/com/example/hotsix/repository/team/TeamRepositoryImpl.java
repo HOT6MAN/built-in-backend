@@ -7,15 +7,17 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import com.example.hotsix.repository.Querydsl4RepositorySupport;
 
 import java.util.List;
+import java.util.Optional;
 
 import static com.example.hotsix.model.QMemberTeam.memberTeam;
 import static com.example.hotsix.model.QTeam.team;
 
 @Repository
 @RequiredArgsConstructor
-public class TeamRepositoryImpl implements TeamRepositoryCustom {
+public class TeamRepositoryImpl extends Querydsl4RepositorySupport implements TeamRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
 
@@ -49,5 +51,15 @@ public class TeamRepositoryImpl implements TeamRepositoryCustom {
         return queryFactory.selectFrom(team)
                 .where(team.id.eq(id))
                 .fetchOne();
+    }
+
+    public Optional<Team> findTeamBySessionId(String sessionId) {
+        if (sessionId == null) {
+            return Optional.empty();
+        }
+        Team result = queryFactory.selectFrom(team)
+                .where(team.sessionId.eq(sessionId))
+                .fetchOne();
+        return Optional.ofNullable(result);
     }
 }

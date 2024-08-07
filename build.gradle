@@ -91,6 +91,9 @@ dependencies {
     implementation 'org.springframework:spring-messaging'
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
 
+    //openvidu 의존성
+    implementation 'io.openvidu:openvidu-java-client:2.30.0'
+
     // Jenkins API
     implementation 'com.offbytwo.jenkins:jenkins-client:0.3.8'
     implementation group: 'io.github.cdancy', name: 'jenkins-rest', version: '1.0.2'

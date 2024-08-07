@@ -83,6 +83,7 @@ CREATE TABLE IF NOT EXISTS `ssafy`.`team` (
     `end_time` TIMESTAMP NULL DEFAULT NULL,
     `git_url` VARCHAR(255) NULL DEFAULT NULL,
     `jira_url` VARCHAR(255) NULL DEFAULT NULL,
+    `session_id` VARCHAR(255) NULL,
     `team_project_credential_id` BIGINT NOT NULL,
     `DEL_YN` TINYINT(1) NOT NULL,
     `REG_DTTM` TIMESTAMP NOT NULL,
@@ -602,7 +603,52 @@ CREATE TABLE IF NOT EXISTS `ssafy`.`member_tech` (
     `REG_DTTM` TIMESTAMP NOT NULL,
     `REG_USER_SEQ` BIGINT NOT NULL,
     `MOD_DTTM` TIMESTAMP NOT NULL,
-    `MOD_USER_SEQ` BIGINT NOT NULL,
+    `MOD_USER_SEQ` BIGINT(20) NOT NULL,
+    PRIMARY KEY (`id`),
+    INDEX `project_idx_01` (`DEL_YN` ASC, `REG_USER_SEQ` ASC, `MOD_USER_SEQ` ASC) VISIBLE,
+    INDEX `fk_team_project_id_team_id_idx` (`team_id` ASC) VISIBLE,
+    CONSTRAINT `fk_team_project_id_team_id`
+    FOREIGN KEY (`team_id`)
+    REFERENCES `ssafy`.`team` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+    ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `ssafy`.`build_setting`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ssafy`.`build_setting` (
+                                                       `id` BIGINT(20) NOT NULL AUTO_INCREMENT,
+    `build_id` BIGINT(20) NULL,
+    `git_token` VARCHAR(127) NULL,
+    `jenkins_url` VARCHAR(127) NULL,
+    `docker_image` VARCHAR(127) NULL,
+    `created_at` TIMESTAMP NOT NULL,
+    `updated_at` TIMESTAMP NOT NULL,
+    PRIMARY KEY (`id`),
+    INDEX `build_setting_idx_01` (`created_at` ASC, `updated_at` ASC) VISIBLE,
+    INDEX `fk_build_build_setting_id_build_id_idx` (`build_id` ASC) VISIBLE,
+    CONSTRAINT `fk_build_build_setting_id_build_id`
+    FOREIGN KEY (`build_id`)
+    REFERENCES `ssafy`.`build` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+    ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `ssafy`.`meeting`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ssafy`.`meeting` (
+                                                 `id` BIGINT(20) NOT NULL AUTO_INCREMENT,
+    `team_id` BIGINT(20) NULL,
+    `name` VARCHAR(20) NULL,
+    `user_count` INT NULL,
+    `max_user_count` INT NULL,
+    `secret` TINYINT NULL,
+    `created_at` TIMESTAMP NOT NULL,
+    `updated_at` TIMESTAMP NOT NULL,
     PRIMARY KEY (`id`),
     INDEX `member_tech_idx_01` (`DEL_YN` ASC, `REG_USER_SEQ` ASC, `MOD_USER_SEQ` ASC) VISIBLE,
     INDEX `fk_member_member_tech_id_member_id_idx` (`member_id` ASC) VISIBLE,

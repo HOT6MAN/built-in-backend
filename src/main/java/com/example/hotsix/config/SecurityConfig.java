@@ -106,6 +106,7 @@ public class SecurityConfig {
                         .requestMatchers("/v3/api-docs/**").permitAll()
                         .requestMatchers("/ws/log/**").permitAll()
                         .requestMatchers(("/hot6man/member/**")).permitAll()
+                        .requestMatchers("/meeting/**").permitAll()
                         .anyRequest().authenticated());
 
         // 세션 설정 : STATELESS

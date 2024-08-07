@@ -20,6 +20,7 @@ public class TeamDto {
     private LocalDateTime endTime;
     private String gitUrl;
     private String jiraUrl;
+    private String sessionId;
     private List<MemberTeamDto> memberTeams;
 
     private Long memberId;
@@ -35,6 +36,7 @@ public class TeamDto {
                 ", endTime=" + endTime +
                 ", gitUrl='" + gitUrl + '\'' +
                 ", jiraUrl='" + jiraUrl + '\'' +
+                ", sessionId='" + sessionId + '\'' +
                 ", memberTeams=" + memberTeams +
                 ", memberId=" + memberId +
                 '}';
