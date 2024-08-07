@@ -708,3 +708,13 @@ VALUES (1, 'ssafy@gmail.com', '싸피', '김싸피', 'https://asdf.com', '010-12
 -- INSERT INTO team_project_info (id, team_id, title)
 -- values (1, 1, '1번 세팅');
 --
+-- -- team dummy data 생성
+INSERT INTO `ssafy`.`team` (
+    `name`, `status`, `content`, `start_time`, `end_time`, `git_url`, `jira_url`, `session_id`, `team_project_credential_id`, `DEL_YN`, `REG_DTTM`, `REG_USER_SEQ`, `MOD_DTTM`, `MOD_USER_SEQ`
+) VALUES
+    ('Team Alpha', 'active', 'Content for team alpha', '2024-01-01 10:00:00', '2024-12-31 18:00:00', 'https://github.com/team-alpha', 'https://jira.team-alpha.com', NULL, 1, 0, NOW(), 1, NOW(), 1),
+    ('Team Beta', 'inactive', 'Content for team beta', '2024-02-01 11:00:00', '2024-11-30 17:00:00', 'https://github.com/team-beta', 'https://jira.team-beta.com', NULL, 2, 0, NOW(), 2, NOW(), 2),
+    ('Team Gamma', 'active', 'Content for team gamma', '2024-03-01 12:00:00', '2024-10-31 16:00:00', 'https://github.com/team-gamma', 'https://jira.team-gamma.com', NULL, 3, 0, NOW(), 3, NOW(), 3),
+    ('Team Delta', 'inactive', 'Content for team delta', '2024-04-01 13:00:00', '2024-09-30 15:00:00', 'https://github.com/team-delta', 'https://jira.team-delta.com', NULL, 4, 0, NOW(), 4, NOW(), 4),
+    ('Team Epsilon', 'active', 'Content for team epsilon', '2024-05-01 14:00:00', '2024-08-31 14:00:00', 'https://github.com/team-epsilon', 'https://jira.team-epsilon.com', 'session_5', 5, 0, NOW(), 5, NOW(), 5);
+--
