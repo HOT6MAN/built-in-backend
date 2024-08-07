@@ -6,6 +6,8 @@ import java.io.IOException;
 
 public interface StorageService {
 
+    String getUploadedImageUrl(String imageName);
+
     void store(MultipartFile file) throws IOException;
 
     void remove(String fileName) throws IOException;

@@ -4,6 +4,7 @@ import com.example.hotsix.model.Member;
 import org.springframework.core.io.Resource;
 
 import java.nio.file.Path;
+import java.util.Optional;
 
 public interface MemberService {
     Member findMemberProfileByMemberId(Long id);
@@ -15,4 +16,6 @@ public interface MemberService {
     Resource getImagePath();
     Path getImagePath(Member member);
     String getContentType(Member member);
+
+    Member findById(Long id);
 }

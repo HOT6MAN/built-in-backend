@@ -1,6 +1,9 @@
 package com.example.hotsix.service.storage;
 
+import com.example.hotsix.properties.ServerProperties;
 import com.example.hotsix.properties.StorageProperties;
+import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -11,27 +14,40 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
+@RequiredArgsConstructor
 public class FileSystemStorageService implements StorageService {
 
-    private final Path uploadImgPath;
+    private final ServerProperties serverProperties;
+    private final StorageProperties storageProperties;
+    private Path uploadImagePath;
 
-    @Autowired
-    public FileSystemStorageService(StorageProperties storageProperties) {
-        String path = storageProperties.uploadImages();
+    @PostConstruct
+    public void init() {
+        this.uploadImagePath = Paths.get(storageProperties.uploadImages());
+    }
 
-        this.uploadImgPath = Paths.get(path);
+    @Override
+    public String getUploadedImageUrl(String imageName) {
+        Pattern pattern = Pattern.compile("src/main/resources/static/(.*)");
+        Matcher matcher = pattern.matcher(storageProperties.uploadImages());
+
+        matcher.matches();
+
+        return String.format("%s/%s/%s", serverProperties.origin(), matcher.group(1), imageName);
     }
 
     @Override
     public void store(MultipartFile file) throws IOException {
         if (file.isEmpty()) throw new IOException("Failed to store empty file");
 
-        Path path = this.uploadImgPath.resolve(Paths.get(file.getOriginalFilename())).normalize().toAbsolutePath();
+        Path path = uploadImagePath.resolve(Paths.get(file.getOriginalFilename())).normalize().toAbsolutePath();
         Path parentDir = path.getParent();
 
-        if (!parentDir.equals(this.uploadImgPath.toAbsolutePath())) throw new IOException("Cannot store file outside current directory.");
+        if (!parentDir.equals(uploadImagePath.toAbsolutePath())) throw new IOException("Cannot store file outside current directory.");
 
         Files.createDirectories(parentDir);
 
@@ -44,15 +60,19 @@ public class FileSystemStorageService implements StorageService {
 
     @Override
     public void remove(String fileName) throws IOException {
-        Files.delete(uploadImgPath.resolve(fileName));
+        if (fileName.isEmpty()) throw new IOException("Filename is null or empty");
+
+        Files.delete(uploadImagePath.resolve(fileName));
     }
 
     @Override
     public void replace(String fileName, MultipartFile toUpload) throws IOException {
-        Files.delete(uploadImgPath.resolve(fileName));
+        if (fileName.isEmpty()) throw new IOException("Filename is null or empty");
+
+        Files.delete(uploadImagePath.resolve(fileName));
 
         try (InputStream inputStream = toUpload.getInputStream()) {
-            Files.copy(inputStream, uploadImgPath.resolve(toUpload.getOriginalFilename()), StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(inputStream, uploadImagePath.resolve(toUpload.getOriginalFilename()), StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             throw new IOException("Failed to store file " + toUpload.getOriginalFilename(), e);
         }

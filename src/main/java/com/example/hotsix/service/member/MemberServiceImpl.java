@@ -1,6 +1,8 @@
 package com.example.hotsix.service.member;
 
 import com.example.hotsix.dto.member.MemberDto;
+import com.example.hotsix.enums.Process;
+import com.example.hotsix.exception.BuiltInException;
 import com.example.hotsix.model.Member;
 import com.example.hotsix.repository.member.MemberImageRepository;
 import com.example.hotsix.repository.member.MemberRepository;
@@ -21,6 +23,10 @@ public class MemberServiceImpl implements MemberService{
     private final MemberRepository memberRepository;
     private final MemberImageRepository memberImageRepository;
 
+    @Override
+    public Member findById(Long id) {
+        return memberRepository.findById(id).orElseThrow(() -> new BuiltInException(Process.USER_NOT_FOUND));
+    }
 
     @Override
     public Member findMemberProfileByMemberId(Long id) {

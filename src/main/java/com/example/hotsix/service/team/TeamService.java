@@ -12,6 +12,7 @@ public interface TeamService {
     void createTeam(Team team, Long memberId);
     List<TeamDto> getAllMyTeams(Long memberId);
 
+    Team findById(Long id);
     TeamDto getTeamById(Long teamId);
     TeamDto updateJiraUrl(String jiraUrl, Long teamId);
     TeamDto updateGitUrl(String gitUrl, Long teamId);
