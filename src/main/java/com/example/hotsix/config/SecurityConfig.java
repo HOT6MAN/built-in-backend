@@ -94,6 +94,7 @@ public class SecurityConfig {
                         .requestMatchers("/email-login").permitAll()
                         .requestMatchers("/register").permitAll()
                         .requestMatchers("/signup").permitAll()
+                        .requestMatchers("/hot6man/signup").permitAll()
                         .requestMatchers("/email-register").permitAll()
                         //.requestMatchers("/teams/**").permitAll()
                         .requestMatchers("/hot6man/test/**").permitAll()
@@ -107,6 +108,7 @@ public class SecurityConfig {
                         .requestMatchers("/ws/log/**").permitAll()
                         .requestMatchers(("/hot6man/member/**")).permitAll()
                         .requestMatchers("/meeting/**").permitAll()
+                        .requestMatchers(("/member/**")).permitAll()
                         .anyRequest().authenticated());
 
         // 세션 설정 : STATELESS

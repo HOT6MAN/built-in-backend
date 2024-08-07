@@ -92,7 +92,7 @@ public class EmailController {
 
         response.addCookie(cookies.get("access"));
         response.addCookie(cookies.get("refresh"));
-        response.sendRedirect(clinetHost+"/hot6man/afterlogin");
+        response.sendRedirect(clinetHost+"/afterlogin");
         }
     }
 
@@ -120,10 +120,11 @@ public class EmailController {
     }
 
     // 프로필 작성 후 가입 버튼 누를시 가입완료
-    @PostMapping("/signup")
-    public MemberDto signup(@RequestBody Member member){
+    @PostMapping(value = "/signup", consumes = "application/json;charset=UTF-8")
+    public MemberDto signup(@RequestBody MemberDto member){
+        System.out.println("Member = "+member);
         log.info("member {}",member.toString());
-        MemberDto memberDto = loginService.signUp(member);
+        MemberDto memberDto = loginService.signUp(Member.fromDto(member));
         return memberDto;
     }
 

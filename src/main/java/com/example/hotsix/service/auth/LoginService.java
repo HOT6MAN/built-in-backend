@@ -31,16 +31,18 @@ public class LoginService {
     private final RedisTemplate<String ,String> redisTemplate;
 
     public MemberDto signUp(Member member) {
+        log.info("call LoginService.signUp");
         member.setRole("ROLE_USER");
         member.setLgnMtd("built-in");
         memberRepository.save(member);
 
         MemberDto memberDto = MemberDto.builder()
                 .id(member.getId())
-                .name(member.getNickname())
+                .name(member.getName())
+                .nickname(member.getNickname())
                 .phone(member.getPhone())
                 .build();
-
+        log.info("after save Member infos");
         return memberDto;
     }
 
@@ -52,6 +54,7 @@ public class LoginService {
                 .id(member.getId())
                 .email(member.getEmail())
                 .name(member.getName())
+                .nickname(member.getNickname())
                 .role(member.getRole())
                 .build();
 

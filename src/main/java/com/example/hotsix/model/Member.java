@@ -71,6 +71,19 @@ public class Member extends BaseEntity {
                 .name(this.name)
                 .build();
     }
+    public static Member fromDto(MemberDto dto) {
+        return Member.builder()
+                .id(dto.getId())
+                .name(dto.getName())
+                .email(dto.getEmail())
+                .nickname(dto.getNickname())
+                .profileUrl(dto.getProfileUrl())
+                .phone(dto.getPhone())
+                .address(dto.getAddress())
+                .role(dto.getRole())
+                .lgnMtd(dto.getLgnMtd())
+                .build();
+    }
 
     public MemberDto toDtoForMemberTeam(){
         MemberDto memberDto = MemberDto.builder()
