@@ -6,6 +6,7 @@ import com.example.hotsix.model.Member;
 import com.example.hotsix.service.member.MemberImageService;
 import com.example.hotsix.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -24,6 +25,7 @@ import java.util.UUID;
 @RequestMapping("/member")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "http://localhost:5173")
+@Slf4j
 public class MemberController {
     private final MemberService memberService;
     private final MemberImageService memberImageService;
@@ -43,8 +45,11 @@ public class MemberController {
 
     @GetMapping("/image/{memberId}")
     public ResponseEntity<Resource> findMemberProfileImageByMemberId(@PathVariable("memberId")Long memberId){
+        log.info("find Member Profile Image By Member Id Controller 도착");
         Member member = memberService.findMemberProfileByMemberId(memberId);
+        log.info(" MemberId로부터 찾은 member = {}", member);
         String contentType = memberService.getContentType(member);
+        log.info(" member의 프로필 이미지 content type = {}", contentType);
         Resource resource = memberService.findMemberProfileImageByMemberId(memberId);
         if(resource!=null) {
             return ResponseEntity.ok()
