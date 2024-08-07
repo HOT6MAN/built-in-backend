@@ -5,14 +5,30 @@ import com.example.hotsix.dto.recruit.RecruitResponse;
 import com.example.hotsix.dto.recruit.RecruitShortResponse;
 import com.example.hotsix.editor.RecruitPropertyEditor;
 import com.example.hotsix.model.Member;
+import com.example.hotsix.model.MemberTeam;
 import com.example.hotsix.model.Recruit;
 import com.example.hotsix.model.Team;
+import com.example.hotsix.oauth.dto.CustomOAuth2User;
+import com.example.hotsix.oauth.dto.UserDTO;
+import com.example.hotsix.service.member.MemberService;
 import com.example.hotsix.service.recruit.RecruitService;
 import com.example.hotsix.service.storage.StorageService;
+import com.example.hotsix.service.team.TeamService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.inject.Provider;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,13 +42,19 @@ import java.util.Map;
 @RestController
 public class RecruitController {
 
+    private final MemberService memberService;
+    private final TeamService teamService;
     private final RecruitService recruitService;
     private final StorageService storageService;
     private final Provider<RecruitPropertyEditor> recruitPropertyEditorProvider;
 
-    public RecruitController(RecruitService recruitService,
-                      @Qualifier("fileSystemStorageService") StorageService storageService,
-                      Provider<RecruitPropertyEditor> recruitPropertyEditorProvider) {
+    public RecruitController(MemberService memberService,
+                             TeamService teamService,
+                             RecruitService recruitService,
+                             @Qualifier("fileSystemStorageService") StorageService storageService,
+                             Provider<RecruitPropertyEditor> recruitPropertyEditorProvider) {
+        this.memberService = memberService;
+        this.teamService = teamService;
         this.recruitService = recruitService;
         this.storageService = storageService;
         this.recruitPropertyEditorProvider = recruitPropertyEditorProvider;
@@ -48,7 +70,7 @@ public class RecruitController {
         recruit.hit();
         recruitService.save(recruit);
 
-        return recruitService.toResponse(recruit);
+        return recruit.toResponse(storageService.getUploadedImageUrl(recruit.getThumbnail()));
     }
 
     @GetMapping("/teambuilding/recruits")
@@ -59,30 +81,30 @@ public class RecruitController {
     ) throws InterruptedException {
         Thread.sleep(1000*3);
 
+        List<Recruit> list = null;
+
         if (teamName != null) {
-            return recruitService.findSummaryAllByTeamName(teamName);
+            list = recruitService.findAllByTeamName(teamName);
         } else if (authorName != null) {
-            return recruitService.findSummaryAllByAuthorName(authorName);
+            list = recruitService.findAllByAuthorName(authorName);
         } else if (desiredPos != null) {
-            return recruitService.findSummaryAllByDesiredPos(desiredPos);
+            list = recruitService.findAllByDesiredPos(desiredPos);
+        } else {
+            list = recruitService.findAll();
         }
 
-        return recruitService.findSummaryAll();
+        return convertToShortResponse(list);
     }
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/teambuilding/recruit")
-    public void registerRecruit(@ModelAttribute RecruitRequest recruitRequest /*, @AuthenticationPrincipal Member author */) throws IOException {
-        // TODO: @AuthenticationPrincipal에서 받기
-//        Member testMember = new Member(1L, "ssafy", "ssafy@ssafy.com", "ssafy", "X", "010-1111-2222", "addr", "X", "X", null);
-        //Member testMember = new Member(1L, "ssafy", "ssafy@ssafy.com", "ssafy", "X", "010-1111-2222", "addr", "X", "X", null);
+    public void registerRecruit(@ModelAttribute RecruitRequest recruitRequest, @AuthenticationPrincipal CustomOAuth2User me) throws IOException {
+        Member author = memberService.findById(me.getId());
+        Team recruitingTeam = teamService.findById(recruitRequest.teamId());
 
-        // TODO: team 가져오기
-//        Team recruitingTeam = new Team(1L, "hot6man", "X", "Hello hot6man", LocalDateTime.now(), LocalDateTime.now(), "X", "X",  null, null, null);
+        Recruit newRecruit = recruitRequest.toEntity(author, recruitingTeam);
 
-//        Recruit newRecruit = recruitRequest.toEntity(testMember, recruitingTeam);
-
-//        recruitService.save(newRecruit);
+        recruitService.save(newRecruit);
         storageService.store(recruitRequest.thumbnail());
     }
 
@@ -113,14 +135,13 @@ public class RecruitController {
     }
 
     @GetMapping("/team")
-    public List<Map<Long, String>> myTeams(/*, @AuthenticationPrincipal Member me */) {
-        // TODO: 내가 속한 팀 가져오기
+    public List<Map<Long, String>> myTeams(@AuthenticationPrincipal CustomOAuth2User me) {
+        Member memberMe = memberService.findById(me.getId());
 
-        return Arrays.asList(
-                Map.of(1L, "hot6man"),
-                Map.of(2L, "hot6man2"),
-                Map.of(3L, "hot6man3"),
-                Map.of(4L, "hot6man4")
-        );
+        return memberMe.getMemberTeams().stream().map(MemberTeam::toShortResponse).toList();
+    }
+
+    private List<RecruitShortResponse> convertToShortResponse(List<Recruit> list) {
+        return list.stream().map(recruit -> recruit.toShortResponse(storageService.getUploadedImageUrl(recruit.getThumbnail()))).toList();
     }
 }

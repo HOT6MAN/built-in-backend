@@ -2,6 +2,8 @@ package com.example.hotsix.model;
 
 import com.example.hotsix.converter.ListToJsonConverter;
 import com.example.hotsix.dto.recruit.RecruitRequest;
+import com.example.hotsix.dto.recruit.RecruitResponse;
+import com.example.hotsix.dto.recruit.RecruitShortResponse;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -41,5 +43,34 @@ public class Recruit extends Board {
         this.domain = request.domain();
         this.desiredPosList = request.desiredPosList();
         this.content = request.content();
+    }
+
+    public RecruitResponse toResponse(String thumbnailUrl) {
+        return new RecruitResponse(
+                thumbnailUrl,
+                this.team.getId(),
+                this.team.getName(),
+                this.getHit(),
+                this.getAuthor().getName(),
+                this.domain,
+                this.desiredPosList,
+                this.getCreatedDate(),
+                this.introduction,
+                this.content
+        );
+    }
+
+    public RecruitShortResponse toShortResponse(String thumbnailUrl) {
+        return new RecruitShortResponse(
+                this.getId(),
+                this.team.getName(),
+                this.getHit(),
+                thumbnailUrl,
+                this.introduction,
+                this.domain,
+                this.desiredPosList,
+                this.getAuthor().getName(),
+                this.getCreatedDate().toLocalDate()
+        );
     }
 }

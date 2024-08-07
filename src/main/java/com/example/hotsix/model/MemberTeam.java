@@ -5,6 +5,8 @@ import com.example.hotsix.dto.team.MemberTeamDto;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.Map;
+
 
 @Entity
 @Builder
@@ -39,6 +41,9 @@ public class MemberTeam extends BaseEntity{
                 .build();
     }
 
+    public static Map<Long, String> toShortResponse(MemberTeam team) {
+        return Map.of(team.getTeam().getId(), team.getTeam().getName());
+    }
 
     @Override
     public String toString() {
