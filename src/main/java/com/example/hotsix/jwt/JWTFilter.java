@@ -149,7 +149,10 @@ public class JWTFilter extends OncePerRequestFilter {
         if(accessToken==null && refreshToken==null){
             log.info("가입, 로그인 JWT 필터 끝");
             filterChain.doFilter(request, response);
+            return;
         }
+
+        filterChain.doFilter(request, response);
 
 
     }
