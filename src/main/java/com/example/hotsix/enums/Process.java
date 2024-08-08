@@ -26,6 +26,7 @@ public enum Process {
 
     EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, "유효기간이 만료된 Token입니다."),
     TEAM_NOT_FOUND(HttpStatus.INTERNAL_SERVER_ERROR, "존재하지 않는 팀입니다"),
+    MEETING_NOT_FOUND(HttpStatus.INTERNAL_SERVER_ERROR, "존재하지 않는 회의입니다"),
     UNAUTHORIZED_USER(HttpStatus.UNAUTHORIZED, "접근 권한이 없습니다."),
 
     // 생각하지 못한 에러가 발생하였을 경우 발생하는 ProcessInfo

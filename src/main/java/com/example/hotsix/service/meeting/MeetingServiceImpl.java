@@ -1,27 +1,34 @@
 package com.example.hotsix.service.meeting;
 
+import com.example.hotsix.dto.team.TeamDto;
+import com.example.hotsix.enums.Process;
+import com.example.hotsix.exception.BuiltInException;
 import com.example.hotsix.model.Team;
 import com.example.hotsix.repository.team.TeamRepository;
 import io.openvidu.java.client.*;
 import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.Map;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
+@Transactional
+@Slf4j
 public class MeetingServiceImpl implements MeetingService {
 
 
     private OpenVidu openvidu;
     private final TeamRepository teamRepository;
 
-    public MeetingServiceImpl(TeamRepository teamRepository) {
-        this.teamRepository = teamRepository;
-    }
 
     @Value("${openvidu.url}")
     private String OPENVIDU_URL;
@@ -35,44 +42,42 @@ public class MeetingServiceImpl implements MeetingService {
     }
 
     @Override
-    public ResponseEntity<String> initializeSession(Map<String, Object> params)
+    public TeamDto createSession(Long teamId)
             throws OpenViduJavaClientException, OpenViduHttpException {
+        //openvidu 서버에 session 생성 요청
+        Map<String, Object> params = Map.of();
+        String sessionId = initializeSession(params);
 
-        // 세션 속성 생성
-        SessionProperties properties = SessionProperties.fromJson(params).build();
-        // 새 세션 생성
-        Session session = openvidu.createSession(properties);
+        // sessionId 저장 후 TeamDto return
+        return updateSessionId(sessionId, teamId);
 
-        // 클라이언트에서 전달된 teamId 가져오기
-        Long teamId = getTeamId(params);
-        if (teamId == null) {
-            return new ResponseEntity<>("teamId is required and should be a number", HttpStatus.BAD_REQUEST);
-        }
-        // 팀 찾아서 세션 ID 업데이트
-        Team team = updateTeamSessionId(teamId, session.getSessionId());
-        if (team == null) {
-            return new ResponseEntity<>("Invalid teamId: " + teamId, HttpStatus.BAD_REQUEST);
-        }
-        return new ResponseEntity<>(session.getSessionId(), HttpStatus.OK);
     }
 
     @Override
-    public ResponseEntity<String> getSession(String sessionId, Map<String, Object> params) throws OpenViduJavaClientException, OpenViduHttpException {
-        Session session = openvidu.getActiveSession(sessionId);
-        if (session == null) {
-            return new ResponseEntity<>("session not found", HttpStatus.NOT_FOUND);
+    public TeamDto getSession(Long teamId) {
+        Team team = teamRepository.findTeamById(teamId);
+        String sessionId = team.getSessionId();
+
+        // sessionId 있는데 openvidu 서버에서 활성화가 안 됐을 때
+        if (sessionId != null) {
+            Session activeSession = openvidu.getActiveSession(sessionId);
+            if (activeSession == null) {
+                // sessionId 초기화
+                team.setSessionId(null);
+                teamRepository.save(team);
+                throw new BuiltInException(Process.MEETING_NOT_FOUND);
+            }
         }
-        return new ResponseEntity<>("show me the session: " + session.getSessionId(), HttpStatus.OK);
+        return getTeamById(teamId);
     }
 
     @Override
-    public ResponseEntity<String> deleteSession(Map<String, Object> params) throws OpenViduJavaClientException, OpenViduHttpException {
-        String sessionId = getSessionId(params);
+    public ResponseEntity<String> deleteSession(Map<String, Object> params) {
+        String sessionId = getSessionIdFromParam(params);
         System.out.println("sessionId: " + sessionId);
         if (sessionId == null) {
             return new ResponseEntity<>("sessionId is required", HttpStatus.BAD_REQUEST);
         }
-
         Optional<Team> team = deleteTeamSessionId(sessionId);
         if (team.isPresent()) {
             return new ResponseEntity<>("session deleted", HttpStatus.OK);
@@ -81,27 +86,33 @@ public class MeetingServiceImpl implements MeetingService {
         }
     }
 
-    private Long getTeamId(Map<String, Object> params) {
-        try {
-            return params.get("teamId") != null ? ((Number) params.get("teamId")).longValue() : null;
-        } catch (ClassCastException e) {
-            return null;
-        }
+    private String initializeSession(@RequestBody(required = false) Map<String, Object> params)
+            throws OpenViduJavaClientException, OpenViduHttpException {
+        SessionProperties properties = SessionProperties.fromJson(params).build();
+        Session session = openvidu.createSession(properties);
+        return session.getSessionId();
     }
 
-    private String getSessionId(Map<String, Object> params) {
+    private TeamDto updateSessionId(String sessionId, Long teamId) {
+        Team team = teamRepository.findTeamById(teamId);
+        team.setSessionId(sessionId);
+        teamRepository.save(team);
+        return team.toDto();
+    }
+
+    private TeamDto getTeamById(Long teamId) {
+        Optional<Team> team = teamRepository.findById(teamId);
+        return team
+                .map(Team::toDto)
+                .orElse(null);
+    }
+
+    private String getSessionIdFromParam(Map<String, Object> params) {
         try {
             return params.get("sessionId") != null ? ((String) params.get("sessionId")) : null;
         } catch (ClassCastException e) {
             return null;
         }
-    }
-
-    private Team updateTeamSessionId(Long teamId, String sessionId) {
-        return teamRepository.findById(teamId).map(team -> {
-            team.setSessionId(sessionId);
-            return teamRepository.save(team);
-        }).orElse(null);
     }
 
     private Optional<Team> deleteTeamSessionId(String sessionId) {
@@ -111,4 +122,5 @@ public class MeetingServiceImpl implements MeetingService {
             return team;
         });
     }
+
 }
