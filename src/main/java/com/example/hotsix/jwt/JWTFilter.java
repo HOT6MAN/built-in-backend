@@ -169,7 +169,9 @@ public class JWTFilter extends OncePerRequestFilter {
             return;
         }
 
-        log.info("JWT Filter의 마지막에 도착 아무것도 못함");
+        filterChain.doFilter(request, response);
+
+
     }
 
 
