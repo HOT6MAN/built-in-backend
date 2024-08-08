@@ -96,7 +96,7 @@ public class SecurityConfig {
                         .requestMatchers("/signup").permitAll()
                         .requestMatchers("/hot6man/signup").permitAll()
                         .requestMatchers("/email-register").permitAll()
-                        //.requestMatchers("/teams/**").permitAll()
+                        .requestMatchers("/teams/**").permitAll()
                         .requestMatchers("/hot6man/test/**").permitAll()
                         .requestMatchers(("/member/**")).permitAll()
                         .requestMatchers(("/build/**")).permitAll()
