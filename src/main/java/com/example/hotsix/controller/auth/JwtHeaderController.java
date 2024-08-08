@@ -41,6 +41,11 @@ public class JwtHeaderController {
 //        }
         if (access != null) {
             // 액세스 토큰을 로컬 스토리지에 저장하기 위해 헤더에 포함
+            //리프레시 토큰 쿠키 값 0
+            Cookie newCookie = new Cookie("access",null);
+            newCookie.setMaxAge(0);
+            newCookie.setPath("/");
+            response.addCookie(newCookie);
             response.setHeader("Authorization", "Bearer " + access);
             // 리다이렉트
             //response.sendRedirect(clinetHost);
