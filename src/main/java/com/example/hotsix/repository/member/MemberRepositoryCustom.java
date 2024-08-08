@@ -1,5 +1,6 @@
 package com.example.hotsix.repository.member;
 
+import com.example.hotsix.dto.member.MemberDto;
 import com.example.hotsix.model.MemberImage;
 import com.example.hotsix.model.Member;
 import com.example.hotsix.vo.MemberVo;
@@ -13,7 +14,7 @@ public interface MemberRepositoryCustom {
 
     void deleteMemberByMemberId(Long id);
 
-    void updateMemberProfileByMemberId(Member dto);
+    void updateMemberProfileByMemberId(MemberDto dto);
 
     void updateMemberProfileImageByMemberId(MemberImage dto);
 

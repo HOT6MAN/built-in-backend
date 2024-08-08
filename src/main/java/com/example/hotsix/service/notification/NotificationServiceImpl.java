@@ -5,6 +5,7 @@ import com.example.hotsix.repository.notification.NotificationRepository;
 import com.example.hotsix.repository.notification.NotificationRepositoryCustom;
 import com.example.hotsix.util.LocalTimeUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -15,6 +16,7 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class NotificationServiceImpl implements NotificationService{
     private final NotificationRepository repository;
 
@@ -39,6 +41,7 @@ public class NotificationServiceImpl implements NotificationService{
     @Override
     public SseEmitter subscribe(String userId, String lastEventId) {
         String emitterId = userId+"_"+System.currentTimeMillis();
+        log.info("Notification Service Impl . subscribe // emitterId: {}", emitterId );
         SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
 
         if(repository.findAllNotificationByUserId(Long.parseLong(userId)) != null){
@@ -49,7 +52,8 @@ public class NotificationServiceImpl implements NotificationService{
         emitter.onCompletion(() -> repository.deleteById(emitterId));
         emitter.onTimeout(() -> repository.deleteById(emitterId));
 
-        String eventId = userId + "_" + System.currentTimeMillis();
+        String eventId = userId;
+        log.info(" Enter Event Call. eventId : {}", eventId);
         sendNotification(emitter, eventId, emitterId, "EventStream Created. [userId=" + userId + "]");
 
         if (hasLostData(lastEventId)) {
@@ -62,11 +66,14 @@ public class NotificationServiceImpl implements NotificationService{
     @Override
     public void sendNotification(SseEmitter emitter, String eventId, String emitterId, Object data) {
         try {
+            log.info(" send Notification. eventId = {}, name = {}, data = {}", eventId, emitterId, data.toString());
             emitter.send(SseEmitter.event()
                     .id(eventId)
                     .name("open")
                     .data(data, MediaType.APPLICATION_JSON));
+            log.info(" successfully Send Notification Type Enter");
         } catch (IOException exception) {
+            log.error("send Notification Error {}", exception.getMessage());
             repository.deleteById(emitterId);
             emitter.completeWithError(exception);
         }
@@ -126,7 +133,9 @@ public class NotificationServiceImpl implements NotificationService{
                     .name(data.getType())
                     .data(data, MediaType.APPLICATION_JSON)
                     .reconnectTime(0));
+            log.info("send Successfully clear to Client");
         } catch (Exception exception) {
+            log.error("Send to Client Error {}", exception.getMessage());
             repository.deleteById(id);
             emitter.completeWithError(exception);
         }

@@ -105,7 +105,7 @@ public class MemberServiceImpl implements MemberService{
 
     @Override
     @Transactional
-    public boolean updateMemberProfileByMemberId(Member dto) {
+    public boolean updateMemberProfileByMemberId(MemberDto dto) {
         try{
             memberRepository.updateMemberProfileByMemberId(dto);
             return true;

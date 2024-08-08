@@ -133,6 +133,23 @@ public class JWTFilter extends OncePerRequestFilter {
             return;
         }
 
+        else if(refreshToken != null && authorization != null){
+            accessToken = authorization;
+            try {
+                // accessToken 유효성 검사
+                if (!jwtUtil.isExpired(accessToken)) {
+                    // 유효한 경우, SecurityContext 설정 및 필터 통과
+                    setSecurityContext(request, response, filterChain, accessToken);
+                    return;
+                }
+            } catch (ExpiredJwtException e) {
+                e.printStackTrace();
+            } catch (IllegalArgumentException e) {
+                jwtExceptionHandler(response, new BuiltInException(Process.INVALID_TOKEN));
+                return;
+            }
+        }
+
 
         // 처음 로그인시 access쿠키 헤더 전환
         accessToken = getAccessToeknFromCookie(request);
@@ -152,9 +169,7 @@ public class JWTFilter extends OncePerRequestFilter {
             return;
         }
 
-        filterChain.doFilter(request, response);
-
-
+        log.info("JWT Filter의 마지막에 도착 아무것도 못함");
     }
 
 

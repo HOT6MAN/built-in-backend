@@ -1,5 +1,6 @@
 package com.example.hotsix.repository.member;
 
+import com.example.hotsix.dto.member.MemberDto;
 import com.example.hotsix.model.MemberImage;
 import com.example.hotsix.model.Member;
 import com.example.hotsix.repository.Querydsl4RepositorySupport;
@@ -51,7 +52,7 @@ public class MemberRepositoryImpl extends Querydsl4RepositorySupport implements 
     }
 
     @Override
-    public void updateMemberProfileByMemberId(Member dto) {
+    public void updateMemberProfileByMemberId(MemberDto dto) {
         System.out.println("call update Impl dto = "+dto);
         queryFactory.update(member)
                 .set(member.address, dto.getAddress())

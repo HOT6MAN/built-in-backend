@@ -6,6 +6,11 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ChatRoomStatusDto extends ChatRoomStatus{
-    private String receiver;
+@Builder
+public class ChatRoomStatusDto {
+    private Long id;
+    private Long chatRoomId;
+    private Long userId;
+    private Integer unreadCount;
+    private Boolean online;
 }
