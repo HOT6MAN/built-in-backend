@@ -36,8 +36,10 @@ public class ChatController {
      * 카카오톡의 채팅방 목록을 생각하면 될듯.
      */
     @GetMapping("/list/{userId}")
-    public List<ChatRoomStatus> sendChatList(@PathVariable String userId){
-        return chatRoomService.findAllChatRoomByUserId(Long.parseLong(userId));
+    public List<ChatRoomStatus> findAllRoomByUserId(@PathVariable String userId){
+        List<ChatRoomStatus> list = chatRoomService.findAllChatRoomByUserId(Long.parseLong(userId));
+        log.info("find All Room By User Id = {}", list);
+        return list;
     }
 
     /**

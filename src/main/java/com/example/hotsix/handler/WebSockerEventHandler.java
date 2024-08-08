@@ -40,7 +40,6 @@ public class WebSockerEventHandler {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
         String destination = headerAccessor.getDestination();
         System.out.println("destination: " + destination);
-        // /ws/log 경로 무시
         if (destination != null && destination.startsWith("/ws/log")) {
             return;
         }

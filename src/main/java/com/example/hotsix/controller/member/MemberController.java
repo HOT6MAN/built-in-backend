@@ -88,7 +88,7 @@ public class MemberController {
      * 멤버 컬럼의 값을 변경한다.
      */
     @PutMapping("/{memberId}")
-    public String updateMemberProfileByMemberId(@PathVariable("memberId")Long memberId, @RequestBody Member member){
+    public String updateMemberProfileByMemberId(@PathVariable("memberId")Long memberId, @RequestBody MemberDto member){
         System.out.println("member = "+member);
         boolean flag = memberService.updateMemberProfileByMemberId(member);
         if(flag) return "update success";
@@ -112,13 +112,19 @@ public class MemberController {
         try{
             if(file!=null){
                 String today = new SimpleDateFormat("yyMMdd").format(new Date());
-                String uploadDir ="C:/upload/img";
+                String uploadDir ="/spring/image";
                 String imgDirPath =uploadDir+ File.separator+today;
                 File folder =new File(imgDirPath);
                 if(!folder.exists()){
                     folder.mkdirs();
                 }
                 MemberImage image =  memberImageService.findMemberImageByMemberId(memberId);
+                Member member = memberService.findById(memberId);
+                if(image == null){
+                    image = new MemberImage();
+                }
+                image.setMember(member);
+                member.setMemberImage(image);
                 String originName = file.getOriginalFilename();
                 if(!originName.isEmpty()){
                     String fixedFileName = UUID.randomUUID()
@@ -130,8 +136,6 @@ public class MemberController {
                     file.transferTo(new File(folder, fixedFileName));
                 }
                 image.setType("profile");
-                Member member = Member.builder().id(memberId).build();
-                member.setMemberImage(image);
                 memberService.updateMemberProfileImageByMemberId(member);
             }
         }

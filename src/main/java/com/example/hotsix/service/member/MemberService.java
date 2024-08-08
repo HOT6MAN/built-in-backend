@@ -1,5 +1,6 @@
 package com.example.hotsix.service.member;
 
+import com.example.hotsix.dto.member.MemberDto;
 import com.example.hotsix.model.Member;
 import org.springframework.core.io.Resource;
 
@@ -10,7 +11,7 @@ public interface MemberService {
     Member findMemberProfileByMemberId(Long id);
     boolean deleteMemberByMebmerId(Long id);
 
-    boolean updateMemberProfileByMemberId(Member dto);
+    boolean updateMemberProfileByMemberId(MemberDto dto);
     boolean updateMemberProfileImageByMemberId(Member dto);
     Resource findMemberProfileImageByMemberId(Long id);
     Resource getImagePath();
