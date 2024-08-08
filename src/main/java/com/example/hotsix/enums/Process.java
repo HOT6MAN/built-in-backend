@@ -19,9 +19,11 @@ public enum Process {
     USER_NOT_FOUND(HttpStatus.INTERNAL_SERVER_ERROR, "존재하지 않는 유저입니다"),
     DEAL_NOT_FOUND(HttpStatus.INTERNAL_SERVER_ERROR, "존재하지 않는 상품입니다"),
     RECRUIT_NOT_FOUND(HttpStatus.BAD_REQUEST, "존재하지 않는 모집글 입니다"),
+
     RESUME_NOT_FOUND(HttpStatus.BAD_REQUEST, "존재하지 않는 이력서 입니다"),
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "잘못된 JWT Token 입니다."),
     INVALID_USER(HttpStatus.UNAUTHORIZED, "잘못된 JWT Token 입니다."),
+
     EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, "유효기간이 만료된 Token입니다."),
     TEAM_NOT_FOUND(HttpStatus.INTERNAL_SERVER_ERROR, "존재하지 않는 팀입니다"),
     UNAUTHORIZED_USER(HttpStatus.UNAUTHORIZED, "접근 권한이 없습니다."),
