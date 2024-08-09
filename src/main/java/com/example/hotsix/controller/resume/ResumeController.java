@@ -1,5 +1,6 @@
 package com.example.hotsix.controller.resume;
 
+import com.example.hotsix.dto.apply.ApplyRequest;
 import com.example.hotsix.dto.resume.ResumeRequest;
 import com.example.hotsix.dto.resume.ResumeResponse;
 import com.example.hotsix.dto.resume.ResumeShortResponse;
@@ -10,6 +11,7 @@ import com.example.hotsix.oauth.dto.CustomOAuth2User;
 import com.example.hotsix.service.member.MemberService;
 import com.example.hotsix.service.resume.ResumeService;
 import com.example.hotsix.service.storage.StorageService;
+import com.example.hotsix.service.team.TeamService;
 import jakarta.inject.Provider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -22,22 +24,27 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 
+import static com.example.hotsix.model.QTeam.team;
+
 @RestController
 public class ResumeController {
 
     private final MemberService memberService;
+    private final TeamService teamService;
     private final ResumeService resumeService;
     private final StorageService storageService;
     private final ExperienceRequestPropertyEditor experienceRequestPropertyEditor;
     private final Provider<ResumePropertyEditor> resumePropertyEditorProvider;
 
     public ResumeController(MemberService memberService,
+                            TeamService teamService,
                             ResumeService resumeService,
                             @Qualifier("fileSystemStorageService") StorageService storageService,
                             ExperienceRequestPropertyEditor experienceRequestPropertyEditor,
                             Provider<ResumePropertyEditor> resumePropertyEditorProvider
     ) {
         this.memberService = memberService;
+        this.teamService = teamService;
         this.resumeService = resumeService;
         this.storageService = storageService;
         this.experienceRequestPropertyEditor = experienceRequestPropertyEditor;
@@ -100,6 +107,18 @@ public class ResumeController {
         storageService.remove(resume.getProfile());
 
         resumeService.delete(resume);
+    }
+
+    @PostMapping("/apply")
+    @ResponseStatus(HttpStatus.CREATED)
+    public void apply(@RequestBody ApplyRequest applyRequest) {
+        Long resumeId = applyRequest.resumeId();
+        Long teamId = applyRequest.teamId();
+
+        Resume application = resumeService.findById(resumeId);
+        Team teamToApply = teamService.findById(teamId);
+
+        resumeService.apply(teamToApply, application);
     }
 
     private List<ResumeShortResponse> convertToShortResponse(List<Resume> list) {
