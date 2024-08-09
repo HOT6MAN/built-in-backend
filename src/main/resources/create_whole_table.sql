@@ -665,6 +665,20 @@ create table if not exists `ssafy`.`resume_experience` (
     foreign key (`resume_id`) references `resume`(`id`)
 ) ENGINE = InnoDB;
 
+create table if not exists `ssafy`.`apply` (
+    `team_id` bigint(20) not null,
+    `resume_id` bigint(20) not null,
+    `status` enum('applied', 'accepted', 'rejected') not null,
+    `DEL_YN` TINYINT(1) NOT NULL,
+    `REG_DTTM` TIMESTAMP NOT NULL,
+    `REG_USER_SEQ` BIGINT NOT NULL,
+    `MOD_DTTM` TIMESTAMP NOT NULL,
+    `MOD_USER_SEQ` BIGINT NOT NULL,
+    primary key(`team_id`, `resume_id`),
+    foreign key(`team_id`) references `team`(`id`),
+    foreign key(`resume_id`) references `resume`(`id`)
+) ENGINE = InnoDB;
+
 -- -----------------------------------------------------
 -- Table `ssafy`.`service_schedule`
 -- -----------------------------------------------------

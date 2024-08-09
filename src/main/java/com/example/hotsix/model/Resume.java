@@ -5,6 +5,8 @@ import com.example.hotsix.dto.resume.ExperienceRequest;
 import com.example.hotsix.dto.resume.ResumeRequest;
 import com.example.hotsix.dto.resume.ResumeResponse;
 import com.example.hotsix.dto.resume.ResumeShortResponse;
+import com.example.hotsix.enums.ApplicationStatus;
+import com.example.hotsix.model.id.ApplyId;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -77,5 +79,14 @@ public class Resume extends BaseEntity {
         this.experiences.clear();
         resumeRequest.experiences().forEach(this::addExperience);
         this.comment = resumeRequest.comment();
+    }
+
+    public Apply toApplication(Team team) {
+        return Apply.builder()
+                .id(new ApplyId(team.getId(), this.getId()))
+                .status(ApplicationStatus.APPLIED)
+                .team(team)
+                .resume(this)
+                .build();
     }
 }

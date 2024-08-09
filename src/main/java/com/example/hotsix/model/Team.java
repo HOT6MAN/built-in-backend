@@ -65,6 +65,8 @@ public class Team extends BaseEntity{
     @OneToMany(mappedBy = "team", fetch = FetchType.LAZY)
     private List<Meeting> meetings;
 
+    @OneToMany(mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<Apply> applications = new ArrayList<>();
 
 //    @OneToMany
 //    @JoinColumn(name = "team_id")
@@ -103,6 +105,10 @@ public class Team extends BaseEntity{
 //        this.teamProjectCredential = teamProjectCredential;
 //        teamProjectCredential.setTeam(this);
 //    }
+
+    public void addApplication(Apply application) {
+        this.applications.add(application);
+    }
 
     @Override
     public String toString() {
