@@ -694,7 +694,7 @@ SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 
 -- -- member dummy data 생성
 -- INSERT INTO member (id, email, nickname, name, profile_url, phone, address, role, lgn_mtd, DEL_YN, REG_DTTM, REG_USER_SEQ, MOD_DTTM, MOD_USER_SEQ)
--- VALUES (1, 'ssafy@gmail.com', '싸피', '김싸피', 'https://asdf.com', '010-1234-5678', '역삼동', 'A', 'some_method', FALSE, '2024-04-25 00:00:00', 1, '2024-04-25 00:00:00', 1234);
+-- VALUES (3, 'ssafy@gmail.com', '싸피', '김싸피', 'https://asdf.com', '010-1234-5678', '역삼동', 'A', 'some_method', FALSE, '2024-04-25 00:00:00', 1, '2024-04-25 00:00:00', 1234);
 
 -- -- team dummy data 생성
 -- INSERT INTO team (id, name, status, content, start_time, end_time, git_url, jira_url, DEL_YN, REG_DTTM, REG_USER_SEQ, MOD_DTTM, MOD_USER_SEQ)
@@ -714,3 +714,12 @@ INSERT INTO `ssafy`.`team` (
       ('Team Delta', 'inactive', 'Content for team delta', '2024-04-01 13:00:00', '2024-09-30 15:00:00', 'https://github.com/team-delta', 'https://jira.team-delta.com', NULL,  0, NOW(), 4, NOW(), 4),
       ('Team Epsilon', 'active', 'Content for team epsilon', '2024-05-01 14:00:00', '2024-08-31 14:00:00', 'https://github.com/team-epsilon', 'https://jira.team-epsilon.com', 'session_5',  0, NOW(), 5, NOW(), 5);
 --
+
+insert into service_schedule(id, team_id, team_project_info_id, is_used, is_pendding)
+values(1, null, null, true, true);
+insert into service_schedule(id, team_id, team_project_info_id, is_used, is_pendding)
+values(2, null, null, true, true);
+insert into service_schedule(id, team_id, team_project_info_id, is_used, is_pendding)
+values(3, null, null, true, true);
+insert into service_schedule(id, team_id, team_project_info_id, is_used, is_pendding)
+values(4, null, null, false, false);

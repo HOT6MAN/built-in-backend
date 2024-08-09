@@ -14,6 +14,7 @@ import com.example.hotsix.service.member.MemberService;
 import com.example.hotsix.service.recruit.RecruitService;
 import com.example.hotsix.service.storage.StorageService;
 import com.example.hotsix.service.team.TeamService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -36,6 +37,7 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
+@Slf4j
 public class RecruitController {
 
     private final MemberService memberService;

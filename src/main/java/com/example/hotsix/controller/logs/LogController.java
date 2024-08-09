@@ -17,24 +17,26 @@ public class LogController {
     private final KafkaService kafkaService;
     private final DynamicKafkaListenerService dynamicKafkaListenerService;
 
-    @GetMapping("{serviceScheduleId}/{projectInfoId}/{configId}")
+    @GetMapping("{serviceScheduleId}/{projectInfoId}/{configId}/{teamId}")
     public List<LogEntryDto> find400LogsByProjectId(@PathVariable("serviceScheduleId") Long serviceScheduleId,
+                                                    @PathVariable("teamId") Long teamId,
                                                     @PathVariable("projectInfoId")Long projectInfoId,
                                                     @PathVariable("configId")Long configId,
                                                     @RequestParam("type") String type){
         System.out.println("call find 400 log");
-        String topic = "vector-container-"+serviceScheduleId+"-"+projectInfoId+"-"+configId;
+        String topic = "vector_container_SN-"+serviceScheduleId+"_TID-"+teamId+"_CID-"+configId;
         System.out.println("topic = "+topic);
         List<LogEntryDto> list = kafkaService.getRecentLogs(topic, 1L,"log-group");
         return list;
     }
 
-    @GetMapping("/active/{serviceScheduleId}/{projectInfoId}/{configId}")
+    @GetMapping("/active/{serviceScheduleId}/{projectInfoId}/{configId}/{teamId}")
     public void readTimeLogging(@PathVariable("serviceScheduleId")Long serviceScheduleId,
+                                @PathVariable("teamId") Long teamId,
                                 @PathVariable("projectInfoId")Long projectInfoId,
                                 @PathVariable("configId")Long configId,
                                 @RequestParam String type){
-        String topic = "vector-container-"+serviceScheduleId+"-"+projectInfoId+"-"+configId;
+        String topic = "vector_container_SN-"+serviceScheduleId+"_TID-"+teamId+"_CID-"+configId;
         String groupId = "log-group";
         System.out.println("topic = "+topic);
         System.out.println("type= "+type);
