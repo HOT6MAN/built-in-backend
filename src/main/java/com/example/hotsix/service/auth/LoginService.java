@@ -78,7 +78,7 @@ public class LoginService {
         log.info("JWT 담을 쿠키 생성");
         Cookie cookie = new Cookie(key, value);
         cookie.setMaxAge(expiretime.intValue());
-        cookie.setSecure(true);   //https 프로토골
+        //cookie.setSecure(true);   //https 프로토골
         cookie.setPath("/");
         cookie.setHttpOnly(true);
 
