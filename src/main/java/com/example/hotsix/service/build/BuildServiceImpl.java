@@ -18,6 +18,7 @@ import com.example.hotsix.util.TimeUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.auth.AuthScope;
@@ -48,6 +49,7 @@ import java.util.*;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BuildServiceImpl implements BuildService{
     private final BuildRepository buildRespository;
     private final MemberRepository memberRepository;
@@ -76,7 +78,7 @@ public class BuildServiceImpl implements BuildService{
     public void buildStart(Long teamId, Long teamProjectInfoId){
         TeamProjectInfo teamProjectInfo = teamProjectInfoRepository.findProjectInfoByProjectInfoId(teamProjectInfoId);
         ServiceSchedule emptyServiceId = serviceScheduleRepository.findEmptyService();
-        System.out.println("empty Schedule = "+emptyServiceId);
+        log.info("empty Service Schedule = {}",emptyServiceId);
         emptyServiceId.setIsUsed(true);
         emptyServiceId.setIsPendding(true);
         emptyServiceId.setTeam(teamProjectInfo.getTeam());

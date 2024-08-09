@@ -7,6 +7,7 @@ import com.example.hotsix.service.build.BuildService;
 import com.example.hotsix.service.build.ServiceScheduleServiceImpl;
 import com.example.hotsix.service.team.TeamProjectInfoService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,6 +18,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/build")
 @RequiredArgsConstructor
+@Slf4j
 public class BuildController {
     private final BuildService buildService;
     private final TeamProjectInfoService teamProjectInfoService;
@@ -92,7 +94,7 @@ public class BuildController {
 
     @PostMapping("/deploy/{teamId}/{projectInfoId}")
     public void buildStart(@PathVariable("teamId")Long teamId, @PathVariable("projectInfoId")Long projectInfoId){
-        System.out.println("call build start");
+        log.info("Build Start Call Team Id = {}, ProjectInfoId = {}", teamId, projectInfoId);
         buildService.buildStart(teamId, projectInfoId);
     }
 

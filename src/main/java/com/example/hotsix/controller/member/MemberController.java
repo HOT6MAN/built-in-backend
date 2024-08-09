@@ -1,6 +1,7 @@
 package com.example.hotsix.controller.member;
 
 import com.example.hotsix.dto.member.MemberDto;
+import com.example.hotsix.dto.team.TeamDto;
 import com.example.hotsix.model.MemberImage;
 import com.example.hotsix.model.Member;
 import com.example.hotsix.service.member.MemberImageService;
@@ -16,10 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @RestController
 @RequestMapping("/member")
@@ -90,6 +88,7 @@ public class MemberController {
     @PutMapping("/{memberId}")
     public String updateMemberProfileByMemberId(@PathVariable("memberId")Long memberId, @RequestBody MemberDto member){
         System.out.println("member = "+member);
+        log.info("user name = ",member.getName());
         boolean flag = memberService.updateMemberProfileByMemberId(member);
         if(flag) return "update success";
         else return "update error";
@@ -143,6 +142,5 @@ public class MemberController {
             e.printStackTrace();
         }
         return null;
-
     }
 }
