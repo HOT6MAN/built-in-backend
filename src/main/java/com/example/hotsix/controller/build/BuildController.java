@@ -98,14 +98,23 @@ public class BuildController {
         buildService.buildStart(teamId, projectInfoId);
     }
 
+    // whole build start API(built_in_full_docker를 돌림)
+    @PostMapping("/deploy/project-info/{projectInfoId}")
+    public BuildStartDto buildStart(@PathVariable("projectInfoId")Long projectInfoId){
+        System.out.println("call build start");;
+
+        return buildService.wholeBuildStart(projectInfoId);
+    }
+
 
     // Jenkins Build 결과를 DB에 저장하는 API
     @PostMapping("/deploy/result")
-    public String saveBuildResult(@RequestBody BuildResultDto buildResultDto) throws URISyntaxException {
+    public String saveBuildResult(@RequestBody BuildResultDto buildResultDto) throws Exception {
         System.out.println("save build start");
+
+        // jenkins build 관련 log 저장
         buildService.addWholeBuildResult(buildResultDto);
 
-        // jobName, buildNum, deployNum
         return "success";
     }
 

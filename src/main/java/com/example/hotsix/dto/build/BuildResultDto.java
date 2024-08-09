@@ -20,4 +20,6 @@ public class BuildResultDto {
     // 해당 team_project_info 기준으로 몇 번째로 실행되었는가?
     private Long deployNum;
     private Long teamProjectInfoId;
+
+    private Integer serviceNum;
 }
