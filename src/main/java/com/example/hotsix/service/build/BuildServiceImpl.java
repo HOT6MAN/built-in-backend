@@ -78,8 +78,7 @@ public class BuildServiceImpl implements BuildService{
         TeamProjectInfo teamProjectInfo = teamProjectInfoRepository.findProjectInfoByProjectInfoId(teamProjectInfoId);
         ServiceSchedule emptyServiceId = serviceScheduleRepository.findEmptyService();
         log.info("empty Service Schedule = {}",emptyServiceId);
-        emptyServiceId.setIsUsed(true);
-        emptyServiceId.setIsPendding(true);
+        emptyServiceId.setBuildStatus(BuildStatus.PENDING);
         emptyServiceId.setTeam(teamProjectInfo.getTeam());
         emptyServiceId.setTeamProjectInfo(teamProjectInfo);
         serviceScheduleRepository.save(emptyServiceId);
@@ -96,7 +95,7 @@ public class BuildServiceImpl implements BuildService{
 
     @Override
     @Transactional
-    public BuildResult addWholeBuildResult(BuildResultDto buildResultDto) throws URISyntaxException {
+    public BuildResult addWholeBuildResult(BuildResultDto buildResultDto) throws Exception {
         Long deployNum = buildResultDto.getDeployNum();
         Long teamProjectInfoId = buildResultDto.getTeamProjectInfoId();
 
