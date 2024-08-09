@@ -641,7 +641,7 @@ CREATE TABLE IF NOT EXISTS `ssafy`.`recruit` (
     COLLATE = utf8mb4_0900_ai_ci;
 
 create table if not exists `ssafy`.`resume` (
-    `id` bigint(20) not null auto_increment,
+                                                `id` bigint(20) not null auto_increment,
     `title` varchar(40) not null,
     `profile` varchar(100) not null,
     `position` varchar(40) not null,
@@ -655,19 +655,19 @@ create table if not exists `ssafy`.`resume` (
     `MOD_USER_SEQ` BIGINT(20) NOT NULL,
     primary key (`id`),
     foreign key (`author_id`) references `member`(`id`)
-) ENGINE = InnoDB;
+    ) ENGINE = InnoDB;
 
 create table if not exists `ssafy`.`resume_experience` (
-    `id` bigint(20) not null auto_increment,
+                                                           `id` bigint(20) not null auto_increment,
     `title` varchar(40) not null,
     `description` varchar(500) not null,
     `resume_id` bigint(20) not null,
     primary key (`id`),
     foreign key (`resume_id`) references `resume`(`id`)
-) ENGINE = InnoDB;
+    ) ENGINE = InnoDB;
 
 create table if not exists `ssafy`.`apply` (
-    `team_id` bigint(20) not null,
+                                               `team_id` bigint(20) not null,
     `resume_id` bigint(20) not null,
     `status` enum('applied', 'accepted', 'rejected') not null,
     `DEL_YN` TINYINT(1) NOT NULL,
@@ -678,7 +678,7 @@ create table if not exists `ssafy`.`apply` (
     primary key(`team_id`, `resume_id`),
     foreign key(`team_id`) references `team`(`id`),
     foreign key(`resume_id`) references `resume`(`id`)
-) ENGINE = InnoDB;
+    ) ENGINE = InnoDB;
 
 -- -----------------------------------------------------
 -- Table `ssafy`.`service_schedule`
@@ -729,11 +729,11 @@ INSERT INTO `ssafy`.`team` (
       ('Team Epsilon', 'active', 'Content for team epsilon', '2024-05-01 14:00:00', '2024-08-31 14:00:00', 'https://github.com/team-epsilon', 'https://jira.team-epsilon.com', 'session_5',  0, NOW(), 5, NOW(), 5);
 --
 
-insert into service_schedule(id, team_id, team_project_info_id, is_used, is_pendding)
-values(1, null, null, true, true);
-insert into service_schedule(id, team_id, team_project_info_id, is_used, is_pendding)
-values(2, null, null, true, true);
-insert into service_schedule(id, team_id, team_project_info_id, is_used, is_pendding)
-values(3, null, null, true, true);
-insert into service_schedule(id, team_id, team_project_info_id, is_used, is_pendding)
-values(4, null, null, false, false);
+insert into service_schedule(id, team_id, team_project_info_id, build_status)
+values(1, null, null, 'SUCCESS');
+insert into service_schedule(id, team_id, team_project_info_id, build_status)
+values(2, null, null, 'SUCCESS');
+insert into service_schedule(id, team_id, team_project_info_id, build_status)
+values(3, null, null, 'SUCCESS');
+insert into service_schedule(id, team_id, team_project_info_id, build_status)
+values(4, null, null, 'EMPTY');
