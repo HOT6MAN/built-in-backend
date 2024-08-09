@@ -138,7 +138,7 @@ public class RecruitController {
     public List<Map<Long, String>> myTeams(@AuthenticationPrincipal CustomOAuth2User me) {
         Member memberMe = memberService.findById(me.getId());
 
-        return memberMe.getMemberTeams().stream().map(MemberTeam::toShortResponse).toList();
+        return memberMe.getMemberTeams().stream().map(MemberTeam::toTeamShortResponse).toList();
     }
 
     private List<RecruitShortResponse> convertToShortResponse(List<Recruit> list) {

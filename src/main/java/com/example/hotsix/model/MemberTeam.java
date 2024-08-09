@@ -2,10 +2,9 @@ package com.example.hotsix.model;
 
 import com.example.hotsix.dto.member.MemberDto;
 import com.example.hotsix.dto.team.MemberTeamDto;
+import com.example.hotsix.dto.team.TeamShortResponse;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.util.Map;
 
 
 @Entity
@@ -41,8 +40,8 @@ public class MemberTeam extends BaseEntity{
                 .build();
     }
 
-    public static Map<Long, String> toShortResponse(MemberTeam team) {
-        return Map.of(team.getTeam().getId(), team.getTeam().getName());
+    public static TeamShortResponse toTeamShortResponse(MemberTeam team) {
+        return new TeamShortResponse(team.getTeam().getId(), team.getTeam().getName());
     }
 
     @Override
