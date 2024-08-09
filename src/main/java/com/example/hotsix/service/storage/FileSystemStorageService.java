@@ -4,7 +4,6 @@ import com.example.hotsix.properties.ServerProperties;
 import com.example.hotsix.properties.StorageProperties;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,8 +13,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
@@ -32,12 +29,7 @@ public class FileSystemStorageService implements StorageService {
 
     @Override
     public String getUploadedImageUrl(String imageName) {
-        Pattern pattern = Pattern.compile("src/main/resources/static/(.*)");
-        Matcher matcher = pattern.matcher(storageProperties.uploadImages());
-
-        matcher.matches();
-
-        return String.format("%s/%s/%s", serverProperties.origin(), matcher.group(1), imageName);
+        return String.format("%s/files/%s", serverProperties.origin(), imageName);
     }
 
     @Override
