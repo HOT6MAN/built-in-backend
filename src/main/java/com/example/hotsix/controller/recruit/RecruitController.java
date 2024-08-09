@@ -3,13 +3,13 @@ package com.example.hotsix.controller.recruit;
 import com.example.hotsix.dto.recruit.RecruitRequest;
 import com.example.hotsix.dto.recruit.RecruitResponse;
 import com.example.hotsix.dto.recruit.RecruitShortResponse;
+import com.example.hotsix.dto.team.TeamShortResponse;
 import com.example.hotsix.editor.RecruitPropertyEditor;
 import com.example.hotsix.model.Member;
 import com.example.hotsix.model.MemberTeam;
 import com.example.hotsix.model.Recruit;
 import com.example.hotsix.model.Team;
 import com.example.hotsix.oauth.dto.CustomOAuth2User;
-import com.example.hotsix.oauth.dto.UserDTO;
 import com.example.hotsix.service.member.MemberService;
 import com.example.hotsix.service.recruit.RecruitService;
 import com.example.hotsix.service.storage.StorageService;
@@ -17,7 +17,6 @@ import com.example.hotsix.service.team.TeamService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,10 +33,7 @@ import jakarta.inject.Provider;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 public class RecruitController {
@@ -135,7 +131,7 @@ public class RecruitController {
     }
 
     @GetMapping("/team")
-    public List<Map<Long, String>> myTeams(@AuthenticationPrincipal CustomOAuth2User me) {
+    public List<TeamShortResponse> myTeams(@AuthenticationPrincipal CustomOAuth2User me) {
         Member memberMe = memberService.findById(me.getId());
 
         return memberMe.getMemberTeams().stream().map(MemberTeam::toTeamShortResponse).toList();
