@@ -1,7 +1,7 @@
 package com.example.hotsix.service.build;
 
+import com.example.hotsix.client.GrafanaClient;
 import com.example.hotsix.dto.build.*;
-import com.example.hotsix.model.Member;
 import com.example.hotsix.model.ServiceSchedule;
 import com.example.hotsix.enums.BuildStatus;
 //import com.example.hotsix.model.TeamProjectCredential;
@@ -13,7 +13,6 @@ import com.example.hotsix.repository.build.ServiceScheduleRepository;
 import com.example.hotsix.repository.member.MemberRepository;
 import com.example.hotsix.repository.team.TeamProjectInfoRepository;
 import com.example.hotsix.repository.team.TeamRepository;
-import com.example.hotsix.util.LocalTimeUtil;
 import com.example.hotsix.util.TimeUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -37,7 +36,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.bind.annotation.GetMapping;
 
 import java.io.IOException;
 import java.net.URI;
@@ -61,6 +59,7 @@ public class BuildServiceImpl implements BuildService{
     private static final String JOB_NAME = "service-deploy";
     private static final String BUILD_WITH_PARAMETERS_URL = "job/"+JOB_NAME+"/buildWithParameters";
     private final BuildLogRepository buildLogRepository;
+    private final GrafanaClient grafanaClient;
 
     @Value("${jenkins.url}")
     private String hostJenkinsUrl;
@@ -77,9 +76,7 @@ public class BuildServiceImpl implements BuildService{
         TeamProjectInfo teamProjectInfo = teamProjectInfoRepository.findProjectInfoByProjectInfoId(teamProjectInfoId);
         ServiceSchedule emptyServiceId = serviceScheduleRepository.findEmptyService();
         System.out.println("empty Schedule = "+emptyServiceId);
-        emptyServiceId.setIsUsed(true);
-        emptyServiceId.setIsPendding(true);
-        emptyServiceId.setTeam(teamProjectInfo.getTeam());
+        emptyServiceId.setBuildStatus(BuildStatus.PENDING);
         emptyServiceId.setTeamProjectInfo(teamProjectInfo);
         serviceScheduleRepository.save(emptyServiceId);
         String servicePort = String.valueOf(emptyServiceId.getId());
@@ -91,12 +88,11 @@ public class BuildServiceImpl implements BuildService{
         catch(Exception e){
             e.printStackTrace();
         }
-
     }
 
     @Override
     @Transactional
-    public BuildResult addWholeBuildResult(BuildResultDto buildResultDto) throws URISyntaxException {
+    public BuildResult addWholeBuildResult(BuildResultDto buildResultDto) throws Exception {
         Long deployNum = buildResultDto.getDeployNum();
         Long teamProjectInfoId = buildResultDto.getTeamProjectInfoId();
 
@@ -108,6 +104,10 @@ public class BuildServiceImpl implements BuildService{
         String jobName = buildResultDto.getJobName();
         Long buildNum = buildResultDto.getBuildNum();
         String targetUrl = String.format("%sjob/%s/%d/wfapi/describe", hostJenkinsUrl, jobName, buildNum);
+
+        // jenkins 서버 모니터링용 grafana dashBoard 추가
+        String uId = addGrafanaDashboard(buildResultDto);
+        System.out.println("uId = " + uId);
 
         System.out.println("targetUrl = " + targetUrl);
 
@@ -234,6 +234,100 @@ public class BuildServiceImpl implements BuildService{
                 .totalCount(buildResultInfoDtos.size())
                 .buildResults(buildResultInfoDtos)
                 .build();
+    }
+
+
+    private String addGrafanaDashboard(BuildResultDto buildResultDto) throws Exception {
+        return grafanaClient.addGrafanaDashboard(buildResultDto.getServiceNum());
+    }
+
+    @Override
+    public BuildStartDto wholeBuildStart(Long projectInfoId) {
+        TeamProjectInfo teamProjectInfo = teamProjectInfoRepository.findProjectInfoByProjectInfoId(projectInfoId);
+        Long teamId = teamProjectInfo.getTeam().getId();
+        ServiceSchedule emptyServiceSchedule = serviceScheduleRepository.findEmptyService();
+
+        System.out.println("empty Schedule = "+emptyServiceSchedule);
+
+        // 예외 처리
+        // 비어 있는 서비스 포트가 없을 경우
+        if (emptyServiceSchedule == null) {
+            return BuildStartDto.builder()
+                    .buildStatus("FAILED")
+                    .build();
+        }
+
+        emptyServiceSchedule.setBuildStatus(BuildStatus.PENDING);
+        emptyServiceSchedule.setTeamProjectInfo(teamProjectInfo);
+        serviceScheduleRepository.save(emptyServiceSchedule);
+        Long serviceNum = emptyServiceSchedule.getId();
+
+        try(CloseableHttpClient httpClient = createHttpClient(hostJenkinsUsername, hostJenkinsToken)){
+            String crumb = getCrumb(httpClient, hostJenkinsUrl, hostJenkinsUsername, hostJenkinsToken);
+            createJenkinsWholeInstance(teamProjectInfo, httpClient, crumb, serviceNum, projectInfoId);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return null;
+    }
+
+    /*
+      시연용으로, built_in_full_docker_copy pipeline을 이용하여, 백 + 프론트 + db 배포를 한꺼번에 수행
+     */
+    private void createJenkinsWholeInstance(TeamProjectInfo teamProjectInfo, CloseableHttpClient httpClient, String crumb, Long serviceNum, Long projectInfoId) throws IOException {
+        Integer serviceIndex = 0;
+        System.out.println("Crumb = "+crumb);
+        String[] crumbParts = crumb.split(":");
+        String crumbFieldName = crumbParts[0];
+        String crumbValue = crumbParts[1];
+
+        BackendConfig backendConfig = teamProjectInfo.getBackendConfigs().get(0);
+        FrontendConfig frontendConfig = teamProjectInfo.getFrontendConfigs().get(0);
+        DatabaseConfig databaseConfig = teamProjectInfo.getDatabaseConfigs().get(0);
+
+        BuildConfigDto buildConfigDto = BuildConfigDto.builder()
+                .serviceNum(serviceNum)
+                .projectInfoId(projectInfoId)
+                .gitBackBranch(backendConfig.getGitBranch())
+                .gitBackUsername(backendConfig.getGitUsername())
+                .gitBackAccessToken(backendConfig.getGitAccessToken())
+                .gitFrontBranch(frontendConfig.getGitBranch())
+                .gitFrontUsername(frontendConfig.getGitUsername())
+                .gitFrontAccessToken(frontendConfig.getGitAccessToken())
+//                .databaseDatabase(databaseConfig.)
+                .databaseUsername(databaseConfig.getUsername())
+                .databasePassword(databaseConfig.getPassword())
+                .build();
+
+        String hostJobName = hostJenkinsUrl + "job/built_in_full_docker_copy/buildWithParameters";
+
+        HttpPost httpPost = new HttpPost(hostJobName);
+        httpPost.setHeader(crumbFieldName, crumbValue);
+        httpPost.setHeader("Authorization", "Basic " + Base64.getEncoder().encodeToString((hostJenkinsUsername + ":" + hostJenkinsToken).getBytes()));
+
+        String eigenServiceName = UUID.randomUUID().toString();
+        List<NameValuePair> params = new ArrayList<>();
+        // JDK 17 이런식으로 jdk하는건 아직 구현 안함.
+        // Gradle 같이 Build 도구도 아직 구현 안함.
+        params.add(new BasicNameValuePair("SERVICE_NUM", String.valueOf(serviceNum)));
+        params.add(new BasicNameValuePair("PROJECT_INFO_ID", String.valueOf(projectInfoId)));
+        params.add(new BasicNameValuePair("GIT_BACK_URL", buildConfigDto.getGitBackUrl()));
+        params.add(new BasicNameValuePair("GIT_BACK_BRANCH", buildConfigDto.getGitBackBranch()));
+        params.add(new BasicNameValuePair("GIT_BACK_USERNAME", buildConfigDto.getGitBackUsername()));
+        params.add(new BasicNameValuePair("GIT_BACK_ACCESS_TOKEN", buildConfigDto.getGitBackAccessToken()));
+        params.add(new BasicNameValuePair("GIT_FRONT_URL", buildConfigDto.getGitBackUrl()));
+        params.add(new BasicNameValuePair("GIT_FRONT_BRANCH", buildConfigDto.getGitBackBranch()));
+        params.add(new BasicNameValuePair("GIT_FRONT_USERNAME", buildConfigDto.getGitBackUsername()));
+        params.add(new BasicNameValuePair("GIT_FRONT_ACCESS_TOKEN", buildConfigDto.getGitBackAccessToken()));
+        params.add(new BasicNameValuePair("GIT_FRONT_USERNAME", buildConfigDto.getGitBackUsername()));
+        params.add(new BasicNameValuePair("GIT_FRONT_ACCESS_TOKEN", buildConfigDto.getGitBackAccessToken()));
+        UrlEncodedFormEntity entity = new UrlEncodedFormEntity(params, StandardCharsets.UTF_8);
+        httpPost.setEntity(entity);
+        System.out.println("Call HttpClient execute");
+        HttpResponse response = httpClient.execute(httpPost);
+        System.out.println("Response status: " + response.getStatusLine().getStatusCode());
+        System.out.println("Response body: " + EntityUtils.toString(response.getEntity()));
     }
 
     private List<BuildStageInfoDto> getBuildStageInfoList(Long buildResultId) {

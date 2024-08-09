@@ -32,10 +32,9 @@ public final class TimeUtil {
     return dob.atStartOfDay().atZone(timeZoneUTC).toInstant().toEpochMilli();
   }
 
-  public static String convertEpochToDateString(long epochMillis, String pattern) {
-    LocalDate localDate = Instant.ofEpochMilli(epochMillis).atZone(timeZoneSeoul).toLocalDate();
+  public static String convertEpochToDateString(LocalDateTime localDateTime, String pattern) {
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
-    return localDate.format(formatter);
+    return localDateTime.format(formatter);
   }
 
   public static int calculateAge(long dobEpochMillis) {

@@ -15,22 +15,25 @@ import java.util.Date;
 @AllArgsConstructor
 @Builder
 public class BuildResult extends BaseEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "team_project_info_id", referencedColumnName = "id")
-    private TeamProjectInfo teamProjectInfo;
+        @ManyToOne(fetch = FetchType.LAZY)
+        @JoinColumn(name = "team_project_info_id", referencedColumnName = "id")
+        private TeamProjectInfo teamProjectInfo;
 
-    @Column(name = "deploy_num")
-    private Long deployNum;
+        @Column(name = "deploy_num")
+        private Long deployNum;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "status")
-    private BuildStatus status;
+        @Enumerated(EnumType.STRING)
+        @Column(name = "status")
+        private BuildStatus status;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "build_time")
-    private LocalDateTime buildTime;
+        @Temporal(TemporalType.TIMESTAMP)
+        @Column(name = "build_time")
+        private LocalDateTime buildTime;
+
+        @Column(name = "grafana_uid")
+        private String grafanaUid;
 }

@@ -1,5 +1,6 @@
 package com.example.hotsix.repository.build;
 
+import com.example.hotsix.enums.BuildStatus;
 import com.example.hotsix.model.ServiceSchedule;
 import com.example.hotsix.model.project.TeamProjectInfo;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -19,9 +20,7 @@ public class ServiceScheduleRepositoryImpl implements ServiceScheduleRepositoryC
     @Override
     public ServiceSchedule findEmptyService() {
         return queryFactory.selectFrom(serviceSchedule)
-                .where(serviceSchedule.isUsed.eq(false).and(
-                        serviceSchedule.isPendding.eq(false)
-                ))
+                .where(serviceSchedule.buildStatus.eq(BuildStatus.EMPTY))
                 .orderBy(serviceSchedule.id.asc())
                 .limit(1)
                 .fetchOne();
@@ -32,9 +31,9 @@ public class ServiceScheduleRepositoryImpl implements ServiceScheduleRepositoryC
         return queryFactory
                 .select(serviceSchedule.teamProjectInfo)
                 .from(serviceSchedule)
-                .join(serviceSchedule.team, team)
-                .where(team.id.eq(teamId)
-                        .and(serviceSchedule.isUsed.isTrue()))
+//                .join(serviceSchedule, team)
+//                .where(team.id.eq(teamId)
+//                        .and(serviceSchedule.isUsed.isTrue()))
                 .fetch();
     }
 }
