@@ -8,6 +8,8 @@ public interface StorageService {
 
     String getUploadedImageUrl(String imageName);
 
+    String getUploadedImagePath();
+
     void store(MultipartFile file) throws IOException;
 
     void remove(String fileName) throws IOException;

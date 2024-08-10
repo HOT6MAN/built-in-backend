@@ -13,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -24,12 +25,19 @@ public class FileSystemStorageService implements StorageService {
 
     @PostConstruct
     public void init() {
-        this.uploadImagePath = Paths.get(storageProperties.uploadImages());
+        String uploadImagePath = storageProperties.uploadImages();
+
+        this.uploadImagePath = Paths.get(isUnix() ? convertUnixStyle(uploadImagePath) : uploadImagePath);
     }
 
     @Override
     public String getUploadedImageUrl(String imageName) {
         return String.format("%s/files/%s", serverProperties.origin(), imageName);
+    }
+
+    @Override
+    public String getUploadedImagePath() {
+        return this.uploadImagePath.toString();
     }
 
     @Override
@@ -68,5 +76,15 @@ public class FileSystemStorageService implements StorageService {
         } catch (IOException e) {
             throw new IOException("Failed to store file " + toUpload.getOriginalFilename(), e);
         }
+    }
+
+    private boolean isUnix() {
+        String osName = System.getProperty("os.name").toLowerCase();
+
+        return Stream.of("nix", "nux", "mac").anyMatch(osName::contains);
+    }
+
+    private String convertUnixStyle(String path) {
+        return path.replaceAll("^[A-Za-z]:", "");
     }
 }
