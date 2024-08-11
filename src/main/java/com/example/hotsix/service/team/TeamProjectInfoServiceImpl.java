@@ -26,17 +26,19 @@ public class TeamProjectInfoServiceImpl implements TeamProjectInfoService{
 
     @Override
     @Transactional
-    public boolean insertEmptyTeamProjectInfo(Long teamId){
+    public TeamProjectInfo insertEmptyTeamProjectInfo(Long teamId){
         TeamProjectInfo teamProjectInfo = TeamProjectInfo.builder()
                 .title("default config")
                 .build();
         Team team = teamRepository.findTeamById(teamId);
 
-        team.addTeamProjectInfo(teamProjectInfo);
+        // 양방향 편의 메서드 사용
         teamProjectInfo.setTeam(team);
 
-        teamRepository.save(team);
-        return true;
+        // 데이터 저장
+        teamProjectInfoRepository.save(teamProjectInfo);
+
+        return teamProjectInfo;
     }
     @Override
     @Transactional

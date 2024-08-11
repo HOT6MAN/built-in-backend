@@ -6,7 +6,7 @@ import com.example.hotsix.model.project.TeamProjectInfo;
 import java.util.List;
 
 public interface TeamProjectInfoService {
-    boolean insertEmptyTeamProjectInfo(Long teamId);
+    TeamProjectInfo insertEmptyTeamProjectInfo(Long teamId);
     boolean insertAllTeamProjectInfo(Long teamId, Long projectInfoId, ProjectInfoDto projectInfoDto);
 
     List<TeamProjectInfo> findAllProjectInfosByTeamId(Long teamId);

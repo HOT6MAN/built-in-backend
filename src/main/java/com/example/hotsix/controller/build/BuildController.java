@@ -35,9 +35,8 @@ public class BuildController {
         return null;
     }
     @PostMapping("/project/{teamId}")
-    public String insertTeamProjectInfo(@PathVariable("teamId")Long teamId){
-        teamProjectInfoService.insertEmptyTeamProjectInfo(teamId);
-        return "success";
+    public TeamProjectInfo insertTeamProjectInfo(@PathVariable("teamId")Long teamId){
+        return teamProjectInfoService.insertEmptyTeamProjectInfo(teamId);
     }
 
     @PutMapping("/project/{projectInfoId}")

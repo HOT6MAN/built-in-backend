@@ -54,6 +54,17 @@ public class TeamProjectInfo {
                 .build();
     }
 
+    // 양방향 관계 편의 메서드
+    public void setTeam(Team team) {
+        // 기존 팀과 관계를 제거
+        if (this.team != null) {
+            this.team.getTeamProjectInfos().remove(this);
+        }
+
+        this.team = team;
+        team.getTeamProjectInfos().add(this);
+    }
+
     public void setPropertiesFromDto(TeamProjectInfoDto dto){
         this.id = dto.getId();
         this.backendConfigs = dto.getBackendConfigs().stream().map(BackendConfig::fromDto).collect(Collectors.toList());
