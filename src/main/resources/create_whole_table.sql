@@ -518,10 +518,10 @@ CREATE TABLE IF NOT EXISTS `ssafy`.`member_team` (
     INDEX `fk_team_member_team_id_team_id_idx` (`team_id` ASC) VISIBLE,
     CONSTRAINT `fk_member_member_team_id_member_id`
     FOREIGN KEY (`member_id`)
-    REFERENCES `ssafy`.`member` (`id`),
+    REFERENCES `ssafy`.`member` (`id`) ON DELETE CASCADE,
     CONSTRAINT `fk_team_member_team_id_team_id`
     FOREIGN KEY (`team_id`)
-    REFERENCES `ssafy`.`team` (`id`))
+    REFERENCES `ssafy`.`team` (`id`) ON DELETE CASCADE)
     ENGINE = InnoDB
     DEFAULT CHARACTER SET = utf8mb4
     COLLATE = utf8mb4_0900_ai_ci;

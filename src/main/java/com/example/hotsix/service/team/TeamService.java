@@ -11,6 +11,7 @@ public interface TeamService {
 
     void createTeam(Team team, Long memberId);
     List<TeamDto> getAllMyTeams(Long memberId);
+    void deleteTeam(Long teamId);
 
     Team findById(Long id);
     TeamDto getTeamById(Long teamId);
