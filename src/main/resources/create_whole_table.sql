@@ -243,13 +243,38 @@ CREATE TABLE IF NOT EXISTS `ssafy`.`build_result` (
     DEFAULT CHARACTER SET = utf8mb4
     COLLATE = utf8mb4_0900_ai_ci;
 
+-- -----------------------------------------------------
+-- Table `ssafy`.`build_jenkins_job`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ssafy`.`build_jenkins_job` (
+                                                      `id` BIGINT NOT NULL AUTO_INCREMENT,
+                                                      `build_result_id` BIGINT NULL DEFAULT NULL,
+                                                      `build_number` BIGINT NULL DEFAULT NULL,
+                                                      `job_name` VARCHAR(255) NULL DEFAULT NULL,
+    `result` VARCHAR(255),
+    `job_type` VARCHAR(255),
+    `DEL_YN` TINYINT(1) NOT NULL,
+    `REG_DTTM` TIMESTAMP NOT NULL,
+    `REG_USER_SEQ` BIGINT NOT NULL,
+    `MOD_DTTM` TIMESTAMP NOT NULL,
+    `MOD_USER_SEQ` BIGINT NOT NULL,
+    PRIMARY KEY (`id`),
+    INDEX `build_result_id` (`build_result_id` ASC) VISIBLE,
+    INDEX `build_jenkins_job_idx_01` (`DEL_YN` ASC, `REG_USER_SEQ` ASC, `MOD_USER_SEQ` ASC) VISIBLE,
+    CONSTRAINT `build_jenkins_job_ibfk_1`
+    FOREIGN KEY (`build_result_id`)
+    REFERENCES `ssafy`.`build_result` (`id`))
+    ENGINE = InnoDB
+    DEFAULT CHARACTER SET = utf8mb4
+    COLLATE = utf8mb4_0900_ai_ci;
+
 
 -- -----------------------------------------------------
 -- Table `ssafy`.`build_stage`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `ssafy`.`build_stage` (
                                                      `id` BIGINT NOT NULL AUTO_INCREMENT,
-                                                     `build_result_id` BIGINT NULL DEFAULT NULL,
+                                                     `build_jenkins_job_id` BIGINT NULL DEFAULT NULL,
                                                      `name` VARCHAR(255) NULL DEFAULT NULL,
     `stage_id` BIGINT NULL DEFAULT NULL,
     `status` VARCHAR(255) NULL DEFAULT NULL,
@@ -260,11 +285,11 @@ CREATE TABLE IF NOT EXISTS `ssafy`.`build_stage` (
     `MOD_DTTM` TIMESTAMP NOT NULL,
     `MOD_USER_SEQ` BIGINT NOT NULL,
     PRIMARY KEY (`id`),
-    INDEX `build_result_id` (`build_result_id` ASC) VISIBLE,
+    INDEX `build_jenkins_job_id` (`build_jenkins_job_id` ASC) VISIBLE,
     INDEX `build_stage_idx_01` (`DEL_YN` ASC, `REG_USER_SEQ` ASC, `MOD_USER_SEQ` ASC) VISIBLE,
     CONSTRAINT `build_stage_ibfk_1`
-    FOREIGN KEY (`build_result_id`)
-    REFERENCES `ssafy`.`build_result` (`id`))
+    FOREIGN KEY (`build_jenkins_job_id`)
+    REFERENCES `ssafy`.`build_jenkins_job` (`id`))
     ENGINE = InnoDB
     DEFAULT CHARACTER SET = utf8mb4
     COLLATE = utf8mb4_0900_ai_ci;
@@ -740,3 +765,15 @@ insert into service_schedule(id, team_id, team_project_info_id, build_status)
 values(3, null, null, 'SUCCESS');
 insert into service_schedule(id, team_id, team_project_info_id, build_status)
 values(4, null, null, 'EMPTY');
+insert into service_schedule(id, team_id, team_project_info_id, build_status)
+values(5, null, null, 'EMPTY');
+insert into service_schedule(id, team_id, team_project_info_id, build_status)
+values(6, null, null, 'EMPTY');
+insert into service_schedule(id, team_id, team_project_info_id, build_status)
+values(7, null, null, 'EMPTY');
+insert into service_schedule(id, team_id, team_project_info_id, build_status)
+values(8, null, null, 'EMPTY');
+insert into service_schedule(id, team_id, team_project_info_id, build_status)
+values(9, null, null, 'EMPTY');
+insert into service_schedule(id, team_id, team_project_info_id, build_status)
+values(10, null, null, 'EMPTY');
