@@ -137,6 +137,15 @@ public class BuildController {
         return "success";
     }
 
+    // {teamId}에 해당하는 서비스를, 배포할 수 있는지 여부를 판단한다
+    @GetMapping("/deploy/member/{memberId}/project-info/{projectInfoId}")
+    public BuildCheckDto buildCheck(@PathVariable("memberId") Long memberId, @PathVariable("projectInfoId") Long projectInfoId){
+        long serviceNum = buildService.buildCheck(memberId, projectInfoId);
+        return BuildCheckDto.builder()
+                .serviceNum(serviceNum)
+                .build();
+    }
+
     // Jenkins Build 결과를 불러오는 API
     @GetMapping("/deploy/result/team_project_info/{teamProjectInfoId}")
     public BuildWholeDto getBuildResultInfo(@PathVariable("teamProjectInfoId") Long teamProjectInfoId) {

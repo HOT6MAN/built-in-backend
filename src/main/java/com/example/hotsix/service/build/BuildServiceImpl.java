@@ -307,6 +307,23 @@ public class BuildServiceImpl implements BuildService{
         return null;
     }
 
+    @Override
+    public long buildCheck(Long memberId, Long projectInfoId) {
+        TeamProjectInfo teamProjectInfo = teamProjectInfoRepository.findProjectInfoByProjectInfoId(projectInfoId);
+        ServiceSchedule emptyService = serviceScheduleRepository.findEmptyService();
+
+        // 비어 있는 서비스가 없을 경우
+        if (emptyService == null) {
+            return -1;
+        }
+
+        emptyService.setBuildStatus(BuildStatus.PENDING);
+        emptyService.setTeam(teamProjectInfo.getTeam());
+        emptyService.setTeamProjectInfo(teamProjectInfo);
+        serviceScheduleRepository.save(emptyService);
+        return emptyService.getId();
+    }
+
     /*
       시연용으로, built_in_full_docker_copy pipeline을 이용하여, 백 + 프론트 + db 배포를 한꺼번에 수행
      */

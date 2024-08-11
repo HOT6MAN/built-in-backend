@@ -20,4 +20,6 @@ public interface BuildService {
 
 
     BuildStartDto wholeBuildStart(Long projectInfoId);
+
+    long buildCheck(Long memberId, Long projectInfoId);
 }
