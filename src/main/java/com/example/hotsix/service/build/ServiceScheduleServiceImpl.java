@@ -1,5 +1,6 @@
 package com.example.hotsix.service.build;
 
+import com.example.hotsix.enums.BuildStatus;
 import com.example.hotsix.model.ServiceSchedule;
 import com.example.hotsix.model.project.TeamProjectInfo;
 import com.example.hotsix.repository.build.ServiceScheduleRepository;
@@ -31,8 +32,7 @@ public class ServiceScheduleServiceImpl {
         ServiceSchedule serviceSchedule = findServiceScheduleByServiceScheduleId(serviceScheduleId);
         serviceSchedule.setTeam(null);
         serviceSchedule.setTeamProjectInfo(null);
-        serviceSchedule.setIsUsed(false);
-        serviceSchedule.setIsPendding(false);
+        serviceSchedule.setBuildStatus(BuildStatus.EMPTY);
         serviceScheduleRepository.save(serviceSchedule);
         return true;
     }

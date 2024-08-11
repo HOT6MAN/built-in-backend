@@ -100,8 +100,7 @@ public class BuildServiceImpl implements BuildService{
         ServiceSchedule serviceSchedule = serviceScheduleRepository.findServiceScheduleByServiceScheduleId(serviceScheduleId);
         serviceSchedule.setTeam(null);
         serviceSchedule.setTeamProjectInfo(null);
-        serviceSchedule.setIsUsed(false);
-        serviceSchedule.setIsPendding(false);
+        serviceSchedule.setBuildStatus(BuildStatus.EMPTY);
 
         try(CloseableHttpClient httpClient = createHttpClient(hostJenkinsUsername, hostJenkinsToken)){
             String crumb = getCrumb(httpClient, hostJenkinsUrl, hostJenkinsUsername, hostJenkinsToken);
