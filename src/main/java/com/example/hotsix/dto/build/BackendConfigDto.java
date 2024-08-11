@@ -19,6 +19,7 @@ import lombok.Builder;
 public class BackendConfigDto {
     private Long id;
     private Long teamProjectInfoId;
+    private String configName;
     private String gitUrl;
     private String gitBranch;
     private String gitUsername;

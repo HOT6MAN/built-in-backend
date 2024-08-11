@@ -3,6 +3,7 @@ package com.example.hotsix.service.chat;
 import com.example.hotsix.dto.chat.ChatRoom;
 import com.example.hotsix.dto.chat.ChatRoomStatus;
 import com.example.hotsix.dto.chat.UserChatRoomId;
+import com.example.hotsix.repository.chat.BoardRepository;
 import com.example.hotsix.repository.chat.ChatRoomRepository;
 import com.example.hotsix.repository.chat.ChatRoomStatusRepository;
 import com.example.hotsix.util.LocalTimeUtil;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -18,13 +20,19 @@ import java.util.UUID;
 public class ChatRoomServiceImpl implements ChatRoomService{
     private final ChatRoomRepository chatRoomRepository;
     private final ChatRoomStatusRepository chatRoomStatusRepository;
-
+    private final BoardRepository boardRepository;
 
     @Override
     @Transactional
-    public ChatRoom createChatRoom(String chatRoomName, Long userAId, Long userBId) {
+    public ChatRoom createChatRoom(Long boardId, Long memberId) {
+        Long receiveId = boardRepository.findBoardByBoardId(boardId).getAuthor().getId();
+        Optional<ChatRoom> chatroom = chatRoomRepository.findChatRoomBetweenUsers(memberId, receiveId);
+        if(chatroom.isPresent()){
+            System.out.println("Can't Create because room is already exist");
+            return null;
+        }
         ChatRoom chatRoom = ChatRoom.builder()
-                .name(chatRoomName)
+                .name("default Chat Room")
                 .create_date(LocalTimeUtil.getDateTime())
                 .last_message(null)
                 .last_message_date(null)
@@ -33,7 +41,7 @@ public class ChatRoomServiceImpl implements ChatRoomService{
 
         ChatRoomStatus userAStatus = ChatRoomStatus.builder()
                 .chatRoom(chatRoom)
-                .userId(userAId)
+                .userId(memberId)
                 .unreadCount(0)
                 .online(false)
                 .build();
@@ -43,10 +51,10 @@ public class ChatRoomServiceImpl implements ChatRoomService{
                 .chatRoom(chatRoom)
                 .unreadCount(0)
                 .online(false)
-                .userId(userBId)
+                .userId(receiveId)
                 .build();
         chatRoomStatusRepository.save(userBStatus);
-
+        System.out.println("Create ChatRoom and ChatRoom Status Successfully");
         return chatRoom;
     }
 
@@ -88,4 +96,6 @@ public class ChatRoomServiceImpl implements ChatRoomService{
     public void updateUnreadCount(Long chatroomId, Long userId, Integer num) {
         chatRoomRepository.updateUnreadCount(chatroomId, userId, num);
     }
+
+
 }

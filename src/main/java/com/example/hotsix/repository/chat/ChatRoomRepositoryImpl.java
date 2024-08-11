@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import static com.example.hotsix.dto.chat.QChatRoom.chatRoom;
 import static com.example.hotsix.dto.chat.QChatRoomStatus.chatRoomStatus;
@@ -24,11 +25,23 @@ public class ChatRoomRepositoryImpl implements ChatRoomRepositoryCustom {
     public List<ChatRoomStatus> findAllChatRoomsByUserId(Long userId) {
         List<ChatRoomStatus> statuses = queryFactory
                 .selectFrom(chatRoomStatus)
-                .join(chatRoomStatus.chatRoom, chatRoom).fetchJoin() // chatRoom 엔터티를 함께 가져옴
+                .join(chatRoomStatus.chatRoom, chatRoom).fetchJoin()
                 .where(chatRoomStatus.userId.eq(userId))
                 .fetch();
 
         return statuses;
+    }
+
+    @Override
+    public Optional<ChatRoom> findChatRoomBetweenUsers(Long userAId, Long userBId){
+        return Optional.ofNullable(
+            queryFactory.selectFrom(chatRoom)
+                    .join(chatRoomStatus).on(chatRoom.id.eq(chatRoomStatus.chatRoom.id))
+                    .where(chatRoomStatus.userId.in(userAId, userBId))
+                    .groupBy(chatRoom.id)
+                    .having(chatRoomStatus.userId.countDistinct().eq(2L))
+                    .fetchFirst()
+        );
     }
 
     @Override

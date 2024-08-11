@@ -14,6 +14,11 @@ import java.util.List;
 public class ServiceScheduleServiceImpl {
     private final ServiceScheduleRepository serviceScheduleRepository;
 
+
+    public ServiceSchedule findServiceScheduleByServiceScheduleId(Long serviceScheduleId){
+        return serviceScheduleRepository.findServiceScheduleByServiceScheduleId(serviceScheduleId);
+    }
+
     public ServiceSchedule findEmptyServiceId(){
         return serviceScheduleRepository.findEmptyService();
     }
@@ -21,4 +26,15 @@ public class ServiceScheduleServiceImpl {
     public List<TeamProjectInfo> findUsedProjectInfoIdByTeamId(Long teamId){
         return serviceScheduleRepository.findUsedProjectInfoIdByTeamId(teamId);
     }
+
+    public Boolean stopDeployByServiceScheduleId(Long serviceScheduleId){
+        ServiceSchedule serviceSchedule = findServiceScheduleByServiceScheduleId(serviceScheduleId);
+        serviceSchedule.setTeam(null);
+        serviceSchedule.setTeamProjectInfo(null);
+        serviceSchedule.setIsUsed(false);
+        serviceSchedule.setIsPendding(false);
+        serviceScheduleRepository.save(serviceSchedule);
+        return true;
+    }
+
 }

@@ -1,6 +1,7 @@
 package com.example.hotsix.controller.notification;
 
 import com.example.hotsix.dto.notification.Notification;
+import com.example.hotsix.model.NotificationDto;
 import com.example.hotsix.service.notification.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,11 +40,11 @@ public class NotificationController {
     }
 
     @GetMapping("/list/{userId}")
-    public List<Notification> findAllNotificationByUserId(@PathVariable("userId") String userId){
+    public List<NotificationDto> findAllNotificationByUserId(@PathVariable("userId") String userId){
         log.info("find All Notification By User Id Called");
-        List<Notification> list = notificationService.findAllNotificationByUserId(Long.parseLong(userId));
+        List<NotificationDto> list = notificationService.findAllNotificationDtoByUserId(Long.parseLong(userId));
         log.info("find Notification Result = {}", list);
-        return notificationService.findAllNotificationByUserId(Long.parseLong(userId));
+        return list;
     }
 
 

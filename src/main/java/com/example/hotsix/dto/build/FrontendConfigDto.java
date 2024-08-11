@@ -13,6 +13,7 @@ import lombok.Builder;
 public class FrontendConfigDto {
     private Long id;
     private Long teamProjectInfoId;
+    private String configName;
     private String framework;
     private String version;
     private String gitUrl;

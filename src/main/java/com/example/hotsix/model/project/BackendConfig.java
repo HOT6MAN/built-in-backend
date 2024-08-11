@@ -26,6 +26,9 @@ public class BackendConfig {
     @Column(name = "backend_job_name")
     private BackendJobName backendJobName;
 
+    @Column(name = "config_name")
+    private String configName;
+
     @Column(name = "git_url")
     private String gitUrl;
 
@@ -49,6 +52,7 @@ public class BackendConfig {
     private String buildTool;
 
     public void setProperties(BackendConfigDto dto) {
+        this.configName = dto.getConfigName();
         this.gitUrl = dto.getGitUrl();
         this.gitBranch = dto.getGitBranch();
         this.gitUsername = dto.getGitUsername();
@@ -63,6 +67,7 @@ public class BackendConfig {
         return BackendConfigDto.builder()
                 .id(id)
                 .teamProjectInfoId(projectInfo.getId())
+                .configName(configName)
                 .gitUrl(gitUrl)
                 .gitBranch(gitBranch)
                 .gitAccessToken(gitAccessToken)
@@ -77,6 +82,7 @@ public class BackendConfig {
     public static BackendConfig fromDto(BackendConfigDto dto) {
         return BackendConfig.builder()
                 .id(dto.getId())
+                .configName(dto.getConfigName())
                 .gitUrl(dto.getGitUrl())
                 .gitBranch(dto.getGitBranch())
                 .gitUsername(dto.getGitUsername())

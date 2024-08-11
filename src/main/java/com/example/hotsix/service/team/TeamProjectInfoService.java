@@ -13,4 +13,5 @@ public interface TeamProjectInfoService {
     boolean saveBackendConfigs(Long teamProjectInfoId, BackendConfigDto[] dtos);
     boolean saveFrontendConfigs(Long teamProjectInfoId, FrontendConfigDto[] dtos);
     boolean saveDatabaseConfigs(Long teamProjectInfoId, DatabaseConfigDto[] dtos);
+    boolean updateProjectInfoNameByProjectInfoId(Long projectInfoId, String updateName);
 }

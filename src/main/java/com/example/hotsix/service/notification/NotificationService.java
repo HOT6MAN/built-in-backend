@@ -1,6 +1,7 @@
 package com.example.hotsix.service.notification;
 
 import com.example.hotsix.dto.notification.Notification;
+import com.example.hotsix.model.NotificationDto;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.util.List;
@@ -16,4 +17,5 @@ public interface NotificationService {
     Notification save(Notification notification);
     List<Notification> findAllUnreadNotificationByUserId(Long userId);
     List<Notification> findAllNotificationByUserId(Long userId);
+    List<NotificationDto> findAllNotificationDtoByUserId(Long userId);
 }

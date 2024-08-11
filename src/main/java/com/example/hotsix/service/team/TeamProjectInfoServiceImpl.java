@@ -50,6 +50,13 @@ public class TeamProjectInfoServiceImpl implements TeamProjectInfoService{
 
         return true;
     }
+    @Override
+    public boolean updateProjectInfoNameByProjectInfoId(Long projectInfoId, String updateName){
+        TeamProjectInfo teamProjectInfo = teamProjectInfoRepository.findProjectInfoByProjectInfoId(projectInfoId);
+        teamProjectInfo.setTitle(updateName);
+        teamProjectInfoRepository.save(teamProjectInfo);
+        return true;
+    }
 
     @Override
     public List<TeamProjectInfo> findAllProjectInfosByTeamId(Long teamId) {

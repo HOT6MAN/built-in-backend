@@ -18,6 +18,13 @@ public class ServiceScheduleRepositoryImpl implements ServiceScheduleRepositoryC
     private final JPAQueryFactory queryFactory;
 
     @Override
+    public ServiceSchedule findServiceScheduleByServiceScheduleId(Long serviceScheduleId) {
+        return queryFactory.selectFrom(serviceSchedule)
+                .where(serviceSchedule.id.eq(serviceScheduleId))
+                .fetchOne();
+    }
+
+    @Override
     public ServiceSchedule findEmptyService() {
         return queryFactory.selectFrom(serviceSchedule)
                 .where(serviceSchedule.buildStatus.eq(BuildStatus.EMPTY))

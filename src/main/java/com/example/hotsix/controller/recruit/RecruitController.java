@@ -98,7 +98,7 @@ public class RecruitController {
     @PostMapping("/teambuilding/recruit")
     public void registerRecruit(@ModelAttribute RecruitRequest recruitRequest, @AuthenticationPrincipal CustomOAuth2User me) throws IOException {
         Member author = memberService.findById(me.getId());
-        Team recruitingTeam = teamService.findById(recruitRequest.teamId());
+        Team recruitingTeam = teamService.findById(Long.parseLong(recruitRequest.teamId()));
 
         Recruit newRecruit = recruitRequest.toEntity(author, recruitingTeam);
 

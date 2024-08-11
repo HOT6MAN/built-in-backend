@@ -42,7 +42,8 @@ public class JWTFilter extends OncePerRequestFilter {
         log.info("JWT 필터");
         log.info("request url: {}", request.getRequestURI());
         log.info("request cookies: {}", (Object[]) request.getCookies());
-        if(request.getRequestURI().startsWith("/ws/log")){
+        if(request.getRequestURI().startsWith("/ws/log") || request.getRequestURI().startsWith("/ws/chat")){
+            System.out.println("WebSocket 전용 처리 구간 도달. doFilter 호출");
             filterChain.doFilter(request,response);
             return;
         }

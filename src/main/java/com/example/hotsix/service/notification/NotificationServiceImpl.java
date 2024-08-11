@@ -1,6 +1,10 @@
 package com.example.hotsix.service.notification;
 
+import com.example.hotsix.dto.member.MemberDto;
 import com.example.hotsix.dto.notification.Notification;
+import com.example.hotsix.model.Member;
+import com.example.hotsix.model.NotificationDto;
+import com.example.hotsix.repository.member.MemberRepository;
 import com.example.hotsix.repository.notification.NotificationRepository;
 import com.example.hotsix.repository.notification.NotificationRepositoryCustom;
 import com.example.hotsix.util.LocalTimeUtil;
@@ -11,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -19,7 +24,7 @@ import java.util.Map;
 @Slf4j
 public class NotificationServiceImpl implements NotificationService{
     private final NotificationRepository repository;
-
+    private final MemberRepository memberRepository;
 
     @Override
     public Notification save(Notification notification){
@@ -35,6 +40,19 @@ public class NotificationServiceImpl implements NotificationService{
     @Override
     public List<Notification> findAllNotificationByUserId(Long userId) {
         return repository.findAllNotificationByUserId(userId);
+    }
+
+    @Override
+    public List<NotificationDto> findAllNotificationDtoByUserId(Long userId){
+        List<Notification> list = repository.findAllNotificationByUserId(userId);
+        List<NotificationDto> result = new ArrayList<>();
+        for(Notification noti : list){
+            NotificationDto dto = noti.toDto();
+            Member member = memberRepository.findMemberById(noti.getSender());
+            dto.setSenderName(member.getName());
+            result.add(dto);
+        }
+        return result;
     }
 
 

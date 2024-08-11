@@ -5,9 +5,11 @@ import com.example.hotsix.dto.chat.ChatRoomStatus;
 import com.example.hotsix.dto.chat.ChatRoomStatusDto;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ChatRoomRepositoryCustom{
     List<ChatRoomStatus>  findAllChatRoomsByUserId(Long userId);
+    Optional<ChatRoom> findChatRoomBetweenUsers(Long userAId, Long userBId);
     ChatRoomStatus findReceiver(Long chatroomId, Long userId);
     ChatRoomStatus findUser(Long chatroomId, Long userId);
     void updateOnlineStatus(Long chatroomId, Long userId);

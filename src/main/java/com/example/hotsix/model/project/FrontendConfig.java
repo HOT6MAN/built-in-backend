@@ -27,6 +27,9 @@ public class FrontendConfig {
     @Column(name = "frontend_job_name")
     private FrontendJobName frontendJobName;
 
+    @Column(name = "config_name")
+    private String configName;
+
     @Column(name = "framework")
     private String framework;
 
@@ -45,6 +48,7 @@ public class FrontendConfig {
     public FrontendConfigDto toDto() {
         return FrontendConfigDto.builder()
                 .id(id)
+                .configName(configName)
                 .framework(framework)
                 .version(version)
                 .gitUrl(gitUrl)
@@ -57,6 +61,7 @@ public class FrontendConfig {
     public static FrontendConfig fromDto(FrontendConfigDto dto) {
         return FrontendConfig.builder()
                 .id(dto.getId())
+                .configName(dto.getConfigName())
                 .framework(dto.getFramework())
                 .version(dto.getVersion())
                 .gitUrl(dto.getGitUrl())
@@ -67,6 +72,7 @@ public class FrontendConfig {
     }
     public void setProperties(FrontendConfigDto dto) {
         this.framework = dto.getFramework();
+        this.configName = dto.getConfigName();
         this.version = dto.getVersion();
         this.gitUrl = dto.getGitUrl();
         this.gitBranch = dto.getGitBranch();

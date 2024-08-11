@@ -22,6 +22,7 @@ public class WebSockerEventHandler {
     public void handleWebSocketSubscribeListener(SessionSubscribeEvent event) {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
         String destination = headerAccessor.getDestination();
+        System.out.println("WebSocket Subscribe Listener Destination = "+destination);
         if(destination != null && destination.startsWith("/ws/log")){
             return;
         }
@@ -39,7 +40,7 @@ public class WebSockerEventHandler {
     public void handleWebSocketConnectListener(SessionConnectEvent event) {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
         String destination = headerAccessor.getDestination();
-        System.out.println("destination: " + destination);
+        System.out.println("WebSocket Connect Listener destination: " + destination);
         if (destination != null && destination.startsWith("/ws/log")) {
             return;
         }

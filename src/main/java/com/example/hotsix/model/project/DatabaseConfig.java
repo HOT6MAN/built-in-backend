@@ -27,6 +27,9 @@ public class DatabaseConfig {
     @Column(name = "database_job_name")
     private DatabaseJobName databaseJobName;
 
+    @Column(name = "config_name")
+    private String configName;
+
     @Column(name = "url")
     private String url;
 
@@ -42,6 +45,7 @@ public class DatabaseConfig {
     public DatabaseConfigDto toDto() {
         return DatabaseConfigDto.builder()
                 .id(id)
+                .configName(configName)
                 .url(url)
                 .schemaName(schemaName)
                 .username(username)
@@ -52,6 +56,7 @@ public class DatabaseConfig {
     public static DatabaseConfig fromDto(DatabaseConfigDto dto) {
         return DatabaseConfig.builder()
                 .id(dto.getId())
+                .configName(dto.getConfigName())
                 .url(dto.getUrl())
                 .schemaName(dto.getSchemaName())
                 .username(dto.getUsername())
@@ -61,6 +66,7 @@ public class DatabaseConfig {
 
     public void setProperties(DatabaseConfigDto dto) {
         this.url = dto.getUrl();
+        this.configName = dto.getConfigName();
         this.schemaName = dto.getSchemaName();
         this.username = dto.getUsername();
         this.password = dto.getPassword();

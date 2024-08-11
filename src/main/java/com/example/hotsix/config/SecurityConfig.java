@@ -99,14 +99,19 @@ public class SecurityConfig {
                         .requestMatchers("/email-register").permitAll()
                         .requestMatchers("/teams/**").permitAll()
                         .requestMatchers("/hot6man/test/**").permitAll()
+                        .requestMatchers("/notify/**").permitAll()
+                        .requestMatchers("/hot6man//notify/**").permitAll()
                         .requestMatchers(("/member/**")).permitAll()
-                        .requestMatchers(("/build/**")).permitAll()
+                        .requestMatchers("/build/**").permitAll()
+                        .requestMatchers("/hot6man/build/**").permitAll()
                         .requestMatchers(("/teambuilding/**")).permitAll()
                         .requestMatchers("/log/**").permitAll()
                         .requestMatchers("/swagger-ui.html").permitAll()
                         .requestMatchers("/swagger-ui/**").permitAll()
                         .requestMatchers("/v3/api-docs/**").permitAll()
                         .requestMatchers("/ws/log/**").permitAll()
+                        .requestMatchers("/ws/chat/**").permitAll()
+                        .requestMatchers("/hot6man/ws/chat/**").permitAll()
                         .requestMatchers(("/hot6man/member/**")).permitAll()
                         .requestMatchers("/meeting/**").permitAll()
                         .requestMatchers(("/member/**")).permitAll()
@@ -123,14 +128,12 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-//        configuration.setAllowedOrigins(Collections.singletonList(clientHost));
         configuration.setAllowedOrigins(Arrays.asList(clientHost, "http://localhost:5173"));
-        configuration.setAllowedMethods(Collections.singletonList("*")); // GET, POST, PUT 등 모든 요청 허용
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowCredentials(true);
-        configuration.setAllowedHeaders(Collections.singletonList("*")); // 받을 헤더값 세팅
+        configuration.setAllowedHeaders(Collections.singletonList("*"));
+        configuration.setExposedHeaders(Arrays.asList("Set-Cookie", "Authorization"));
         configuration.setMaxAge(3600L);
-        configuration.addExposedHeader("Set-Cookie");
-        configuration.addExposedHeader("Authorization");
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

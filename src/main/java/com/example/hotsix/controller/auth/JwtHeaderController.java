@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -24,7 +25,7 @@ public class JwtHeaderController {
     public ResponseEntity<?> convertJwtHeader(HttpServletRequest request, HttpServletResponse response, @CookieValue(value = "access", required = false) Cookie accessCookie) throws IOException {
         log.info("/convert 컨트롤러");
         String access = accessCookie.getValue();
-
+        System.out.println("coockie = "+access);
 //        Cookie[] cookies = request.getCookies();
 //        for (Cookie cookie : cookies) {
 //            if(cookie.getName().equals("access")){
@@ -48,7 +49,7 @@ public class JwtHeaderController {
             response.addCookie(newCookie);
             response.setHeader("Authorization", "Bearer " + access);
             // 리다이렉트
-            //response.sendRedirect(clinetHost);
+//            response.sendRedirect(clinetHost);
             return new ResponseEntity<>(NORMAL_RESPONSE.getHttpStatus());
         } else {
             //response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

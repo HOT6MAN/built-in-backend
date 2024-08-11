@@ -12,6 +12,7 @@ import lombok.Builder;
 public class DatabaseConfigDto {
     private Long id;
     private Long teamProjectInfoId;
+    private String configName;
     private String url;
     private String schemaName;
     private String username;

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/build")
@@ -38,6 +39,19 @@ public class BuildController {
         teamProjectInfoService.insertEmptyTeamProjectInfo(teamId);
         return "success";
     }
+
+    @PutMapping("/project/{projectInfoId}")
+    public String updateProjectInfoNameByProjectInfoId(
+            @PathVariable("projectInfoId") Long projectInfoId,
+            @RequestBody Map<String, String> requestBody) {
+
+        String updateProjectInfoName = requestBody.get("updateProjectInfoName");
+        System.out.println("updateProjectInfoName = " + updateProjectInfoName);
+        Boolean flag = teamProjectInfoService.updateProjectInfoNameByProjectInfoId(projectInfoId, updateProjectInfoName);
+        if(flag) return "success";
+        return "fail";
+    }
+
     @PostMapping("/project/backend/{projectInfoId}")
     public String saveBackendConfigs(@PathVariable("projectInfoId")Long projectInfoId,
                                      @RequestBody BackendConfigDto[] dtos){
@@ -104,6 +118,12 @@ public class BuildController {
         System.out.println("call build start");;
 
         return buildService.wholeBuildStart(projectInfoId);
+    }
+
+    @PostMapping("/deploy/{serviceNum}")
+    public void buildStop(@PathVariable("serviceNum")Long serviceNum){
+        System.out.println("Service Num = "+serviceNum);
+        buildService.deployStop(serviceNum);
     }
 
 

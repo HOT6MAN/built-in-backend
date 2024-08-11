@@ -18,6 +18,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.auth.AuthScope;
@@ -89,6 +90,38 @@ public class BuildServiceImpl implements BuildService{
 
         }
         catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    @Transactional
+    public void deployStop(Long serviceScheduleId){
+        ServiceSchedule serviceSchedule = serviceScheduleRepository.findServiceScheduleByServiceScheduleId(serviceScheduleId);
+        serviceSchedule.setTeam(null);
+        serviceSchedule.setTeamProjectInfo(null);
+        serviceSchedule.setIsUsed(false);
+        serviceSchedule.setIsPendding(false);
+
+        try(CloseableHttpClient httpClient = createHttpClient(hostJenkinsUsername, hostJenkinsToken)){
+            String crumb = getCrumb(httpClient, hostJenkinsUrl, hostJenkinsUsername, hostJenkinsToken);
+            String[] crumbParts = crumb.split(":");
+            String crumbFieldName = crumbParts[0];
+            String crumbValue = crumbParts[1];
+            String hostJobName = hostJenkinsUrl+"job/built_in_backend_stop/buildWithParameters";
+            HttpPost httpPost = new HttpPost(hostJobName);
+            httpPost.setHeader(crumbFieldName, crumbValue);
+            httpPost.setHeader("Authorization", "Basic " + Base64.getEncoder().encodeToString((hostJenkinsUsername + ":" + hostJenkinsToken).getBytes()));
+            List<NameValuePair> params = new ArrayList<>();
+            params.add(new BasicNameValuePair("SERVICE_NUM", String.valueOf(serviceScheduleId)));
+            UrlEncodedFormEntity entity = new UrlEncodedFormEntity(params, StandardCharsets.UTF_8);
+            httpPost.setEntity(entity);
+            System.out.println("Call HttpClient execute");
+            HttpResponse response = httpClient.execute(httpPost);
+            System.out.println("Response status: " + response.getStatusLine().getStatusCode());
+            System.out.println("Response body: " + EntityUtils.toString(response.getEntity()));
+        }
+        catch (Exception e){
             e.printStackTrace();
         }
     }

@@ -2,6 +2,8 @@ package com.example.hotsix.controller.chat;
 
 import com.example.hotsix.dto.chat.ChatRoom;
 import com.example.hotsix.dto.chat.ChatRoomStatus;
+import com.example.hotsix.model.Board;
+import com.example.hotsix.repository.chat.BoardRepository;
 import com.example.hotsix.service.chat.ChatMessageService;
 import com.example.hotsix.service.chat.ChatRoomService;
 import com.example.hotsix.vo.ChatMessageVo;
@@ -60,16 +62,14 @@ public class ChatController {
         return chatRoomService.findReceiver(Long.parseLong(chatroomId), Long.parseLong(userId)).getUserId();
     }
 
-    @PostMapping("/room")
-    public String createChatRoom(@RequestBody Map<String, String> request){
-        System.out.println(request.get("userAId")+" "+request.get("userBId"));
-        Long id1 = Long.parseLong(request.get("userAId"));
-        Long id2 = Long.parseLong(request.get("userBId"));
-        System.out.println("id = "+id1+" // id2 = "+id2);
-        ChatRoom room = chatRoomService.createChatRoom("새 채팅방",id1, id2);
+
+
+    @PostMapping("/room/{boardId}")
+    public String createChatRoomByBoardId(@PathVariable("boardId")Long boardId, @RequestBody String userId){
+        System.out.println("receive board Id = "+boardId + " // userId = "+userId);
+        chatRoomService.createChatRoom(boardId, Long.parseLong(userId));
         return null;
     }
-
 
 
 }

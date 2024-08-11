@@ -38,6 +38,7 @@ public class ChatConnectController {
         chatMessage.setSendDate(LocalTimeUtil.getDateTime());
         chatMessage.setDescSendDate(LocalTimeUtil.getDescDateTime());
 
+
         if(!chatMessage.getReceiverStatus()){
             chatRoomService.updateUnreadCount(Long.parseLong(chatMessage.getChatroomId()),
                     Long.parseLong(chatMessage.getReceiver()), 1);

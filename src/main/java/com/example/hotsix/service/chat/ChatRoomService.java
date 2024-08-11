@@ -6,7 +6,7 @@ import com.example.hotsix.dto.chat.ChatRoomStatus;
 import java.util.List;
 
 public interface ChatRoomService {
-    ChatRoom createChatRoom(String chatRoomName, Long userAId, Long userBId);
+    ChatRoom createChatRoom(Long boardId, Long memberId);
     List<ChatRoomStatus>   findAllChatRoomByUserId(Long userId);
     ChatRoomStatus findReceiver(Long chatroomId, Long userId);
     ChatRoomStatus findUser(Long chatroomId, Long userId);
@@ -14,4 +14,5 @@ public interface ChatRoomService {
     void updateOfflineStatus(Long chatroomId, Long userId);
     void updateUnreadCount(Long chatroomId, Long userId);
     void updateUnreadCount(Long chatroomId, Long userId, Integer num);
+
 }

@@ -11,14 +11,13 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class CorsMvcConfig implements WebMvcConfigurer {
 
     @Value("${client.host}")
-    private String clinetHost;
+    private String clientHost;
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
                 .exposedHeaders("Set-Cookie")
-                .allowedOrigins("http://localhost:5173")
-                .allowedOrigins(clinetHost)
+                .allowedOrigins("http://localhost:5173", clientHost) // 특정 도메인만 허용
                 .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
                 .allowCredentials(true);

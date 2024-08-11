@@ -12,6 +12,7 @@ import java.util.List;
 public interface BuildService {
     boolean MemberProjectBuildStart(Long memberId, Long projectInfoId);
     void buildStart(Long teamId, Long teamProjectInfoId);
+    void deployStop(Long serviceScheduleId);
 
     BuildResult addWholeBuildResult(BuildResultDto buildResultDto) throws Exception;
 
