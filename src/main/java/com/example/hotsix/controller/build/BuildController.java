@@ -34,9 +34,9 @@ public class BuildController {
         System.out.println("dtos = "+projectInfoDto);
         return null;
     }
-    @PostMapping("/project/{teamId}")
-    public TeamProjectInfo insertTeamProjectInfo(@PathVariable("teamId")Long teamId){
-        return teamProjectInfoService.insertEmptyTeamProjectInfo(teamId);
+    @PostMapping("/project/team/{teamId}/title/{title}")
+    public TeamProjectInfo insertTeamProjectInfo(@PathVariable("teamId")Long teamId, @PathVariable("title") String title){
+        return teamProjectInfoService.insertEmptyTeamProjectInfo(teamId, title);
     }
 
     @PutMapping("/project/{projectInfoId}")

@@ -26,9 +26,9 @@ public class TeamProjectInfoServiceImpl implements TeamProjectInfoService{
 
     @Override
     @Transactional
-    public TeamProjectInfo insertEmptyTeamProjectInfo(Long teamId){
+    public TeamProjectInfo insertEmptyTeamProjectInfo(Long teamId, String title){
         TeamProjectInfo teamProjectInfo = TeamProjectInfo.builder()
-                .title("default config")
+                .title(title)
                 .build();
         Team team = teamRepository.findTeamById(teamId);
 
