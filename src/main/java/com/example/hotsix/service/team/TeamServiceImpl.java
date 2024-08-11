@@ -60,7 +60,7 @@ public class TeamServiceImpl implements TeamService{
 
     @Override
     public void deleteTeam(Long teamId) {
-        
+        teamRepository.deleteById(teamId);
     }
 
     @Override

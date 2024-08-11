@@ -10,6 +10,7 @@ import com.example.hotsix.oauth.dto.CustomOAuth2User;
 import com.example.hotsix.service.team.TeamService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
@@ -37,6 +38,13 @@ public class TeamController {
         teamService.createTeam(team, memberId);
         return team;
     }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @DeleteMapping("/teams/{teamId}")
+    public void deleteTeam(@PathVariable("teamId") String teamId){
+        teamService.deleteTeam(Long.valueOf(teamId));
+    }
+
 
     @GetMapping("/teams/{memberId}")
     public List<TeamDto> getAllMyTeams(@PathVariable("memberId") String memberId) {
