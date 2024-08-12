@@ -2,8 +2,10 @@ package com.example.hotsix.repository;
 
 import com.querydsl.core.types.EntityPath;
 import com.querydsl.core.types.Expression;
+import com.querydsl.jpa.impl.JPADeleteClause;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.querydsl.jpa.impl.JPAUpdateClause;
 import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,5 +50,11 @@ public abstract class Querydsl4RepositorySupport {
     }
     protected <R> JPAQuery<R> selectFrom(EntityPath<R> from) {
         return getQueryFactory().selectFrom(from);
+    }
+    protected <R> JPAUpdateClause updateFrom(EntityPath<R> from) {
+        return getQueryFactory().update(from);
+    }
+    protected <R> JPADeleteClause deleteFrom(EntityPath<R> from) {
+        return getQueryFactory().delete(from);
     }
 }
