@@ -249,7 +249,7 @@ CREATE TABLE IF NOT EXISTS `ssafy`.`build_result` (
 CREATE TABLE IF NOT EXISTS `ssafy`.`build_jenkins_job` (
                                                       `id` BIGINT NOT NULL AUTO_INCREMENT,
                                                       `build_result_id` BIGINT NULL DEFAULT NULL,
-                                                      `build_number` BIGINT NULL DEFAULT NULL,
+                                                      `build_num` BIGINT NULL DEFAULT NULL,
                                                       `job_name` VARCHAR(255) NULL DEFAULT NULL,
     `result` VARCHAR(255),
     `job_type` VARCHAR(255),
