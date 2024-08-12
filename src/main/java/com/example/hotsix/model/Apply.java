@@ -1,5 +1,6 @@
 package com.example.hotsix.model;
 
+import com.example.hotsix.dto.apply.ApplyShortResponse;
 import com.example.hotsix.enums.ApplicationStatus;
 import com.example.hotsix.model.id.ApplyId;
 import jakarta.persistence.*;
@@ -30,4 +31,16 @@ public class Apply extends BaseEntity {
     @MapsId("resumeId")
     @JoinColumn(name = "resume_id")
     private Resume resume;
+
+    public static ApplyShortResponse toShortResponse(Apply apply) {
+        Resume resume = apply.getResume();
+
+        return new ApplyShortResponse(
+                resume.getId(),
+                apply.getCreatedDate().toLocalDate(),
+                resume.getAuthor().getName(),
+                resume.getPosition(),
+                apply.getStatus().name()
+        );
+    }
 }

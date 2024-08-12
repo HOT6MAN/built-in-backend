@@ -27,21 +27,18 @@ import java.util.Objects;
 public class ResumeController {
 
     private final MemberService memberService;
-    private final TeamService teamService;
     private final ResumeService resumeService;
     private final StorageService storageService;
     private final ExperienceRequestPropertyEditor experienceRequestPropertyEditor;
     private final Provider<ResumePropertyEditor> resumePropertyEditorProvider;
 
     public ResumeController(MemberService memberService,
-                            TeamService teamService,
                             ResumeService resumeService,
                             @Qualifier("fileSystemStorageService") StorageService storageService,
                             ExperienceRequestPropertyEditor experienceRequestPropertyEditor,
                             Provider<ResumePropertyEditor> resumePropertyEditorProvider
     ) {
         this.memberService = memberService;
-        this.teamService = teamService;
         this.resumeService = resumeService;
         this.storageService = storageService;
         this.experienceRequestPropertyEditor = experienceRequestPropertyEditor;
@@ -104,18 +101,6 @@ public class ResumeController {
         storageService.remove(resume.getProfile());
 
         resumeService.delete(resume);
-    }
-
-    @PostMapping("/apply")
-    @ResponseStatus(HttpStatus.CREATED)
-    public void apply(@RequestBody ApplyRequest applyRequest) {
-        Long resumeId = applyRequest.resumeId();
-        Long teamId = applyRequest.teamId();
-
-        Resume application = resumeService.findById(resumeId);
-        Team teamToApply = teamService.findById(teamId);
-
-        resumeService.apply(teamToApply, application);
     }
 
     private List<ResumeShortResponse> convertToShortResponse(List<Resume> list) {
