@@ -58,7 +58,7 @@ public class ResumeController {
 
     @GetMapping("/resumes")
     public List<ResumeShortResponse> myResumes(@AuthenticationPrincipal CustomOAuth2User me) throws InterruptedException {
-        Thread.sleep(1000*3);
+        Thread.sleep(1000*1);
 
         Member memberMe = memberService.findById(me.getId());
 

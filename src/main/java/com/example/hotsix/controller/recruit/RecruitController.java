@@ -77,7 +77,7 @@ public class RecruitController {
             @RequestParam(value = "authorName", required = false) String authorName,
             @RequestParam(value = "desiredPos", required = false) String desiredPos
     ) throws InterruptedException {
-        Thread.sleep(1000*3);
+        Thread.sleep(1000*1);
 
         List<Recruit> list = null;
 
