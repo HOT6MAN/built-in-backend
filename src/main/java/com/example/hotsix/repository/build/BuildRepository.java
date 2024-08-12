@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface BuildRepository extends JpaRepository<BuildResult, Long>, BuildRepositoryCustom {
-    Optional<BuildResult> findByDeployNum(Long deployNum);
+    Optional<BuildResult> findByDeployNumAndTeamProjectInfoId(Long deployNum, Long teamProjectInfoId);
 
     List<BuildResult> findByTeamProjectInfoId(Long teamProjectInfoId);
 

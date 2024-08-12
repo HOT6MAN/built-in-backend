@@ -17,8 +17,8 @@ public class BuildStage extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "build_result_id", referencedColumnName = "id")
-    private BuildResult buildResult;
+    @JoinColumn(name = "build_jenkins_job_id", referencedColumnName = "id")
+    private BuildJenkinsJob buildJenkinsJob;
 
     @Column(name = "name")
     private String name;

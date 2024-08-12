@@ -25,9 +25,11 @@ public class ServiceScheduleRepositoryImpl implements ServiceScheduleRepositoryC
     }
 
     @Override
-    public ServiceSchedule findEmptyService() {
+    public ServiceSchedule findEmptyService(TeamProjectInfo teamProjectInfo) {
         return queryFactory.selectFrom(serviceSchedule)
-                .where(serviceSchedule.buildStatus.eq(BuildStatus.EMPTY))
+                .where(serviceSchedule.buildStatus.eq(BuildStatus.EMPTY)
+                        .and(serviceSchedule.teamProjectInfo.isNull()
+                                .or(serviceSchedule.teamProjectInfo.ne(teamProjectInfo))))
                 .orderBy(serviceSchedule.id.asc())
                 .limit(1)
                 .fetchOne();

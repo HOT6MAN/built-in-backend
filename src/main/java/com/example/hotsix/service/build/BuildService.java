@@ -1,9 +1,6 @@
 package com.example.hotsix.service.build;
 
-import com.example.hotsix.dto.build.BuildResultDto;
-import com.example.hotsix.dto.build.BuildResultInfoDto;
-import com.example.hotsix.dto.build.BuildStartDto;
-import com.example.hotsix.dto.build.BuildWholeDto;
+import com.example.hotsix.dto.build.*;
 import com.example.hotsix.model.project.BuildResult;
 
 import java.net.URISyntaxException;
@@ -20,4 +17,12 @@ public interface BuildService {
 
 
     BuildStartDto wholeBuildStart(Long projectInfoId);
+
+    BuildCheckDto buildCheck(Long memberId, Long projectInfoId);
+
+    BuildResult insertBuildResult(Long teamProjectInfoId, Long deployNum);
+
+    void startJenkinsBackendJob(Long memberId, Long projectInfoId, Long deployNum, Long serviceNum, BackendConfigDto[] dtos);
+
+    void startJenkisSetupJob(DeployConfig deployConfig);
 }

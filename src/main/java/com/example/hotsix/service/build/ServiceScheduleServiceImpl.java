@@ -20,10 +20,6 @@ public class ServiceScheduleServiceImpl {
         return serviceScheduleRepository.findServiceScheduleByServiceScheduleId(serviceScheduleId);
     }
 
-    public ServiceSchedule findEmptyServiceId(){
-        return serviceScheduleRepository.findEmptyService();
-    }
-
     public List<TeamProjectInfo> findUsedProjectInfoIdByTeamId(Long teamId){
         return serviceScheduleRepository.findUsedProjectInfoIdByTeamId(teamId);
     }

@@ -6,16 +6,14 @@ import com.example.hotsix.model.ServiceSchedule;
 import com.example.hotsix.enums.BuildStatus;
 //import com.example.hotsix.model.TeamProjectCredential;
 import com.example.hotsix.model.project.*;
-import com.example.hotsix.repository.build.BuildLogRepository;
-import com.example.hotsix.repository.build.BuildRepository;
-import com.example.hotsix.repository.build.BuildStageRepository;
-import com.example.hotsix.repository.build.ServiceScheduleRepository;
+import com.example.hotsix.repository.build.*;
 import com.example.hotsix.repository.member.MemberRepository;
 import com.example.hotsix.repository.team.TeamProjectInfoRepository;
 import com.example.hotsix.repository.team.TeamRepository;
 import com.example.hotsix.util.TimeUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.offbytwo.jenkins.model.Build;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpHost;
@@ -56,6 +54,7 @@ public class BuildServiceImpl implements BuildService{
     private final TeamProjectInfoRepository teamProjectInfoRepository;
     private final ServiceScheduleRepository serviceScheduleRepository;
     private final BuildStageRepository buildStageRepository;
+    private final BuildResultRepository buildResultRepository;
 
     private static final String GIT_TYPE = "git";
     private static final String DOCKER_TYPE = "docker";
@@ -63,6 +62,7 @@ public class BuildServiceImpl implements BuildService{
     private static final String BUILD_WITH_PARAMETERS_URL = "job/"+JOB_NAME+"/buildWithParameters";
     private final BuildLogRepository buildLogRepository;
     private final GrafanaClient grafanaClient;
+    private final BuildJenkinsJobRepository buildJenkinsJobRepository;
 
     @Value("${jenkins.url}")
     private String hostJenkinsUrl;
@@ -73,11 +73,12 @@ public class BuildServiceImpl implements BuildService{
     @Value("${jenkins.token}")
     private String hostJenkinsToken;
 
+    // 현재는 쓰지 않는 메서드
     @Override
     @Transactional
     public void buildStart(Long teamId, Long teamProjectInfoId){
         TeamProjectInfo teamProjectInfo = teamProjectInfoRepository.findProjectInfoByProjectInfoId(teamProjectInfoId);
-        ServiceSchedule emptyServiceId = serviceScheduleRepository.findEmptyService();
+        ServiceSchedule emptyServiceId = serviceScheduleRepository.findEmptyService(teamProjectInfo);
         log.info("empty Service Schedule = {}",emptyServiceId);
         emptyServiceId.setBuildStatus(BuildStatus.PENDING);
         emptyServiceId.setTeam(teamProjectInfo.getTeam());
@@ -86,7 +87,9 @@ public class BuildServiceImpl implements BuildService{
         String servicePort = String.valueOf(emptyServiceId.getId());
         try(CloseableHttpClient httpClient = createHttpClient(hostJenkinsUsername, hostJenkinsToken)){
             String crumb = getCrumb(httpClient, hostJenkinsUrl, hostJenkinsUsername, hostJenkinsToken);
-            createJenkinsBackendInstance(teamProjectInfo.getBackendConfigs(), httpClient, crumb, servicePort, teamId);
+
+
+//            createJenkinsBackendInstance(teamProjectInfo.getBackendConfigs(), httpClient, crumb, servicePort, teamProjectInfoId);
 
         }
         catch(Exception e){
@@ -128,14 +131,26 @@ public class BuildServiceImpl implements BuildService{
     @Override
     @Transactional
     public BuildResult addWholeBuildResult(BuildResultDto buildResultDto) throws Exception {
-        Long deployNum = buildResultDto.getDeployNum();
+        Long deployNum = buildResultDto.getBuildNum();
         Long teamProjectInfoId = buildResultDto.getTeamProjectInfoId();
 
         // 1. deployNum 에 해당하는 BuildResult 가 없을경우, 새로 생성
-        BuildResult buildResult = buildRespository.findByDeployNum(deployNum)
+        BuildResult buildResult = buildRespository.findByDeployNumAndTeamProjectInfoId(deployNum, teamProjectInfoId)
                 .orElseGet(() -> addBuildResult(deployNum, teamProjectInfoId));
 
-        // 2. Build 결과를 받아오기 위한 Jenkins API 호출
+        // 2. BuildJenkinsJob 데이터 생성
+        BuildJenkinsJob buildJenkinsJob = BuildJenkinsJob.builder()
+                .buildResult(buildResult)
+                .buildNum(buildResultDto.getBuildNum())
+                .jobName(buildResultDto.getJobName())
+                .result(BuildStatus.valueOf(buildResultDto.getResult()))
+                .jobType(buildResultDto.getJobType())
+                .build();
+
+        // 2-1. 저장
+        buildJenkinsJobRepository.save(buildJenkinsJob);
+
+        // 3. Build 결과를 받아오기 위한 Jenkins API 호출
         String jobName = buildResultDto.getJobName();
         Long buildNum = buildResultDto.getBuildNum();
         String targetUrl = String.format("%sjob/%s/%d/wfapi/describe", hostJenkinsUrl, jobName, buildNum);
@@ -150,18 +165,18 @@ public class BuildServiceImpl implements BuildService{
                 .baseUrl(targetUrl)
                 .build();
 
-        // 3. API 응답 결과를 JsonNode 형식으로 변환
+        // 4. API 응답 결과를 JsonNode 형식으로 변환
         JsonNode jsonNode = client.get()
                 .headers(headers -> headers.setBasicAuth(hostJenkinsUsername, hostJenkinsToken))
                 .retrieve()
                 .bodyToMono(JsonNode.class)
                 .block();
 
-        // 4. BuildResult의 Status 변경
+        // 5. BuildResult의 Status 변경
         String wholeStatus = jsonNode.get("status").asText();
         buildResult.setStatus(BuildStatus.valueOf(wholeStatus.toUpperCase()));
 
-        // 5. Stages 추가
+        // 6. Stages 추가
         JsonNode stageNode = jsonNode.get("stages");
 
         if (stageNode != null && stageNode.isArray()) {
@@ -176,7 +191,7 @@ public class BuildServiceImpl implements BuildService{
                 String status = stage.get("status").asText();
 
                 BuildStage buildStage = BuildStage.builder()
-                        .buildResult(buildResult)
+                        .buildJenkinsJob(buildJenkinsJob)
                         .stageId(stageId)
                         .name(name)
                         .duration(duration)
@@ -257,6 +272,8 @@ public class BuildServiceImpl implements BuildService{
         List<BuildResult> buildResults = buildRespository.findByTeamProjectInfoId(teamProjectInfoId);
         System.out.println("buildResults = " + buildResults.size());
 
+
+        // todo: 이 부분 수정해야 함
         List<BuildResultInfoDto> buildResultInfoDtos = buildResults.stream()
                 .map(buildResult -> {
                     BuildResultInfoDto buildResultInfoDto = BuildResultInfoDto.from(buildResult);
@@ -280,7 +297,7 @@ public class BuildServiceImpl implements BuildService{
     public BuildStartDto wholeBuildStart(Long projectInfoId) {
         TeamProjectInfo teamProjectInfo = teamProjectInfoRepository.findProjectInfoByProjectInfoId(projectInfoId);
         Long teamId = teamProjectInfo.getTeam().getId();
-        ServiceSchedule emptyServiceSchedule = serviceScheduleRepository.findEmptyService();
+        ServiceSchedule emptyServiceSchedule = serviceScheduleRepository.findEmptyService(teamProjectInfo);
 
         System.out.println("empty Schedule = "+emptyServiceSchedule);
 
@@ -306,6 +323,91 @@ public class BuildServiceImpl implements BuildService{
 
         return null;
     }
+
+    @Override
+    @Transactional
+    public BuildCheckDto buildCheck(Long memberId, Long projectInfoId) {
+        TeamProjectInfo teamProjectInfo = teamProjectInfoRepository.findProjectInfoByProjectInfoId(projectInfoId);
+
+        System.out.println("teamProjectInfo = " + teamProjectInfo.getId());
+
+        // 1. 현재 teamProjectInfo 기준으로 서비스하고 있는지 여부를 판단
+        ServiceSchedule curServiceSchedule = serviceScheduleRepository.findByTeamProjectInfo(teamProjectInfo);
+        // 현재 서비스하고 있을 경우
+        if (curServiceSchedule != null) {
+            return null;
+        }
+
+        // 2. 비어 있는 서비스가 있는지 여부를 판단
+        ServiceSchedule emptyService = serviceScheduleRepository.findEmptyService(teamProjectInfo);
+
+        // 비어 있는 서비스가 없을 경우
+        if (emptyService == null) {
+            return null;
+        }
+
+        emptyService.setBuildStatus(BuildStatus.PENDING);
+        emptyService.setTeam(teamProjectInfo.getTeam());
+        emptyService.setTeamProjectInfo(teamProjectInfo);
+        serviceScheduleRepository.save(emptyService);
+
+        Long serviceNum = emptyService.getId();
+
+        List<BuildResult> allByTeamProjectInfoOrderByDeployNumDesc = buildResultRepository.findAllByTeamProjectInfoOrderByDeployNumDesc(teamProjectInfo);
+        long deployNum = 1L;
+        if (!allByTeamProjectInfoOrderByDeployNumDesc.isEmpty()) {
+            deployNum = allByTeamProjectInfoOrderByDeployNumDesc.get(0).getDeployNum() + 1;
+        }
+
+        return BuildCheckDto.builder()
+                .serviceNum(serviceNum)
+                .deployNum(deployNum)
+                .build();
+    }
+
+    @Override
+    @Transactional
+    public BuildResult insertBuildResult(Long teamProjectInfoId, Long deployNum) {
+
+        log.info("insertBuildResult 실행");
+
+        TeamProjectInfo teamProjectInfo = teamProjectInfoRepository.findProjectInfoByProjectInfoId(teamProjectInfoId);
+        BuildResult buildResult = BuildResult.builder()
+                .teamProjectInfo(teamProjectInfo)
+                .deployNum(deployNum)
+                .status(BuildStatus.PENDING)
+                .build();
+
+        buildResultRepository.save(buildResult);
+        return buildResult;
+    }
+
+    @Override
+    @Transactional
+    public void startJenkinsBackendJob(Long memberId, Long projectInfoId, Long deployNum, Long serviceNum, BackendConfigDto[] dtos) {
+        TeamProjectInfo teamProjectInfo = teamProjectInfoRepository.findProjectInfoByProjectInfoId(projectInfoId);
+
+        try(CloseableHttpClient httpClient = createHttpClient(hostJenkinsUsername, hostJenkinsToken)){
+            String crumb = getCrumb(httpClient, hostJenkinsUrl, hostJenkinsUsername, hostJenkinsToken);
+            createJenkinsBackendInstance(teamProjectInfo.getBackendConfigs(), httpClient, crumb, String.valueOf(serviceNum), projectInfoId, memberId, deployNum);
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void startJenkisSetupJob(DeployConfig deployConfig) {
+        try(CloseableHttpClient httpClient = createHttpClient(hostJenkinsUsername, hostJenkinsToken)){
+            String crumb = getCrumb(httpClient, hostJenkinsUrl, hostJenkinsUsername, hostJenkinsToken);
+            createJenkinsSetupInstance(httpClient, crumb, deployConfig);
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+
+
 
     /*
       시연용으로, built_in_full_docker_copy pipeline을 이용하여, 백 + 프론트 + db 배포를 한꺼번에 수행
@@ -366,7 +468,7 @@ public class BuildServiceImpl implements BuildService{
     }
 
     private List<BuildStageInfoDto> getBuildStageInfoList(Long buildResultId) {
-        List<BuildStage> buildStageList = buildStageRepository.findByBuildResultId(buildResultId);
+        List<BuildStage> buildStageList = buildStageRepository.findByBuildJenkinsJobId(buildResultId);
         return buildStageList.stream()
                 .map(buildStage -> {
                     BuildStageInfoDto buildStageInfoDto = BuildStageInfoDto.from(buildStage);
@@ -409,8 +511,9 @@ public class BuildServiceImpl implements BuildService{
                                              CloseableHttpClient httpClient,
                                              String crumb,
                                              String servicePort,
-                                             Long teamId) throws IOException {
-        Integer serviceIndex = 0;
+                                             Long teamProjectInfoId,
+                                             Long memberId,
+                                             Long deployNum) throws IOException {
         System.out.println("Crumb = "+crumb);
         String[] crumbParts = crumb.split(":");
         String crumbFieldName = crumbParts[0];
@@ -425,27 +528,70 @@ public class BuildServiceImpl implements BuildService{
             httpPost.setHeader(crumbFieldName, crumbValue);
             httpPost.setHeader("Authorization", "Basic " + Base64.getEncoder().encodeToString((hostJenkinsUsername + ":" + hostJenkinsToken).getBytes()));
 
-            String eigenServiceName = UUID.randomUUID().toString();
+//            String eigenServiceName = UUID.randomUUID().toString();
             List<NameValuePair> params = new ArrayList<>();
             // JDK 17 이런식으로 jdk하는건 아직 구현 안함.
             // Gradle 같이 Build 도구도 아직 구현 안함.
+            params.add(new BasicNameValuePair("SERVICE_NUM", String.valueOf(servicePort)));
             params.add(new BasicNameValuePair("GIT_URL", config.getGitUrl()));
-            params.add(new BasicNameValuePair("GIT_BRANCH", config.getGitBranch()));
             params.add(new BasicNameValuePair("GIT_USERNAME", config.getGitUsername()));
+            params.add(new BasicNameValuePair("GIT_BRANCH", config.getGitBranch()));
             params.add(new BasicNameValuePair("GIT_ACCESS_TOKEN", config.getGitAccessToken()));
-            params.add(new BasicNameValuePair("SERVICE_NUM", servicePort));
-            params.add(new BasicNameValuePair("SERVICE_ID", eigenServiceName));
-            params.add(new BasicNameValuePair("TEAM_ID", String.valueOf(teamId)));
+//            params.add(new BasicNameValuePair("SERVICE_ID", eigenServiceName));
+            params.add(new BasicNameValuePair("TEAM_PROJECT_INFO_ID", String.valueOf(teamProjectInfoId)));
+            params.add(new BasicNameValuePair("MEMBER_ID", String.valueOf(memberId)));
+            params.add(new BasicNameValuePair("DEPLOY_NUM", String.valueOf(deployNum)));
+
+            System.out.println("teamProjectInfoId = " + teamProjectInfoId);
+            System.out.println("params = " + params);
+
             System.out.println("configs id = "+config.getId());
-            params.add(new BasicNameValuePair("CONFIG_ID", String.valueOf(config.getId())));
-            params.add(new BasicNameValuePair("SERVICE_INDEX", String.valueOf(serviceIndex)));
+//            params.add(new BasicNameValuePair("CONFIG_ID", String.valueOf(config.getId())));
+
             UrlEncodedFormEntity entity = new UrlEncodedFormEntity(params, StandardCharsets.UTF_8);
             httpPost.setEntity(entity);
             System.out.println("Call HttpClient execute");
             HttpResponse response = httpClient.execute(httpPost);
             System.out.println("Response status: " + response.getStatusLine().getStatusCode());
             System.out.println("Response body: " + EntityUtils.toString(response.getEntity()));
-            serviceIndex++;
+        }
+    }
+
+    private void createJenkinsSetupInstance(CloseableHttpClient httpClient,
+                                            String crumb,
+                                            DeployConfig deployConfig) {
+        System.out.println("Crumb = "+crumb);
+        String[] crumbParts = crumb.split(":");
+        String crumbFieldName = crumbParts[0];
+        String crumbValue = crumbParts[1];
+
+        String hostJobName = hostJenkinsUrl + "job/deploy_setup/buildWithParameters";
+        HttpPost httpPost = new HttpPost(hostJobName);
+        httpPost.setHeader(crumbFieldName, crumbValue);
+        httpPost.setHeader("Authorization", "Basic " + Base64.getEncoder().encodeToString((hostJenkinsUsername + ":" + hostJenkinsToken).getBytes()));
+
+        System.out.println("deployConfig = " + deployConfig);
+
+        List<NameValuePair> params = new ArrayList<>();
+        params.add(new BasicNameValuePair("SERVICE_NUM", String.valueOf(deployConfig.getServiceNum())));
+        params.add(new BasicNameValuePair("PROJECT_ID", String.valueOf(deployConfig.getTeamProjectInfoId())));
+        params.add(new BasicNameValuePair("MEMBER_ID", String.valueOf(deployConfig.getMemberId())));
+        params.add(new BasicNameValuePair("DEPLOY_NUM", String.valueOf(deployConfig.getDeployNum())));
+        params.add(new BasicNameValuePair("JOB_TYPE", String.valueOf(deployConfig.getJobType())));
+        params.add(new BasicNameValuePair("ACCESS_TOKEN", String.valueOf(deployConfig.getAccessToken())));
+
+        System.out.println("params = " + params);
+
+        UrlEncodedFormEntity entity = new UrlEncodedFormEntity(params, StandardCharsets.UTF_8);
+        httpPost.setEntity(entity);
+        System.out.println("Call HttpClient execute");
+        HttpResponse response = null;
+        try {
+            response = httpClient.execute(httpPost);
+            System.out.println("Response status: " + response.getStatusLine().getStatusCode());
+            System.out.println("Response body: " + EntityUtils.toString(response.getEntity()));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
