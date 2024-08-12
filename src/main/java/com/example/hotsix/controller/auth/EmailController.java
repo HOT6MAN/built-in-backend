@@ -1,5 +1,6 @@
 package com.example.hotsix.controller.auth;
 
+import com.example.hotsix.dto.auth.EmailResponse;
 import com.example.hotsix.dto.member.MemberDto;
 import com.example.hotsix.jwt.JWTUtil;
 import com.example.hotsix.model.Member;
@@ -34,21 +35,30 @@ public class EmailController {
 
     // 링크를 생성하고 메일로 보내줌
     @PostMapping("/email-link")
-    public String emailLink(@RequestBody String email) {
+    public EmailResponse emailLink(@RequestBody String email) {
         log.info(email);
         Member exist = memberRepository.findByEmail(email.replace("\"", ""));
         log.info("exist: {}", exist);
         String link = null;
+        EmailResponse emailResponse = null;
         //이미 존재하는 이메일
         if(exist != null) {
             link = mailLinkService.createLink("email-login", email);
             mailLinkService.sendMail(email, "login", link);
+            emailResponse = EmailResponse.builder()
+                    .link(link)
+                    .type("login")
+                    .build();
         }else{
             link = mailLinkService.createLink("register", email);
             mailLinkService.sendMail(email, "register", link);
+            emailResponse = EmailResponse.builder()
+                    .link(link)
+                    .type("register")
+                    .build();
         }
         //mailLinkService.sendMail(email, "login", link);
-        return link;
+        return emailResponse;
     }
 
 
