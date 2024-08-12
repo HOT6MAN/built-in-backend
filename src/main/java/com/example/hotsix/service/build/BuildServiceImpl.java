@@ -6,10 +6,7 @@ import com.example.hotsix.model.ServiceSchedule;
 import com.example.hotsix.enums.BuildStatus;
 //import com.example.hotsix.model.TeamProjectCredential;
 import com.example.hotsix.model.project.*;
-import com.example.hotsix.repository.build.BuildLogRepository;
-import com.example.hotsix.repository.build.BuildRepository;
-import com.example.hotsix.repository.build.BuildStageRepository;
-import com.example.hotsix.repository.build.ServiceScheduleRepository;
+import com.example.hotsix.repository.build.*;
 import com.example.hotsix.repository.member.MemberRepository;
 import com.example.hotsix.repository.team.TeamProjectInfoRepository;
 import com.example.hotsix.repository.team.TeamRepository;
@@ -56,6 +53,7 @@ public class BuildServiceImpl implements BuildService{
     private final TeamProjectInfoRepository teamProjectInfoRepository;
     private final ServiceScheduleRepository serviceScheduleRepository;
     private final BuildStageRepository buildStageRepository;
+    private final BuildResultRepository buildResultRepository;
 
     private static final String GIT_TYPE = "git";
     private static final String DOCKER_TYPE = "docker";
@@ -308,20 +306,33 @@ public class BuildServiceImpl implements BuildService{
     }
 
     @Override
-    public long buildCheck(Long memberId, Long projectInfoId) {
+    @Transactional
+    public BuildCheckDto buildCheck(Long memberId, Long projectInfoId) {
         TeamProjectInfo teamProjectInfo = teamProjectInfoRepository.findProjectInfoByProjectInfoId(projectInfoId);
         ServiceSchedule emptyService = serviceScheduleRepository.findEmptyService();
 
         // 비어 있는 서비스가 없을 경우
         if (emptyService == null) {
-            return -1;
+            return null;
         }
 
         emptyService.setBuildStatus(BuildStatus.PENDING);
         emptyService.setTeam(teamProjectInfo.getTeam());
         emptyService.setTeamProjectInfo(teamProjectInfo);
         serviceScheduleRepository.save(emptyService);
-        return emptyService.getId();
+
+        Long serviceNum = emptyService.getId();
+
+        List<BuildResult> allByTeamProjectInfoOrderByDeployNumDesc = buildResultRepository.findAllByTeamProjectInfoOrderByDeployNumDesc(teamProjectInfo);
+        Long deployNum = 1L;
+        if (!allByTeamProjectInfoOrderByDeployNumDesc.isEmpty()) {
+            deployNum = allByTeamProjectInfoOrderByDeployNumDesc.get(0).getDeployNum() + 1;
+        }
+
+        return BuildCheckDto.builder()
+                .serviceNum(serviceNum)
+                .deployNum(deployNum)
+                .build();
     }
 
     /*

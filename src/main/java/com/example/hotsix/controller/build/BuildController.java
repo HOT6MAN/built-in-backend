@@ -51,6 +51,11 @@ public class BuildController {
         return "fail";
     }
 
+    @PostMapping("/project/setup/{projectInfoId}")
+    public String setUpDelopyConfigs(@PathVariable("projectInfoId") Long projectInfoId){
+        return null;
+    }
+
     @PostMapping("/project/backend/{projectInfoId}")
     public String saveBackendConfigs(@PathVariable("projectInfoId")Long projectInfoId,
                                      @RequestBody BackendConfigDto[] dtos){
@@ -125,6 +130,13 @@ public class BuildController {
         buildService.deployStop(serviceNum);
     }
 
+    @PostMapping("/jenkins/result")
+    public void jenkinsJobResult(@RequestBody JenkinsResultDto jenkinsResultDto) {
+        log.info("jenkinsResultDto = " + jenkinsResultDto);
+
+
+    }
+
 
     // Jenkins Build 결과를 DB에 저장하는 API
     @PostMapping("/deploy/result")
@@ -140,10 +152,7 @@ public class BuildController {
     // {teamId}에 해당하는 서비스를, 배포할 수 있는지 여부를 판단한다
     @GetMapping("/deploy/member/{memberId}/project-info/{projectInfoId}")
     public BuildCheckDto buildCheck(@PathVariable("memberId") Long memberId, @PathVariable("projectInfoId") Long projectInfoId){
-        long serviceNum = buildService.buildCheck(memberId, projectInfoId);
-        return BuildCheckDto.builder()
-                .serviceNum(serviceNum)
-                .build();
+        return buildService.buildCheck(memberId, projectInfoId);
     }
 
     // Jenkins Build 결과를 불러오는 API

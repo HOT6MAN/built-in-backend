@@ -10,4 +10,5 @@ import lombok.Builder;
 @NoArgsConstructor
 public class BuildCheckDto {
     private Long serviceNum;
+    private Long deployNum;
 }
