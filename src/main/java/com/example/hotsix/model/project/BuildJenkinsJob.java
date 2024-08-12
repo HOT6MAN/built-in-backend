@@ -19,8 +19,9 @@ public class BuildJenkinsJob {
     @JoinColumn(name = "build_result_id", referencedColumnName = "id")
     private BuildResult buildResult;
 
-    @Column(name = "build_number")
-    private Long buildNumber;
+    // jenkins job 기준, 몇 번째로 한 빌드인지
+    @Column(name = "build_num")
+    private Long buildNum;
 
     @Column(name = "job_name")
     private String jobName;

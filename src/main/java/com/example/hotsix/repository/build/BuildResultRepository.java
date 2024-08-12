@@ -10,4 +10,6 @@ import java.util.List;
 @Repository
 public interface BuildResultRepository extends JpaRepository<BuildResult, Long> {
     List<BuildResult> findAllByTeamProjectInfoOrderByDeployNumDesc(TeamProjectInfo teamProjectInfo);
+
+    BuildResult findBuildResultByTeamProjectInfoIdAndDeployNum(Long teamProjectInfoId, Long deployNum);
 }

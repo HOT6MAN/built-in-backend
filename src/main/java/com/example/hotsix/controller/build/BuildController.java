@@ -2,6 +2,7 @@ package com.example.hotsix.controller.build;
 
 
 import com.example.hotsix.dto.build.*;
+import com.example.hotsix.model.project.BuildResult;
 import com.example.hotsix.model.project.TeamProjectInfo;
 import com.example.hotsix.service.build.BuildService;
 import com.example.hotsix.service.build.ServiceScheduleServiceImpl;
@@ -37,6 +38,11 @@ public class BuildController {
     @PostMapping("/project/team/{teamId}/title/{title}")
     public TeamProjectInfo insertTeamProjectInfo(@PathVariable("teamId")Long teamId, @PathVariable("title") String title){
         return teamProjectInfoService.insertEmptyTeamProjectInfo(teamId, title);
+    }
+
+    @PostMapping("/project/team-project-info/{teamProjectInfoId}/deployNum/{deployNum}")
+    public BuildResult insertBuildResult(@PathVariable("teamProjectInfoId") Long teamProjectInfoId, @PathVariable("deployNum") Long deployNum){
+        return buildService.insertBuildResult(teamProjectInfoId, deployNum);
     }
 
     @PutMapping("/project/{projectInfoId}")
@@ -137,7 +143,6 @@ public class BuildController {
 
     }
 
-
     // Jenkins Build 결과를 DB에 저장하는 API
     @PostMapping("/deploy/result")
     public String saveBuildResult(@RequestBody BuildResultDto buildResultDto) throws Exception {
@@ -149,11 +154,35 @@ public class BuildController {
         return "success";
     }
 
-    // {teamId}에 해당하는 서비스를, 배포할 수 있는지 여부를 판단한다
+    // {projectInfoId}에 해당하는 서비스를, 배포할 수 있는지 여부를 판단한다
     @GetMapping("/deploy/member/{memberId}/project-info/{projectInfoId}")
     public BuildCheckDto buildCheck(@PathVariable("memberId") Long memberId, @PathVariable("projectInfoId") Long projectInfoId){
         return buildService.buildCheck(memberId, projectInfoId);
     }
+
+    // deploy_setup jenkins Job 실행
+    @PostMapping("/project/setup")
+    public void startJenkinsSetupJob(@RequestBody DeployConfig deployConfig) {
+        System.out.println("deployConfig = " + deployConfig);
+
+        buildService.startJenkisSetupJob(deployConfig);
+    }
+
+    // built_in_backend_docker jenkins Job 실행
+    @PostMapping("/project/backend/member/{memberId}/team-project-info/{projectInfoId}/deployNum/{deployNum}/serviceNum/{serviceNum}")
+    public void startJenkinsBackendJob(@PathVariable("memberId") Long memberId,
+                                       @PathVariable("projectInfoId")Long projectInfoId,
+                                       @PathVariable("deployNum") Long deployNum,
+                                       @PathVariable("serviceNum") Long serviceNum,
+                                       @RequestBody BackendConfigDto[] dtos) {
+        for(BackendConfigDto dto : dtos){
+            System.out.println(dto);
+        }
+
+        buildService.startJenkinsBackendJob(memberId, projectInfoId, deployNum, serviceNum, dtos);
+        log.info("jenkins backend Job 실행 완료");
+    }
+
 
     // Jenkins Build 결과를 불러오는 API
     @GetMapping("/deploy/result/team_project_info/{teamProjectInfoId}")

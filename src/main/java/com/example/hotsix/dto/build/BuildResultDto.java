@@ -13,13 +13,11 @@ import lombok.Setter;
 @Builder
 public class BuildResultDto {
     private String jobName;
-
     // 현재 build시킨 job이, jenkins job 기준 몇 번째로 실행되었는가?
     private Long buildNum;
-
     // 해당 team_project_info 기준으로 몇 번째로 실행되었는가?
-    private Long deployNum;
     private Long teamProjectInfoId;
-
     private Integer serviceNum;
+    private String result;
+    private String jobType;
 }
