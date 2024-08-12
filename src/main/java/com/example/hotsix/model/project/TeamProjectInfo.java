@@ -48,7 +48,7 @@ public class TeamProjectInfo {
         return TeamProjectInfoDto.builder()
                 .id(id)
                 .title(title)
-                .serviceScheduleId(serviceSchedule.getId())
+                .serviceScheduleId(serviceSchedule==null? null: serviceSchedule.getId())
                 .backendConfigs(backendConfigs.stream().map(BackendConfig::toDto).collect(Collectors.toList()))
                 .frontendConfigs(frontendConfigs.stream().map(FrontendConfig::toDto).collect(Collectors.toList()))
                 .databaseConfigs(databaseConfigs.stream().map(DatabaseConfig::toDto).collect(Collectors.toList()))

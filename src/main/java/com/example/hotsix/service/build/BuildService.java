@@ -19,4 +19,10 @@ public interface BuildService {
     BuildStartDto wholeBuildStart(Long projectInfoId);
 
     BuildCheckDto buildCheck(Long memberId, Long projectInfoId);
+
+    BuildResult insertBuildResult(Long teamProjectInfoId, Long deployNum);
+
+    void startJenkinsBackendJob(Long memberId, Long projectInfoId, Long deployNum, Long serviceNum, BackendConfigDto[] dtos);
+
+    void startJenkisSetupJob(DeployConfig deployConfig);
 }

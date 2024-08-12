@@ -8,6 +8,6 @@ import java.util.List;
 public interface ServiceScheduleRepositoryCustom {
 
     ServiceSchedule findServiceScheduleByServiceScheduleId(Long serviceScheduleId);
-    ServiceSchedule findEmptyService();
+    ServiceSchedule findEmptyService(TeamProjectInfo teamProjectInfo);
     List<TeamProjectInfo> findUsedProjectInfoIdByTeamId(Long teamId);
 }
