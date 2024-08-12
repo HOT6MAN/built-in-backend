@@ -84,7 +84,7 @@ public class Resume extends BaseEntity {
     public Apply toApplication(Team team) {
         return Apply.builder()
                 .id(new ApplyId(team.getId(), this.getId()))
-                .status(ApplicationStatus.APPLIED)
+                .status(ApplicationStatus.applied)
                 .team(team)
                 .resume(this)
                 .build();

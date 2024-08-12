@@ -1,6 +1,5 @@
 package com.example.hotsix.controller.resume;
 
-import com.example.hotsix.dto.apply.ApplyRequest;
 import com.example.hotsix.dto.resume.ResumeRequest;
 import com.example.hotsix.dto.resume.ResumeResponse;
 import com.example.hotsix.dto.resume.ResumeShortResponse;
@@ -23,8 +22,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
-
-import static com.example.hotsix.model.QTeam.team;
 
 @RestController
 public class ResumeController {
@@ -68,7 +65,7 @@ public class ResumeController {
 
         Member memberMe = memberService.findById(me.getId());
 
-        return Objects.nonNull(memberMe.getResumeList()) ? convertToShortResponse(memberMe.getResumeList()) : null;
+        return Objects.nonNull(memberMe.getApplications()) ? convertToShortResponse(memberMe.getApplications()) : null;
     }
 
     @ResponseStatus(HttpStatus.CREATED)
