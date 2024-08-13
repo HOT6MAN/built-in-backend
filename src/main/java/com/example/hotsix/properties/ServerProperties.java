@@ -4,6 +4,10 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties("server")
 public record ServerProperties(
-        String origin
+        String origin,
+        ServletProperties servlet
 ) {
+    public record ServletProperties(
+            String contextPath
+    ) {}
 }

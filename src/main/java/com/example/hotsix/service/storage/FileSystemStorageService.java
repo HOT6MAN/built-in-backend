@@ -32,7 +32,7 @@ public class FileSystemStorageService implements StorageService {
 
     @Override
     public String getUploadedImageUrl(String imageName) {
-        return String.format("%s/files/%s", serverProperties.origin(), imageName);
+        return String.format("%s%s/files/%s", serverProperties.origin(), serverProperties.servlet().contextPath() , imageName);
     }
 
     @Override
