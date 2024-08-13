@@ -31,4 +31,15 @@ public class BuildStage extends BaseEntity {
 
     @Column(name = "duration")
     private Integer duration;
+
+    @Override
+    public String toString() {
+        return "BuildStage{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", stageId=" + stageId +
+                ", status='" + status + '\'' +
+                ", duration=" + duration +
+                '}';
+    }
 }

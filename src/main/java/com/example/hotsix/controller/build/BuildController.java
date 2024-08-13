@@ -159,12 +159,12 @@ public class BuildController {
         log.info("로그 저장 완료");
 
         // 알림 보내기 기능 테스트
-        notificationService.sendGeneralResponse(GeneralResponseDto.builder()
-                        .type(buildResultDto.getJobType())
-                        .receiverId(buildResultDto.getMemberId())
-                        .notifyDate(LocalTimeUtil.getDateTime())
-                        .response(buildResultDto)
-                        .build());
+//        notificationService.sendGeneralResponse(GeneralResponseDto.builder()
+//                        .type(buildResultDto.getJobType())
+//                        .receiverId(buildResultDto.getMemberId())
+//                        .notifyDate(LocalTimeUtil.getDateTime())
+//                        .response(buildResultDto)
+//                        .build());
         return "success";
     }
 

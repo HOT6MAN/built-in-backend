@@ -14,10 +14,8 @@ import com.example.hotsix.repository.team.TeamRepository;
 import com.example.hotsix.util.TimeUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.offbytwo.jenkins.model.Build;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.auth.AuthScope;
@@ -48,7 +46,7 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class BuildServiceImpl implements BuildService{
+public class BuildServiceImpl implements BuildService {
     private final BuildRepository buildRespository;
     private final MemberRepository memberRepository;
     private final TeamRepository teamRepository;
@@ -56,11 +54,12 @@ public class BuildServiceImpl implements BuildService{
     private final ServiceScheduleRepository serviceScheduleRepository;
     private final BuildStageRepository buildStageRepository;
     private final BuildResultRepository buildResultRepository;
+    private final BuildJenkinsJobRepository buildJobRepository;
 
     private static final String GIT_TYPE = "git";
     private static final String DOCKER_TYPE = "docker";
     private static final String JOB_NAME = "service-deploy";
-    private static final String BUILD_WITH_PARAMETERS_URL = "job/"+JOB_NAME+"/buildWithParameters";
+    private static final String BUILD_WITH_PARAMETERS_URL = "job/" + JOB_NAME + "/buildWithParameters";
     private final BuildLogRepository buildLogRepository;
     private final GrafanaClient grafanaClient;
     private final BuildJenkinsJobRepository buildJenkinsJobRepository;
@@ -77,39 +76,38 @@ public class BuildServiceImpl implements BuildService{
     // 현재는 쓰지 않는 메서드
     @Override
     @Transactional
-    public void buildStart(Long teamId, Long teamProjectInfoId){
+    public void buildStart(Long teamId, Long teamProjectInfoId) {
         TeamProjectInfo teamProjectInfo = teamProjectInfoRepository.findProjectInfoByProjectInfoId(teamProjectInfoId);
         ServiceSchedule emptyServiceId = serviceScheduleRepository.findEmptyService(teamProjectInfo);
-        log.info("empty Service Schedule = {}",emptyServiceId);
+        log.info("empty Service Schedule = {}", emptyServiceId);
         emptyServiceId.setBuildStatus(BuildStatus.PENDING);
         emptyServiceId.setTeam(teamProjectInfo.getTeam());
         emptyServiceId.setTeamProjectInfo(teamProjectInfo);
         serviceScheduleRepository.save(emptyServiceId);
         String servicePort = String.valueOf(emptyServiceId.getId());
-        try(CloseableHttpClient httpClient = createHttpClient(hostJenkinsUsername, hostJenkinsToken)){
+        try (CloseableHttpClient httpClient = createHttpClient(hostJenkinsUsername, hostJenkinsToken)) {
             String crumb = getCrumb(httpClient, hostJenkinsUrl, hostJenkinsUsername, hostJenkinsToken);
 
 
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     @Override
     @Transactional
-    public void deployStop(Long serviceScheduleId){
+    public void deployStop(Long serviceScheduleId) {
         ServiceSchedule serviceSchedule = serviceScheduleRepository.findServiceScheduleByServiceScheduleId(serviceScheduleId);
         serviceSchedule.setTeam(null);
         serviceSchedule.setTeamProjectInfo(null);
         serviceSchedule.setBuildStatus(BuildStatus.EMPTY);
 
-        try(CloseableHttpClient httpClient = createHttpClient(hostJenkinsUsername, hostJenkinsToken)){
+        try (CloseableHttpClient httpClient = createHttpClient(hostJenkinsUsername, hostJenkinsToken)) {
             String crumb = getCrumb(httpClient, hostJenkinsUrl, hostJenkinsUsername, hostJenkinsToken);
             String[] crumbParts = crumb.split(":");
             String crumbFieldName = crumbParts[0];
             String crumbValue = crumbParts[1];
-            String hostJobName = hostJenkinsUrl+"job/built_in_backend_stop/buildWithParameters";
+            String hostJobName = hostJenkinsUrl + "job/built_in_backend_stop/buildWithParameters";
             HttpPost httpPost = new HttpPost(hostJobName);
             httpPost.setHeader(crumbFieldName, crumbValue);
             httpPost.setHeader("Authorization", "Basic " + Base64.getEncoder().encodeToString((hostJenkinsUsername + ":" + hostJenkinsToken).getBytes()));
@@ -121,8 +119,7 @@ public class BuildServiceImpl implements BuildService{
             HttpResponse response = httpClient.execute(httpPost);
             System.out.println("Response status: " + response.getStatusLine().getStatusCode());
             System.out.println("Response body: " + EntityUtils.toString(response.getEntity()));
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -202,7 +199,7 @@ public class BuildServiceImpl implements BuildService{
 
                 // 6. 각 stage에 대해, log 결과 저장
                 // /job/:job-name/:run-id/execution/node/:node-id/wfapi/log
-                String describeUrl = String.format("%sjob/%s/%d/execution/node/%s/wfapi/describe", hostJenkinsUrl, jobName, buildNum, stageId);
+                String describeUrl = String.format("%sjob/%s/%d/execution/node/%d/wfapi/describe", hostJenkinsUrl, jobName, buildNum, stageId);
 
                 System.out.println("describeUrl = " + describeUrl);
 
@@ -247,7 +244,7 @@ public class BuildServiceImpl implements BuildService{
 
                         System.out.println("logNode = " + logNode);
 
-                        JsonNode text = logNode.get("text");
+                        JsonNode text = logNode.get("parameterDescription");
                         if (text != null) {
                             String description = text.asText();
                             buildLog.setDescription(description);
@@ -299,7 +296,7 @@ public class BuildServiceImpl implements BuildService{
         Long teamId = teamProjectInfo.getTeam().getId();
         ServiceSchedule emptyServiceSchedule = serviceScheduleRepository.findEmptyService(teamProjectInfo);
 
-        System.out.println("empty Schedule = "+emptyServiceSchedule);
+        System.out.println("empty Schedule = " + emptyServiceSchedule);
 
         // 예외 처리
         // 비어 있는 서비스 포트가 없을 경우
@@ -314,7 +311,7 @@ public class BuildServiceImpl implements BuildService{
         serviceScheduleRepository.save(emptyServiceSchedule);
         Long serviceNum = emptyServiceSchedule.getId();
 
-        try(CloseableHttpClient httpClient = createHttpClient(hostJenkinsUsername, hostJenkinsToken)){
+        try (CloseableHttpClient httpClient = createHttpClient(hostJenkinsUsername, hostJenkinsToken)) {
             String crumb = getCrumb(httpClient, hostJenkinsUrl, hostJenkinsUsername, hostJenkinsToken);
             createJenkinsWholeInstance(teamProjectInfo, httpClient, crumb, serviceNum, projectInfoId);
         } catch (IOException e) {
@@ -386,7 +383,7 @@ public class BuildServiceImpl implements BuildService{
     public void startJenkisJob(DeployConfig deployConfig) {
         JenkinsJobType jobType = deployConfig.getJobType();
 
-        try(CloseableHttpClient httpClient = createHttpClient(hostJenkinsUsername, hostJenkinsToken)){
+        try (CloseableHttpClient httpClient = createHttpClient(hostJenkinsUsername, hostJenkinsToken)) {
             String crumb = getCrumb(httpClient, hostJenkinsUrl, hostJenkinsUsername, hostJenkinsToken);
 
             if (jobType.equals(JenkinsJobType.SETUP)) {
@@ -397,12 +394,10 @@ public class BuildServiceImpl implements BuildService{
             } else if (jobType.equals(JenkinsJobType.DATABASE)) {
 
             }
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
-
 
 
     /*
@@ -410,7 +405,7 @@ public class BuildServiceImpl implements BuildService{
      */
     private void createJenkinsWholeInstance(TeamProjectInfo teamProjectInfo, CloseableHttpClient httpClient, String crumb, Long serviceNum, Long projectInfoId) throws IOException {
         Integer serviceIndex = 0;
-        System.out.println("Crumb = "+crumb);
+        System.out.println("Crumb = " + crumb);
         String[] crumbParts = crumb.split(":");
         String crumbFieldName = crumbParts[0];
         String crumbValue = crumbParts[1];
@@ -464,14 +459,21 @@ public class BuildServiceImpl implements BuildService{
     }
 
     private List<BuildStageInfoDto> getBuildStageInfoList(Long buildResultId) {
-        List<BuildStage> buildStageList = buildStageRepository.findByBuildJenkinsJobId(buildResultId);
-        return buildStageList.stream()
-                .map(buildStage -> {
-                    BuildStageInfoDto buildStageInfoDto = BuildStageInfoDto.from(buildStage);
-                    buildStageInfoDto.setBuildLogs(getBuildLogInfoList(buildStageInfoDto.getStageId()));
-                    return buildStageInfoDto;
-                })
-                .toList();
+
+        List<BuildStageInfoDto> buildStageInfoList = new ArrayList<>();
+
+        List<BuildJenkinsJob> buildJenkinsJobList = buildJenkinsJobRepository.findAllByBuildResultId(buildResultId);
+        buildJenkinsJobList.forEach(buildJenkinsJob -> {
+            List<BuildStage> buildStageList = buildStageRepository.findByBuildJenkinsJob(buildJenkinsJob);
+            for (BuildStage buildStage : buildStageList) {
+                System.out.println("buildStage = " + buildStage);
+                BuildStageInfoDto buildStageInfoDto = BuildStageInfoDto.from(buildStage);
+                buildStageInfoDto.setBuildLogs(getBuildLogInfoList(buildStageInfoDto.getStageId()));
+                buildStageInfoList.add(buildStageInfoDto);
+            }
+        });
+
+        return buildStageInfoList;
     }
 
     private List<BuildLogInfoDto> getBuildLogInfoList(Long buildStageId) {
@@ -504,9 +506,9 @@ public class BuildServiceImpl implements BuildService{
     }
 
     private void createJenkinsBackendInstance(CloseableHttpClient httpClient,
-                                            String crumb,
-                                            DeployConfig deployConfig) {
-        System.out.println("Crumb = "+crumb);
+                                              String crumb,
+                                              DeployConfig deployConfig) {
+        System.out.println("Crumb = " + crumb);
         String[] crumbParts = crumb.split(":");
         String crumbFieldName = crumbParts[0];
         String crumbValue = crumbParts[1];
@@ -550,11 +552,10 @@ public class BuildServiceImpl implements BuildService{
     }
 
 
-
     private void createJenkinsSetupInstance(CloseableHttpClient httpClient,
                                             String crumb,
                                             DeployConfig deployConfig) {
-        System.out.println("Crumb = "+crumb);
+        System.out.println("Crumb = " + crumb);
         String[] crumbParts = crumb.split(":");
         String crumbFieldName = crumbParts[0];
         String crumbValue = crumbParts[1];
@@ -592,7 +593,7 @@ public class BuildServiceImpl implements BuildService{
 
     @Override
     @Transactional
-    public boolean MemberProjectBuildStart(Long teamId, Long projectInfoId){
+    public boolean MemberProjectBuildStart(Long teamId, Long projectInfoId) {
 //        TeamProjectInfo memberProjectInfo = buildRespository.findTeamProjectInfoByMemberAndInfoId(memberId, projectInfoId);
 //        TeamProjectCredential memberProjectCredential = member.getMemberProjectCredential();
 //
@@ -646,13 +647,11 @@ public class BuildServiceImpl implements BuildService{
 //        UrlEncodedFormEntity entity = new UrlEncodedFormEntity(params, StandardCharsets.UTF_8);
 //        httpPost.setEntity(entity);
 //    }
+
     /**
-     *
      * @param username
      * @param apiToken
-     * @return
-     *
-     * Username과 Password(Token) 기반으로 Http 연결을 책임질 Client 생성하여 반환.
+     * @return Username과 Password(Token) 기반으로 Http 연결을 책임질 Client 생성하여 반환.
      */
     public CloseableHttpClient createHttpClient(String username, String apiToken) {
         CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
@@ -670,9 +669,7 @@ public class BuildServiceImpl implements BuildService{
      * @param username
      * @param token
      * @return
-     * @throws IOException
-     *
-     * Jenkins API로부터 Crunb를 가져오는 메서드 ( csrf 토큰 )
+     * @throws IOException Jenkins API로부터 Crunb를 가져오는 메서드 ( csrf 토큰 )
      */
     public String getCrumb(CloseableHttpClient httpClient,
                            String jenkinsUrl, String username, String token) throws IOException {
@@ -690,7 +687,6 @@ public class BuildServiceImpl implements BuildService{
             return EntityUtils.toString(response.getEntity());
         }
     }
-
 
 
     /**
@@ -728,11 +724,8 @@ public class BuildServiceImpl implements BuildService{
 //    }
 
     /**
-     *
      * @param credentials
-     * @throws Exception
-     *
-     * 새로 생성한 Credential을 Job에 적용하는 메서드.
+     * @throws Exception 새로 생성한 Credential을 Job에 적용하는 메서드.
      */
     public void addCredentials(JSONObject credentials) throws Exception {
         String credentialUrl = hostJenkinsUrl + "/manage/credentials/store/system/domain/_/createCredentials";

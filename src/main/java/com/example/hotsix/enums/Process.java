@@ -20,6 +20,7 @@ public enum Process {
     DEAL_NOT_FOUND(HttpStatus.INTERNAL_SERVER_ERROR, "존재하지 않는 상품입니다"),
     RECRUIT_NOT_FOUND(HttpStatus.BAD_REQUEST, "존재하지 않는 모집글 입니다"),
 
+    TEAM_PROJECT_INFO_NOT_FOUND(HttpStatus.INTERNAL_SERVER_ERROR, "존재하지 않는 빌드 환경입니다."),
     RESUME_NOT_FOUND(HttpStatus.BAD_REQUEST, "존재하지 않는 이력서 입니다"),
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "잘못된 JWT Token 입니다."),
     INVALID_USER(HttpStatus.UNAUTHORIZED, "잘못된 JWT Token 입니다."),
@@ -28,6 +29,7 @@ public enum Process {
     TEAM_NOT_FOUND(HttpStatus.INTERNAL_SERVER_ERROR, "존재하지 않는 팀입니다"),
     MEETING_NOT_FOUND(HttpStatus.INTERNAL_SERVER_ERROR, "존재하지 않는 회의입니다"),
     UNAUTHORIZED_USER(HttpStatus.UNAUTHORIZED, "접근 권한이 없습니다."),
+
 
     // 생각하지 못한 에러가 발생하였을 경우 발생하는 ProcessInfo
     UNKNOWN_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "원인 모를 에러입니다");
