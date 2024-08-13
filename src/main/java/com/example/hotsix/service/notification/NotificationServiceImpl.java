@@ -171,9 +171,10 @@ public class NotificationServiceImpl implements NotificationService{
 
     private void sendGeneralResponseToClient(SseEmitter emitter, String key, GeneralResponseDto data) {
         try {
+            log.info("jenkins = " + data.getType());
             emitter.send(SseEmitter.event()
                     .id(key)
-                    .name(data.getType())
+                    .name("jenkins")
                     .data(data, MediaType.APPLICATION_JSON)
                     .reconnectTime(0));
             log.info("send Successfully clear to Client");
