@@ -144,7 +144,7 @@ public class RecruitController {
     @GetMapping("/check/myresume")
     public boolean isMyResumeExists(@AuthenticationPrincipal CustomOAuth2User me) {
         Member meMember = memberService.findById(me.getId());
-        List<Resume> myResumeList = meMember.getApplications();
+        List<Resume> myResumeList = meMember.getResumes();
 
         return !myResumeList.isEmpty();
     }
