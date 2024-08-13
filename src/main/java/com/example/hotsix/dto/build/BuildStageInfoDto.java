@@ -23,7 +23,7 @@ public class BuildStageInfoDto {
         return BuildStageInfoDto.builder()
                 .stageId(buildStage.getId())
                 .name(buildStage.getName())
-                .status(buildStage.getStatus().name())
+                .status(buildStage.getStatus())
                 .duration(buildStage.getDuration())
                 .build();
     }

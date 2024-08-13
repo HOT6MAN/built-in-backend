@@ -26,9 +26,8 @@ public class BuildStage extends BaseEntity {
     @Column(name = "stage_id")
     private Long stageId;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "status")
-    private BuildStatus status;
+    private String status;
 
     @Column(name = "duration")
     private Integer duration;

@@ -158,7 +158,7 @@ public class BuildServiceImpl implements BuildService{
 
         // todo: 다른 데로 옮기기
         // jenkins 서버 모니터링용 grafana dashBoard 추가
-        String uId = addGrafanaDashboard(buildResultDto);
+//        String uId = addGrafanaDashboard(buildResultDto);
 //        System.out.println("uId = " + uId);
 
         System.out.println("targetUrl = " + targetUrl);
@@ -197,7 +197,7 @@ public class BuildServiceImpl implements BuildService{
                         .stageId(stageId)
                         .name(name)
                         .duration(duration)
-                        .status(BuildStatus.valueOf(status.toUpperCase()))
+                        .status(status.toUpperCase())
                         .build();
 
                 buildStages.add(buildStage);

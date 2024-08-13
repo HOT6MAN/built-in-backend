@@ -399,7 +399,6 @@ DROP TABLE IF EXISTS `chatroom`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `chatroom` (
                             `id` bigint NOT NULL AUTO_INCREMENT,
-                            `name` varchar(30) DEFAULT NULL,
                             `create_date` timestamp NULL DEFAULT NULL,
                             `last_message` varchar(200) DEFAULT NULL,
                             `last_message_date` timestamp NULL DEFAULT NULL,
@@ -425,6 +424,7 @@ DROP TABLE IF EXISTS `chatroom_status`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `chatroom_status` (
                                    `id` bigint NOT NULL AUTO_INCREMENT,
+                                   `room_name` varchar(30) DEFAULT NULL,
                                    `chatroom_id` bigint NOT NULL,
                                    `user_id` bigint NOT NULL,
                                    `unread_count` int DEFAULT '0',
