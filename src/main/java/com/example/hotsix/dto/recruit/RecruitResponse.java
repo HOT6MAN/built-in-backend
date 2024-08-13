@@ -10,6 +10,7 @@ public record RecruitResponse(
         Long teamId,
         String teamName,
         Integer hit,
+        Long authorId,
         String authorName,
         String domain,
         List<String> desiredPosList,
