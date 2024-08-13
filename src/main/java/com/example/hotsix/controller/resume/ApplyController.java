@@ -45,7 +45,7 @@ public class ApplyController {
         applyService.apply(teamToApply, application);
     }
 
-    @GetMapping("/team/{teamId}/applications")
+    @GetMapping("/applications/team/{teamId}")
     public List<ApplyShortResponse> teamApplications(@PathVariable("teamId") Team team) {
         return team.getApplications().stream().map(Apply::toShortResponse).toList();
     }
@@ -67,7 +67,7 @@ public class ApplyController {
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @DeleteMapping("/team/{teamId}/application/{resumeId}")
+    @DeleteMapping("/apply/team/{teamId}/application/{resumeId}")
     public void delete(@PathVariable("teamId") Long teamId, @PathVariable("resumeId") Long resumeId) {
         ApplyId applyId = new ApplyId(teamId, resumeId);
 
