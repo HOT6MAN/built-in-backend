@@ -509,6 +509,18 @@ LOCK TABLES `following` WRITE;
 /*!40000 ALTER TABLE `following` DISABLE KEYS */;
 /*!40000 ALTER TABLE `following` ENABLE KEYS */;
 UNLOCK TABLES;
+-- -----------------------------------------------------
+-- Table `ssafy`.`chatroom`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ssafy`.`chatroom` (
+                                                  `id` BIGINT NOT NULL AUTO_INCREMENT,
+    `create_date` TIMESTAMP NULL DEFAULT NULL,
+    `last_message` VARCHAR(200) NULL DEFAULT NULL,
+    `last_message_date` TIMESTAMP NULL DEFAULT NULL,
+    PRIMARY KEY (`id`))
+    ENGINE = InnoDB
+    DEFAULT CHARACTER SET = utf8mb4
+    COLLATE = utf8mb4_0900_ai_ci;
 
 --
 -- Table structure for table `frontend_config`
@@ -537,6 +549,24 @@ CREATE TABLE `frontend_config` (
 --
 -- Dumping data for table `frontend_config`
 --
+-- -----------------------------------------------------
+-- Table `ssafy`.`chatroom_status`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ssafy`.`chatroom_status` (
+                                                         `id` BIGINT NOT NULL AUTO_INCREMENT,
+                                                         `chatroom_id` BIGINT NOT NULL,
+    `room_name` VARCHAR(255) NULL,
+                                                         `user_id` BIGINT NOT NULL,
+                                                         `unread_count` INT NULL DEFAULT '0',
+                                                         `online` TINYINT(1) NULL DEFAULT '0',
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `chatroom_id` (`chatroom_id` ASC, `user_id` ASC) VISIBLE,
+    CONSTRAINT `chatroom_status_ibfk_1`
+    FOREIGN KEY (`chatroom_id`)
+    REFERENCES `ssafy`.`chatroom` (`id`))
+    ENGINE = InnoDB
+    DEFAULT CHARACTER SET = utf8mb4
+    COLLATE = utf8mb4_0900_ai_ci;
 
 LOCK TABLES `frontend_config` WRITE;
 /*!40000 ALTER TABLE `frontend_config` DISABLE KEYS */;

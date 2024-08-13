@@ -14,6 +14,7 @@ public class NotificationDto {
     private Long sender;
     private String receiverName;
     private String senderName;
+    private String content;
     private String type;
     private String url;
     private boolean isRead;

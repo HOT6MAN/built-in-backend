@@ -1,9 +1,13 @@
 package com.example.hotsix.service.chat;
 
+import com.example.hotsix.dto.chat.ChatMessageDto;
+import com.example.hotsix.dto.chat.ChatRoom;
 import com.example.hotsix.exception.chat.ChatMessageInsertException;
 import com.example.hotsix.exception.chat.ChatMessageQueryException;
+import com.example.hotsix.model.Member;
 import com.example.hotsix.repository.chat.ChatMessageRepository;
 import com.example.hotsix.repository.chat.ChatRoomRepository;
+import com.example.hotsix.repository.member.MemberRepository;
 import com.example.hotsix.vo.ChatMessageVo;
 import com.example.hotsix.vo.ChatRoomVo;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +23,7 @@ import java.util.stream.Collectors;
 public class ChatMessageServiceImpl implements ChatMessageService{
     private final ChatMessageRepository chatMessageRepository;
     private final ChatRoomRepository chatRoomRepository;
+    private final MemberRepository memberRepository;
 
     @Override
     public void insert(ChatMessageVo chatMessageVo) {
@@ -47,6 +52,30 @@ public class ChatMessageServiceImpl implements ChatMessageService{
         try{
             List<ChatMessageVo> list = chatMessageRepository.findChatMessageByChatroomId(chatroomId, userId);
             return list;
+        }
+        catch(ChatMessageQueryException e){
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
+    }
+
+    @Override
+    public List<ChatMessageDto> findChatMessageDtoByChatroomId(String chatroomId, String userId) {
+        try{
+            List<ChatMessageVo> list = chatMessageRepository.findChatMessageByChatroomId(chatroomId, userId);
+            List<ChatMessageDto> result = new ArrayList<>();
+            if(!list.isEmpty()){
+                ChatMessageVo vo = list.get(0);
+                Member sender = memberRepository.findById(Long.parseLong(vo.getSender()));
+                Member receiver = memberRepository.findById(Long.parseLong(vo.getReceiver()));
+                for(ChatMessageVo vos : list) {
+                    ChatMessageDto dto = vos.toDto();
+                    dto.setReceiverName(receiver.getName());
+                    dto.setSenderName(sender.getName());
+                    result.add(dto);
+                }
+            }
+            return result;
         }
         catch(ChatMessageQueryException e){
             e.printStackTrace();

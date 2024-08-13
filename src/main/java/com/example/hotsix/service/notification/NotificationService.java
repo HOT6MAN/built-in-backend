@@ -20,4 +20,6 @@ public interface NotificationService {
     List<Notification> findAllUnreadNotificationByUserId(Long userId);
     List<Notification> findAllNotificationByUserId(Long userId);
     List<NotificationDto> findAllNotificationDtoByUserId(Long userId);
+    Boolean readNotificationByNotificationId(Long notificationId);
+    Boolean deleteNotificationByNotificationId(Long notificationId);
 }

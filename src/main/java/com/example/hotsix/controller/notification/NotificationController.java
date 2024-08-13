@@ -47,5 +47,16 @@ public class NotificationController {
         return list;
     }
 
+    @PutMapping("/{notificationId}")
+    public String readNotificationByNotificationId(@PathVariable("notificationId")Long notificationId){
+        notificationService.readNotificationByNotificationId(notificationId);
+        return null;
+    }
+
+    @DeleteMapping("/{notificationId}")
+    public String deleteNotificationByNotificationId(@PathVariable("notificationId")Long notificationId){
+        notificationService.deleteNotificationByNotificationId(notificationId);
+        return null;
+    }
 
 }

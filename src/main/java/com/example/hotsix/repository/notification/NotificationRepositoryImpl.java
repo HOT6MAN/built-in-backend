@@ -94,4 +94,18 @@ public class NotificationRepositoryImpl implements NotificationRepositoryCustom 
                 .where(notification.receiver.eq(userId))
                 .fetch();
     }
+
+    @Override
+    public Notification findNotificationByNotificationId(Long notificationId) {
+        return queryFactory.selectFrom(notification)
+                .where(notification.id.eq(notificationId))
+                .fetchOne();
+    }
+
+    @Override
+    public void deleteNotificationByNotificationId(Long notificationId){
+        queryFactory.delete(notification)
+                .where(notification.id.eq(notificationId))
+                .execute();
+    }
 }

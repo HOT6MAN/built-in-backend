@@ -18,6 +18,9 @@ public class ChatRoomStatus {
     @JoinColumn(name = "chatroom_id", nullable = false)
     private ChatRoom chatRoom;
 
+    @Column(name = "room_name")
+    private String roomName;
+
     private Long userId;
 
     private Integer unreadCount;

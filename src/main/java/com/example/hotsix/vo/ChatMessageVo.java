@@ -1,5 +1,6 @@
 package com.example.hotsix.vo;
 
+import com.example.hotsix.dto.chat.ChatMessageDto;
 import lombok.*;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.*;
 
@@ -84,5 +85,46 @@ public class ChatMessageVo {
                 ", descSendDate='" + descSendDate + '\'' +
                 ", receiverStatus='" + receiverStatus + '\'' +
                 "}\n";
+    }
+    public ChatMessageDto toDto() {
+        return ChatMessageDto.builder()
+                .chatroomId(this.chatroomId)
+                .chatroomName(this.chatroomName)
+                .sender(this.sender)
+                .receiver(this.receiver)
+                .content(this.content)
+                .sendDate(this.sendDate)
+                .descSendDate(this.descSendDate)
+                .receiverStatus(this.receiverStatus)
+                .type(this.type)
+                .build();
+    }
+
+    // Method to populate VO from DTO
+    public static ChatMessageVo fromDto(ChatMessageDto dto) {
+        return ChatMessageVo.builder()
+                .chatroomId(dto.getChatroomId())
+                .chatroomName(dto.getChatroomName())
+                .sender(dto.getSender())
+                .receiver(dto.getReceiver())
+                .content(dto.getContent())
+                .sendDate(dto.getSendDate())
+                .descSendDate(dto.getDescSendDate())
+                .receiverStatus(dto.getReceiverStatus())
+                .type(dto.getType())
+                .build();
+    }
+
+    // Method to set properties from DTO
+    public void setProperties(ChatMessageDto dto) {
+        this.chatroomId = dto.getChatroomId();
+        this.chatroomName = dto.getChatroomName();
+        this.sender = dto.getSender();
+        this.receiver = dto.getReceiver();
+        this.content = dto.getContent();
+        this.sendDate = dto.getSendDate();
+        this.descSendDate = dto.getDescSendDate();
+        this.receiverStatus = dto.getReceiverStatus();
+        this.type = dto.getType();
     }
 }

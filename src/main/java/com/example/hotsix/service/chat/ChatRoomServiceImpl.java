@@ -3,9 +3,12 @@ package com.example.hotsix.service.chat;
 import com.example.hotsix.dto.chat.ChatRoom;
 import com.example.hotsix.dto.chat.ChatRoomStatus;
 import com.example.hotsix.dto.chat.UserChatRoomId;
+import com.example.hotsix.dto.notification.Notification;
 import com.example.hotsix.repository.chat.BoardRepository;
 import com.example.hotsix.repository.chat.ChatRoomRepository;
 import com.example.hotsix.repository.chat.ChatRoomStatusRepository;
+import com.example.hotsix.repository.member.MemberRepository;
+import com.example.hotsix.service.notification.NotificationService;
 import com.example.hotsix.util.LocalTimeUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,6 +24,8 @@ public class ChatRoomServiceImpl implements ChatRoomService{
     private final ChatRoomRepository chatRoomRepository;
     private final ChatRoomStatusRepository chatRoomStatusRepository;
     private final BoardRepository boardRepository;
+    private final NotificationService notificationService;
+    private final MemberRepository memberRepository;
 
     @Override
     @Transactional
@@ -32,15 +37,16 @@ public class ChatRoomServiceImpl implements ChatRoomService{
             return null;
         }
         ChatRoom chatRoom = ChatRoom.builder()
-                .name("default Chat Room")
                 .create_date(LocalTimeUtil.getDateTime())
-                .last_message(null)
-                .last_message_date(null)
+                .last_message("새로운 채팅이 활성화 되었습니다!")
+                .last_message_date(LocalTimeUtil.getDateTime())
                 .build();
         chatRoom = chatRoomRepository.save(chatRoom);
-
+        String memberName = memberRepository.findMemberById(memberId).getName();
+        String receiverName = memberRepository.findMemberById(receiveId).getName();
         ChatRoomStatus userAStatus = ChatRoomStatus.builder()
                 .chatRoom(chatRoom)
+                .roomName(receiverName+"님과의 채팅방")
                 .userId(memberId)
                 .unreadCount(0)
                 .online(false)
@@ -49,17 +55,31 @@ public class ChatRoomServiceImpl implements ChatRoomService{
 
         ChatRoomStatus userBStatus = ChatRoomStatus.builder()
                 .chatRoom(chatRoom)
+                .roomName(memberName+"님과의 채팅방")
                 .unreadCount(0)
                 .online(false)
                 .userId(receiveId)
                 .build();
         chatRoomStatusRepository.save(userBStatus);
+
+        notificationService.save(Notification.builder()
+                .isRead(false)
+                .url("/")
+                .type("chat")
+                .sender(memberId)
+                .receiver(receiveId)
+                .notifyDate(LocalTimeUtil.getDateTime())
+                .build());
         System.out.println("Create ChatRoom and ChatRoom Status Successfully");
         return chatRoom;
     }
 
     @Override
     public List<ChatRoomStatus> findAllChatRoomByUserId(Long userId){
+        List<ChatRoomStatus> list = chatRoomRepository.findAllChatRoomsByUserId(userId);
+        for(ChatRoomStatus status : list){
+
+        }
         return chatRoomRepository.findAllChatRoomsByUserId(userId);
     }
 
@@ -97,5 +117,11 @@ public class ChatRoomServiceImpl implements ChatRoomService{
         chatRoomRepository.updateUnreadCount(chatroomId, userId, num);
     }
 
+    public void updateLastMessage(Long chatRoomId, String message){
+        ChatRoom chatRoom = chatRoomRepository.findChatRoomById(chatRoomId);
+        chatRoom.setLast_message(message);
+        chatRoom.setLast_message_date(LocalTimeUtil.getDateTime());
+        chatRoomRepository.save(chatRoom);
+    }
 
 }

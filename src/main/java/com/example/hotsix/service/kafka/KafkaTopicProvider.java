@@ -1,4 +1,4 @@
-package com.example.hotsix.util;
+package com.example.hotsix.service.kafka;
 
 import com.example.hotsix.service.chat.ChatMessageService;
 import com.example.hotsix.vo.ChatMessageVo;
@@ -30,7 +30,7 @@ public class KafkaTopicProvider {
         return chatroomId;
     }
 
-    @KafkaListener(topics = "#{__listener.chatRoomId}", groupId = "chat-group")
+    @KafkaListener(topics = "#{__listener.chatRoomId}", containerFactory = "kafkaListenerContainerFactory")
     public void listenToRoom(@Payload String message, @Header(KafkaHeaders.RECEIVED_TOPIC) String chatRoomId) {
         System.out.println("Received message for room " + chatRoomId + ": " + message);
         ChatMessageVo messageVo = new Gson().fromJson(message, ChatMessageVo.class);

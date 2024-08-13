@@ -11,6 +11,8 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
@@ -32,15 +34,27 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
-@RequiredArgsConstructor
 public class DynamicKafkaListenerService {
     private final Map<Long, ConcurrentMessageListenerContainer<String, String>> listeners = new ConcurrentHashMap<>();
     private final ConcurrentKafkaListenerContainerFactory<String, String> factory;
     private final SimpMessagingTemplate messagingTemplate;
     private final KafkaProperties kafkaProperties;
     private final TeamProjectInfoRepository teamProjectInfoRepository;
+
     @Value("${kafka.bootstrap.server.config}")
     private String serverConfig;
+
+    @Autowired
+    public DynamicKafkaListenerService(
+            @Qualifier("logListenerContainerFactory") ConcurrentKafkaListenerContainerFactory<String, String> factory,
+            SimpMessagingTemplate messagingTemplate,
+            KafkaProperties kafkaProperties,
+            TeamProjectInfoRepository teamProjectInfoRepository) {
+        this.factory = factory;
+        this.messagingTemplate = messagingTemplate;
+        this.kafkaProperties = kafkaProperties;
+        this.teamProjectInfoRepository = teamProjectInfoRepository;
+    }
     public void createDynamicListener(Long projectInfoId,Long configId, String topic, String groupId){
         TeamProjectInfo teamProjectInfo = teamProjectInfoRepository.findProjectInfoByProjectInfoId(projectInfoId);
         Long teamId = teamProjectInfo.getTeam().getId();
@@ -49,12 +63,12 @@ public class DynamicKafkaListenerService {
         consumerProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         consumerProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         consumerProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, serverConfig);
-
-
-        ConsumerFactory<String, String> consumerFactory = new DefaultKafkaConsumerFactory<>(consumerProps);
-
-        ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory<>();
-        factory.setConsumerFactory(consumerFactory);
+//
+//
+//        ConsumerFactory<String, String> consumerFactory = new DefaultKafkaConsumerFactory<>(consumerProps);
+//
+//        ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory<>();
+//        factory.setConsumerFactory(consumerFactory);
 
         ConcurrentMessageListenerContainer<String, String> container = factory.createContainer(
                 new TopicPartitionOffset(topic, 0)

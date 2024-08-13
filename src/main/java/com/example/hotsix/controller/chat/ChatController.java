@@ -1,5 +1,6 @@
 package com.example.hotsix.controller.chat;
 
+import com.example.hotsix.dto.chat.ChatMessageDto;
 import com.example.hotsix.dto.chat.ChatRoom;
 import com.example.hotsix.dto.chat.ChatRoomStatus;
 import com.example.hotsix.model.Board;
@@ -51,8 +52,8 @@ public class ChatController {
      * @Feature 특정 채팅방의 모든 메시지를 불러온다.
      */
     @GetMapping("/room/{roomId}")
-    public List<ChatMessageVo> findAllMessageByChatroomId(@PathVariable String roomId, String userId){
-        List<ChatMessageVo> messages = chatMessageService.findChatMessageByChatroomId(roomId, userId);
+    public List<ChatMessageDto> findAllMessageByChatroomId(@PathVariable String roomId, String userId){
+        List<ChatMessageDto> messages = chatMessageService.findChatMessageDtoByChatroomId(roomId, userId);
         Collections.reverse(messages);
         return messages;
     }
