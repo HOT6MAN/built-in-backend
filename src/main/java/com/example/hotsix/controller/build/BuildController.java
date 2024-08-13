@@ -178,7 +178,8 @@ public class BuildController {
     @PostMapping("/project/{jobtype}")
     public void startJenkinsJob(@PathVariable("jobtype") String jobtype, @RequestBody DeployConfig deployConfig) {
         deployConfig.setJobType(JenkinsJobType.valueOf(jobtype.toUpperCase()));
-        System.out.println("deployConfig = " + deployConfig);
+        log.info("jenkins job 실행 준비");
+        log.info("deployConfig = {}", deployConfig);
 
         buildService.startJenkisJob(deployConfig);
     }

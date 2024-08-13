@@ -406,6 +406,7 @@ public class BuildServiceImpl implements BuildService{
             String crumb = getCrumb(httpClient, hostJenkinsUrl, hostJenkinsUsername, hostJenkinsToken);
 
             if (jobType.equals(JenkinsJobType.SETUP)) {
+                log.info("setup jenkins job 실행");
                 createJenkinsSetupInstance(httpClient, crumb, deployConfig);
             }
             else if (jobType.equals(JenkinsJobType.DATABASE)) {
