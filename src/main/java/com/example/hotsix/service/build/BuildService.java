@@ -19,7 +19,5 @@ public interface BuildService {
 
     BuildResult insertBuildResult(Long teamProjectInfoId, Long deployNum);
 
-    void startJenkinsBackendJob(Long memberId, Long projectInfoId, Long deployNum, Long serviceNum, BackendConfigDto[] dtos);
-
     void startJenkisJob(DeployConfig deployConfig);
 }

@@ -184,22 +184,6 @@ public class BuildController {
         buildService.startJenkisJob(deployConfig);
     }
 
-    // built_in_backend_docker jenkins Job 실행
-    @PostMapping("/project/backend/member/{memberId}/team-project-info/{projectInfoId}/deployNum/{deployNum}/serviceNum/{serviceNum}")
-    public void startJenkinsBackendJob(@PathVariable("memberId") Long memberId,
-                                       @PathVariable("projectInfoId")Long projectInfoId,
-                                       @PathVariable("deployNum") Long deployNum,
-                                       @PathVariable("serviceNum") Long serviceNum,
-                                       @RequestBody BackendConfigDto[] dtos) {
-        for(BackendConfigDto dto : dtos){
-            System.out.println(dto);
-        }
-
-        buildService.startJenkinsBackendJob(memberId, projectInfoId, deployNum, serviceNum, dtos);
-        log.info("jenkins backend Job 실행 완료");
-    }
-
-
     // Jenkins Build 결과를 불러오는 API
     @GetMapping("/deploy/result/team_project_info/{teamProjectInfoId}")
     public BuildWholeDto getBuildResultInfo(@PathVariable("teamProjectInfoId") Long teamProjectInfoId) {
