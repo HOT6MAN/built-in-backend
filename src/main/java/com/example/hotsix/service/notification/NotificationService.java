@@ -1,5 +1,6 @@
 package com.example.hotsix.service.notification;
 
+import com.example.hotsix.dto.notification.GeneralResponseDto;
 import com.example.hotsix.dto.notification.Notification;
 import com.example.hotsix.model.NotificationDto;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -13,6 +14,7 @@ public interface NotificationService {
     void sendLostData(String lastEventId, String email, String emitterId, SseEmitter emitter);
     void send(Long sender, Long receiver, String type);
     void sendToClient(SseEmitter emitter, String id, Notification data);
+    void sendGeneralResponse(GeneralResponseDto data);
 
     Notification save(Notification notification);
     List<Notification> findAllUnreadNotificationByUserId(Long userId);

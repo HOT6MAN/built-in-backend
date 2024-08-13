@@ -1,12 +1,11 @@
 package com.example.hotsix.service.notification;
 
-import com.example.hotsix.dto.member.MemberDto;
+import com.example.hotsix.dto.notification.GeneralResponseDto;
 import com.example.hotsix.dto.notification.Notification;
 import com.example.hotsix.model.Member;
 import com.example.hotsix.model.NotificationDto;
 import com.example.hotsix.repository.member.MemberRepository;
 import com.example.hotsix.repository.notification.NotificationRepository;
-import com.example.hotsix.repository.notification.NotificationRepositoryCustom;
 import com.example.hotsix.util.LocalTimeUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -158,4 +157,32 @@ public class NotificationServiceImpl implements NotificationService{
             emitter.completeWithError(exception);
         }
     }
+
+    @Override
+    public void sendGeneralResponse(GeneralResponseDto data) {
+        System.out.println("Before Send Event Check Type : "+data.getType());
+        Map<String, SseEmitter> sseEmitters = repository.findAllEmittersByUserId(data.getReceiverId());
+        sseEmitters.forEach(
+                (key, emitter) -> {
+                    sendGeneralResponseToClient(emitter, key, data);
+                }
+        );
+    }
+
+    private void sendGeneralResponseToClient(SseEmitter emitter, String key, GeneralResponseDto data) {
+        try {
+            emitter.send(SseEmitter.event()
+                    .id(key)
+                    .name(data.getType())
+                    .data(data, MediaType.APPLICATION_JSON)
+                    .reconnectTime(0));
+            log.info("send Successfully clear to Client");
+        } catch (Exception exception) {
+            log.error("Send to Client Error {}", exception.getMessage());
+//            repository.deleteById(id);
+            emitter.completeWithError(exception);
+        }
+    }
+
+
 }

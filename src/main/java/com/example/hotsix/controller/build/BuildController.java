@@ -2,11 +2,14 @@ package com.example.hotsix.controller.build;
 
 
 import com.example.hotsix.dto.build.*;
+import com.example.hotsix.dto.notification.GeneralResponseDto;
 import com.example.hotsix.model.project.BuildResult;
 import com.example.hotsix.model.project.TeamProjectInfo;
 import com.example.hotsix.service.build.BuildService;
 import com.example.hotsix.service.build.ServiceScheduleServiceImpl;
+import com.example.hotsix.service.notification.NotificationService;
 import com.example.hotsix.service.team.TeamProjectInfoService;
+import com.example.hotsix.util.LocalTimeUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.parameters.P;
@@ -25,6 +28,7 @@ public class BuildController {
     private final BuildService buildService;
     private final TeamProjectInfoService teamProjectInfoService;
     private final ServiceScheduleServiceImpl serviceScheduleServiceImpl;
+    private final NotificationService notificationService;
 
     @PostMapping("/{teamId}/{projectInfoId}")
     public String insertTeamProjectCredential(@PathVariable("teamId") Long teamId,
@@ -146,11 +150,20 @@ public class BuildController {
     // Jenkins Build 결과를 DB에 저장하는 API
     @PostMapping("/deploy/result")
     public String saveBuildResult(@RequestBody BuildResultDto buildResultDto) throws Exception {
-        System.out.println("save build start");
+        log.info("save build start");
+
+        log.info("buildResultDto = " + buildResultDto);
 
         // jenkins build 관련 log 저장
-        buildService.addWholeBuildResult(buildResultDto);
+//        buildService.addWholeBuildResult(buildResultDto);
 
+        // 알림 보내기 기능 테스트
+        notificationService.sendGeneralResponse(GeneralResponseDto.builder()
+                        .type("jenkins")
+                        .receiverId(buildResultDto.getMemberId())
+                        .notifyDate(LocalTimeUtil.getDateTime())
+                        .response("테스트 성공!!!")
+                        .build());
         return "success";
     }
 
@@ -189,4 +202,7 @@ public class BuildController {
     public BuildWholeDto getBuildResultInfo(@PathVariable("teamProjectInfoId") Long teamProjectInfoId) {
         return buildService.getBuildResultInfo(teamProjectInfoId);
     }
+
+
+
 }
