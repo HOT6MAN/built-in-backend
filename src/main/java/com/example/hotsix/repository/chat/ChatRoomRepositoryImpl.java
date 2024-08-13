@@ -22,6 +22,13 @@ public class ChatRoomRepositoryImpl implements ChatRoomRepositoryCustom {
 
 
     @Override
+    public ChatRoom findChatRoomById(Long chatRoomId) {
+        return queryFactory.selectFrom(chatRoom)
+                .where(chatRoom.id.eq(chatRoomId))
+                .fetchOne();
+    }
+
+    @Override
     public List<ChatRoomStatus> findAllChatRoomsByUserId(Long userId) {
         List<ChatRoomStatus> statuses = queryFactory
                 .selectFrom(chatRoomStatus)

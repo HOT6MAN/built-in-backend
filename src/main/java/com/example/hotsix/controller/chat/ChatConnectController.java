@@ -1,10 +1,9 @@
 package com.example.hotsix.controller.chat;
 
-import com.example.hotsix.dto.notification.Notification;
 import com.example.hotsix.service.chat.ChatMessageService;
 import com.example.hotsix.service.chat.ChatRoomService;
 import com.example.hotsix.service.notification.NotificationService;
-import com.example.hotsix.util.KafkaTopicProvider;
+import com.example.hotsix.service.kafka.KafkaTopicProvider;
 import com.example.hotsix.util.LocalTimeUtil;
 import com.example.hotsix.vo.ChatMessageVo;
 import com.google.gson.Gson;
@@ -17,7 +16,6 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PathVariable;
 
 @Controller
 @RequiredArgsConstructor
@@ -43,14 +41,7 @@ public class ChatConnectController {
             chatRoomService.updateUnreadCount(Long.parseLong(chatMessage.getChatroomId()),
                     Long.parseLong(chatMessage.getReceiver()), 1);
         }
-        notificationService.save(Notification.builder()
-                .isRead(false)
-                .url("/")
-                .type("chat")
-                        .sender(Long.parseLong(chatMessage.getSender()))
-                .receiver(Long.parseLong(chatMessage.getReceiver()))
-                        .notifyDate(LocalTimeUtil.getDateTime())
-                .build());
+        chatRoomService.updateLastMessage(Long.parseLong(chatMessage.getChatroomId()), chatMessage.getContent());
         notificationService.send(
                 Long.parseLong(chatMessage.getSender()),
                 Long.parseLong(chatMessage.getReceiver()),

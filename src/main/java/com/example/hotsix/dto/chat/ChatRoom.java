@@ -13,8 +13,6 @@ public class ChatRoom {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "name")
-    private String name;
     @Column(name = "create_date")
     private String create_date;
     @Column(name = "last_message")
@@ -25,7 +23,6 @@ public class ChatRoom {
     public ChatRoomDto toDto() {
         return ChatRoomDto.builder()
                 .id(this.id)
-                .name(this.name)
                 .create_date(this.create_date)
                 .last_message(this.last_message)
                 .last_message_date(this.last_message_date)
@@ -35,7 +32,6 @@ public class ChatRoom {
     public static ChatRoom fromDto(ChatRoomDto dto) {
         return ChatRoom.builder()
                 .id(dto.getId())
-                .name(dto.getName())
                 .create_date(dto.getCreate_date())
                 .last_message(dto.getLast_message())
                 .last_message_date(dto.getLast_message_date())
@@ -43,7 +39,6 @@ public class ChatRoom {
     }
 
     public void setProperties(ChatRoomDto dto) {
-        this.name = dto.getName();
         this.create_date = dto.getCreate_date();
         this.last_message = dto.getLast_message();
         this.last_message_date = dto.getLast_message_date();
@@ -52,7 +47,6 @@ public class ChatRoom {
     public String toString() {
         return "ChatRoom{" +
                 "id=" + id +
-                ", name='" + name + '\'' +
                 ", create_date='" + create_date + '\'' +
                 ", last_message='" + last_message + '\'' +
                 ", last_message_date='" + last_message_date + '\'' +

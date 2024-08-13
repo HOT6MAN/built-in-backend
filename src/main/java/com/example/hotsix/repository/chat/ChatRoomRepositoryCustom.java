@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ChatRoomRepositoryCustom{
+    ChatRoom findChatRoomById(Long chatRoomId);
     List<ChatRoomStatus>  findAllChatRoomsByUserId(Long userId);
     Optional<ChatRoom> findChatRoomBetweenUsers(Long userAId, Long userBId);
     ChatRoomStatus findReceiver(Long chatroomId, Long userId);

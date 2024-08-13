@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
@@ -49,11 +50,28 @@ public class NotificationServiceImpl implements NotificationService{
             NotificationDto dto = noti.toDto();
             Member member = memberRepository.findMemberById(noti.getSender());
             dto.setSenderName(member.getName());
+            dto.setContent("님과 새로운 대화가 시작되었습니다.");
             result.add(dto);
         }
         return result;
     }
 
+    @Override
+    @Transactional
+    public Boolean readNotificationByNotificationId(Long notificationId){
+        Notification notification = repository.findNotificationByNotificationId(notificationId);
+        notification.setRead(true);
+        repository.save(notification);
+        return true;
+    }
+
+
+    @Override
+    @Transactional
+    public Boolean deleteNotificationByNotificationId(Long notificationId){
+        repository.deleteNotificationByNotificationId(notificationId);
+        return true;
+    }
 
     @Override
     public SseEmitter subscribe(String userId, String lastEventId) {

@@ -14,5 +14,6 @@ public interface ChatRoomService {
     void updateOfflineStatus(Long chatroomId, Long userId);
     void updateUnreadCount(Long chatroomId, Long userId);
     void updateUnreadCount(Long chatroomId, Long userId, Integer num);
+    void updateLastMessage(Long chatRoomId, String message);
 
 }

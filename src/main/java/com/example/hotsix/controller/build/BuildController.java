@@ -120,11 +120,11 @@ public class BuildController {
         return returnList;
     }
 
-    @PostMapping("/deploy/{teamId}/{projectInfoId}")
-    public void buildStart(@PathVariable("teamId")Long teamId, @PathVariable("projectInfoId")Long projectInfoId){
-        log.info("Build Start Call Team Id = {}, ProjectInfoId = {}", teamId, projectInfoId);
-        buildService.buildStart(teamId, projectInfoId);
-    }
+//    @PostMapping("/deploy/{teamId}/{projectInfoId}")
+//    public void buildStart(@PathVariable("teamId")Long teamId, @PathVariable("projectInfoId")Long projectInfoId){
+//        log.info("Build Start Call Team Id = {}, ProjectInfoId = {}", teamId, projectInfoId);
+//        buildService.buildStart(teamId, projectInfoId);
+//    }
 
     // whole build start API(built_in_full_docker를 돌림)
     @PostMapping("/deploy/project-info/{projectInfoId}")
