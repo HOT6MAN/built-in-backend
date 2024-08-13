@@ -159,7 +159,7 @@ public class BuildServiceImpl implements BuildService{
 //        String uId = addGrafanaDashboard(buildResultDto);
 //        System.out.println("uId = " + uId);
 
-        System.out.println("targetUrl = " + targetUrl);
+        log.warn("targetUrl = {}", targetUrl);
 
         WebClient client = WebClient.builder()
                 .baseUrl(targetUrl)
