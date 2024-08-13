@@ -54,7 +54,7 @@ public class Member extends BaseEntity {
     private List<MemberTeam> memberTeams = new ArrayList<>();
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<Resume> applications = new ArrayList<>();
+    private List<Resume> resumes = new ArrayList<>();
 
     public void setMemberImage(MemberImage memberImage) {
         this.memberImage = memberImage;
