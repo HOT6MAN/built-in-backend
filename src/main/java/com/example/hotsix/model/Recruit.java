@@ -51,6 +51,7 @@ public class Recruit extends Board {
                 this.team.getId(),
                 this.team.getName(),
                 this.getHit(),
+                this.getAuthor().getId(),
                 this.getAuthor().getName(),
                 this.domain,
                 this.desiredPosList,

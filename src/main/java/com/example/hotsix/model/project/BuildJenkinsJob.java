@@ -2,6 +2,7 @@ package com.example.hotsix.model.project;
 
 import com.example.hotsix.enums.BuildStatus;
 import com.example.hotsix.enums.JenkinsJobType;
+import com.example.hotsix.model.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -11,7 +12,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class BuildJenkinsJob {
+public class BuildJenkinsJob extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
