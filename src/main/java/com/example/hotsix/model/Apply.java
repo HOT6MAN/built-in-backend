@@ -43,4 +43,8 @@ public class Apply extends BaseEntity {
                 apply.getStatus().name()
         );
     }
+
+    public boolean isAlreadyApplied(Long applicantId) {
+        return this.resume.getAuthor().getId().equals(applicantId) && this.status == ApplicationStatus.applied;
+    }
 }

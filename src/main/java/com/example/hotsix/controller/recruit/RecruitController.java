@@ -5,10 +5,8 @@ import com.example.hotsix.dto.recruit.RecruitResponse;
 import com.example.hotsix.dto.recruit.RecruitShortResponse;
 import com.example.hotsix.dto.team.TeamShortResponse;
 import com.example.hotsix.editor.RecruitPropertyEditor;
-import com.example.hotsix.model.Member;
-import com.example.hotsix.model.MemberTeam;
-import com.example.hotsix.model.Recruit;
-import com.example.hotsix.model.Team;
+import com.example.hotsix.editor.TeamPropertyEditor;
+import com.example.hotsix.model.*;
 import com.example.hotsix.oauth.dto.CustomOAuth2User;
 import com.example.hotsix.service.member.MemberService;
 import com.example.hotsix.service.recruit.RecruitService;
@@ -45,22 +43,26 @@ public class RecruitController {
     private final RecruitService recruitService;
     private final StorageService storageService;
     private final Provider<RecruitPropertyEditor> recruitPropertyEditorProvider;
+    private final Provider<TeamPropertyEditor> teamPropertyEditorProvider;
 
     public RecruitController(MemberService memberService,
                              TeamService teamService,
                              RecruitService recruitService,
                              @Qualifier("fileSystemStorageService") StorageService storageService,
-                             Provider<RecruitPropertyEditor> recruitPropertyEditorProvider) {
+                             Provider<RecruitPropertyEditor> recruitPropertyEditorProvider,
+                             Provider<TeamPropertyEditor> teamPropertyEditorProvider) {
         this.memberService = memberService;
         this.teamService = teamService;
         this.recruitService = recruitService;
         this.storageService = storageService;
         this.recruitPropertyEditorProvider = recruitPropertyEditorProvider;
+        this.teamPropertyEditorProvider = teamPropertyEditorProvider;
     }
 
     @InitBinder
     public void initBinder(WebDataBinder binder) {
         binder.registerCustomEditor(Recruit.class, recruitPropertyEditorProvider.get());
+        binder.registerCustomEditor(Team.class, teamPropertyEditorProvider.get());
     }
 
     @GetMapping("/teambuilding/recruit/{id}")
@@ -132,11 +134,29 @@ public class RecruitController {
         recruitService.delete(recruit);
     }
 
-    @GetMapping("/team")
+    @GetMapping("/myteam")
     public List<TeamShortResponse> myTeams(@AuthenticationPrincipal CustomOAuth2User me) {
         Member memberMe = memberService.findById(me.getId());
 
         return memberMe.getMemberTeams().stream().map(MemberTeam::toTeamShortResponse).toList();
+    }
+
+    @GetMapping("/check/myresume")
+    public boolean isMyResumeExists(@AuthenticationPrincipal CustomOAuth2User me) {
+        Member meMember = memberService.findById(me.getId());
+        List<Resume> myResumeList = meMember.getResumes();
+
+        return !myResumeList.isEmpty();
+    }
+
+    @GetMapping("/check/myteam/{teamId}")
+    public boolean isMyTeam(@PathVariable("teamId") Team recruitingTeam, @AuthenticationPrincipal CustomOAuth2User me) {
+        return recruitingTeam.isMemberByMemberId(me.getId());
+    }
+
+    @GetMapping("/check/application/status/team/{teamId}")
+    public boolean isMyApplicationApplied(@PathVariable("teamId") Team recruitingTeam, @AuthenticationPrincipal CustomOAuth2User me) {
+        return recruitingTeam.getApplications().stream().anyMatch(apply -> apply.isAlreadyApplied(me.getId()));
     }
 
     private List<RecruitShortResponse> convertToShortResponse(List<Recruit> list) {

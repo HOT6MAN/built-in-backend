@@ -10,7 +10,6 @@ import com.example.hotsix.oauth.dto.CustomOAuth2User;
 import com.example.hotsix.service.member.MemberService;
 import com.example.hotsix.service.resume.ResumeService;
 import com.example.hotsix.service.storage.StorageService;
-import com.example.hotsix.service.team.TeamService;
 import jakarta.inject.Provider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -62,7 +61,7 @@ public class ResumeController {
 
         Member memberMe = memberService.findById(me.getId());
 
-        return Objects.nonNull(memberMe.getApplications()) ? convertToShortResponse(memberMe.getApplications()) : null;
+        return Objects.nonNull(memberMe.getResumes()) ? convertToShortResponse(memberMe.getResumes()) : null;
     }
 
     @ResponseStatus(HttpStatus.CREATED)

@@ -121,6 +121,10 @@ public class Team extends BaseEntity{
         return memberTeam;
     }
 
+    public boolean isMemberByMemberId(Long memberId) {
+        return this.memberTeams.stream().map(MemberTeam::getMember).anyMatch(member -> member.getId().equals(memberId));
+    }
+
     @Override
     public String toString() {
         return "Team{" +
