@@ -110,6 +110,17 @@ public class Team extends BaseEntity{
         this.applications.add(application);
     }
 
+    public MemberTeam addMember(Member applicant) {
+        MemberTeam memberTeam = MemberTeam.builder()
+                .team(this)
+                .member(applicant)
+                .build();
+
+        this.memberTeams.add(memberTeam);
+
+        return memberTeam;
+    }
+
     @Override
     public String toString() {
         return "Team{" +

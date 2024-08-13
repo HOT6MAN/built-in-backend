@@ -1,6 +1,7 @@
 package com.example.hotsix.service.team;
 
 import com.example.hotsix.dto.team.TeamDto;
+import com.example.hotsix.model.Member;
 import com.example.hotsix.model.Team;
 
 import java.util.List;
@@ -18,4 +19,6 @@ public interface TeamService {
     TeamDto updateJiraUrl(String jiraUrl, Long teamId);
     TeamDto updateGitUrl(String gitUrl, Long teamId);
     TeamDto updateStatus(Long teamId);
+
+    void join(Team teamToApply, Member applicant);
 }

@@ -101,4 +101,11 @@ public class TeamServiceImpl implements TeamService{
         }
         return team.toDto();
     }
+
+    @Override
+    public void join(Team teamToApply, Member applicant) {
+        MemberTeam memberTeam = teamToApply.addMember(applicant);
+
+        memberTeamRepository.save(memberTeam);
+    }
 }

@@ -5,6 +5,7 @@ import com.example.hotsix.dto.apply.ApplyShortResponse;
 import com.example.hotsix.dto.resume.ApproveRequest;
 import com.example.hotsix.editor.TeamPropertyEditor;
 import com.example.hotsix.model.Apply;
+import com.example.hotsix.model.Member;
 import com.example.hotsix.model.Resume;
 import com.example.hotsix.model.Team;
 import com.example.hotsix.model.id.ApplyId;
@@ -53,9 +54,17 @@ public class ApplyController {
     @PatchMapping("/approve")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void approve(@RequestBody ApproveRequest approveRequest) {
-        ApplyId applyId = new ApplyId(approveRequest.teamId(), approveRequest.resumeId());
+        Long teamId = approveRequest.teamId();
+        Long resumeId = approveRequest.resumeId();
 
-        applyService.approve(applyId);
+        applyService.approve(new ApplyId(teamId, resumeId));
+
+        Team teamToApply = teamService.findById(teamId);
+
+        Resume application = resumeService.findById(resumeId);
+        Member applicant = application.getAuthor();
+
+        teamService.join(teamToApply, applicant);
     }
 
     @PatchMapping("/reject")
