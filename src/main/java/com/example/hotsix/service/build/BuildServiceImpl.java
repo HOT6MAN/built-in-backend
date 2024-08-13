@@ -2,6 +2,7 @@ package com.example.hotsix.service.build;
 
 import com.example.hotsix.client.GrafanaClient;
 import com.example.hotsix.dto.build.*;
+import com.example.hotsix.enums.JenkinsJobType;
 import com.example.hotsix.model.ServiceSchedule;
 import com.example.hotsix.enums.BuildStatus;
 //import com.example.hotsix.model.TeamProjectCredential;
@@ -144,7 +145,7 @@ public class BuildServiceImpl implements BuildService{
                 .buildNum(buildResultDto.getBuildNum())
                 .jobName(buildResultDto.getJobName())
                 .result(BuildStatus.valueOf(buildResultDto.getResult()))
-                .jobType(buildResultDto.getJobType())
+                .jobType(JenkinsJobType.valueOf(buildResultDto.getJobType().toUpperCase()))
                 .build();
 
         // 2-1. 저장
@@ -155,9 +156,10 @@ public class BuildServiceImpl implements BuildService{
         Long buildNum = buildResultDto.getBuildNum();
         String targetUrl = String.format("%sjob/%s/%d/wfapi/describe", hostJenkinsUrl, jobName, buildNum);
 
+        // todo: 다른 데로 옮기기
         // jenkins 서버 모니터링용 grafana dashBoard 추가
-        String uId = addGrafanaDashboard(buildResultDto);
-        System.out.println("uId = " + uId);
+//        String uId = addGrafanaDashboard(buildResultDto);
+//        System.out.println("uId = " + uId);
 
         System.out.println("targetUrl = " + targetUrl);
 
@@ -173,8 +175,8 @@ public class BuildServiceImpl implements BuildService{
                 .block();
 
         // 5. BuildResult의 Status 변경
-        String wholeStatus = jsonNode.get("status").asText();
-        buildResult.setStatus(BuildStatus.valueOf(wholeStatus.toUpperCase()));
+//        String wholeStatus = jsonNode.get("status").asText();
+//        buildResult.setStatus(BuildStatus.valueOf(wholeStatus.toUpperCase()));
 
         // 6. Stages 추가
         JsonNode stageNode = jsonNode.get("stages");
@@ -397,10 +399,18 @@ public class BuildServiceImpl implements BuildService{
     }
 
     @Override
-    public void startJenkisSetupJob(DeployConfig deployConfig) {
+    public void startJenkisJob(DeployConfig deployConfig) {
+        JenkinsJobType jobType = deployConfig.getJobType();
+
         try(CloseableHttpClient httpClient = createHttpClient(hostJenkinsUsername, hostJenkinsToken)){
             String crumb = getCrumb(httpClient, hostJenkinsUrl, hostJenkinsUsername, hostJenkinsToken);
-            createJenkinsSetupInstance(httpClient, crumb, deployConfig);
+
+            if (jobType.equals(JenkinsJobType.SETUP)) {
+                createJenkinsSetupInstance(httpClient, crumb, deployConfig);
+            }
+            else if (jobType.equals(JenkinsJobType.DATABASE)) {
+
+            }
         }
         catch(Exception e){
             e.printStackTrace();

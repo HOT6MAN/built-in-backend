@@ -159,23 +159,23 @@ public class NotificationServiceImpl implements NotificationService{
     }
 
     @Override
-    public void sendGeneralResponse(GeneralResponseDto data) {
-        System.out.println("Before Send Event Check Type : "+data.getType());
-        Map<String, SseEmitter> sseEmitters = repository.findAllEmittersByUserId(data.getReceiverId());
+    public void sendGeneralResponse(GeneralResponseDto response) {
+        System.out.println("Before Send Event Check Type : "+response.getType());
+        Map<String, SseEmitter> sseEmitters = repository.findAllEmittersByUserId(response.getReceiverId());
         sseEmitters.forEach(
                 (key, emitter) -> {
-                    sendGeneralResponseToClient(emitter, key, data);
+                    sendGeneralResponseToClient(emitter, key, response);
                 }
         );
     }
 
-    private void sendGeneralResponseToClient(SseEmitter emitter, String key, GeneralResponseDto data) {
+    private void sendGeneralResponseToClient(SseEmitter emitter, String key, GeneralResponseDto response) {
         try {
-            log.info("jenkins = " + data.getType());
+            log.info("jenkins = " + response.getType());
             emitter.send(SseEmitter.event()
                     .id(key)
                     .name("jenkins")
-                    .data(data, MediaType.APPLICATION_JSON)
+                    .data(response, MediaType.APPLICATION_JSON)
                     .reconnectTime(0));
             log.info("send Successfully clear to Client");
         } catch (Exception exception) {

@@ -1,6 +1,7 @@
 package com.example.hotsix.model.project;
 
 import com.example.hotsix.enums.BuildStatus;
+import com.example.hotsix.enums.JenkinsJobType;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -30,5 +31,7 @@ public class BuildJenkinsJob {
     private BuildStatus result;
 
     @Column(name = "job_type")
-    private String jobType;
+    @Enumerated(EnumType.STRING)
+    private JenkinsJobType jobType;
+
 }

@@ -3,6 +3,7 @@ package com.example.hotsix.controller.build;
 
 import com.example.hotsix.dto.build.*;
 import com.example.hotsix.dto.notification.GeneralResponseDto;
+import com.example.hotsix.enums.JenkinsJobType;
 import com.example.hotsix.model.project.BuildResult;
 import com.example.hotsix.model.project.TeamProjectInfo;
 import com.example.hotsix.service.build.BuildService;
@@ -12,10 +13,8 @@ import com.example.hotsix.service.team.TeamProjectInfoService;
 import com.example.hotsix.util.LocalTimeUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -155,14 +154,16 @@ public class BuildController {
         log.info("buildResultDto = " + buildResultDto);
 
         // jenkins build 관련 log 저장
-//        buildService.addWholeBuildResult(buildResultDto);
+        buildService.addWholeBuildResult(buildResultDto);
+
+        log.info("로그 저장 완료");
 
         // 알림 보내기 기능 테스트
         notificationService.sendGeneralResponse(GeneralResponseDto.builder()
-                        .type("jenkins")
+                        .type(buildResultDto.getJobType())
                         .receiverId(buildResultDto.getMemberId())
                         .notifyDate(LocalTimeUtil.getDateTime())
-                        .response("테스트 성공!!!")
+                        .response(buildResultDto)
                         .build());
         return "success";
     }
@@ -174,11 +175,12 @@ public class BuildController {
     }
 
     // deploy_setup jenkins Job 실행
-    @PostMapping("/project/setup")
-    public void startJenkinsSetupJob(@RequestBody DeployConfig deployConfig) {
+    @PostMapping("/project/{jobtype}")
+    public void startJenkinsJob(@PathVariable("jobtype") String jobtype, @RequestBody DeployConfig deployConfig) {
+        deployConfig.setJobType(JenkinsJobType.valueOf(jobtype.toUpperCase()));
         System.out.println("deployConfig = " + deployConfig);
 
-        buildService.startJenkisSetupJob(deployConfig);
+        buildService.startJenkisJob(deployConfig);
     }
 
     // built_in_backend_docker jenkins Job 실행

@@ -6,12 +6,14 @@ import com.example.hotsix.util.TimeUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class GrafanaClient {
     @Value("${grafana.url}")
     private String grafanaUrl;
@@ -25,10 +27,10 @@ public class GrafanaClient {
         String createDashBoardUrl = grafanaUrl + "/api/dashboards/import";
 
         JsonNode jsonNode = jsonUtil.readJsonFile("/grafana-datasource.json");
-        System.out.println("jsonNode = " + jsonNode);
+        log.info("jsonNode = {}", jsonNode);
 
         if (jsonNode.has("dashboard") && jsonNode.get("dashboard").isObject()) {
-            System.out.println("여기 실행되나요");
+            log.info("여기 실행되나요");
             String uId = this.generateOrderId();
             String title = "Monitoring Nginx Server - Service Metric-" + uId;
             System.out.println("uId = " + uId);
@@ -42,7 +44,7 @@ public class GrafanaClient {
 
             String response = builtInWebClient.post(createDashBoardUrl, jsonNode, httpHeaders);
             // Process response
-            System.out.println("response = " + response);
+            log.info("grafana response = {}", response);
 
             return uId;
         }
