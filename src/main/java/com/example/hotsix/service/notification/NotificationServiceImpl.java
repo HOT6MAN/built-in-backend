@@ -146,6 +146,10 @@ public class NotificationServiceImpl implements NotificationService{
             notification.setType("join");
             notification.setType("join");
         }
+        else if("apply".equals(type)){
+            notification.setType("apply");
+            notification.setType("apply");
+        }
         Map<String, SseEmitter> sseEmitters = repository.findAllEmittersByUserId(receiver);
         // 로그인 한 유저의 SseEmitter 모두 가져오기
 
