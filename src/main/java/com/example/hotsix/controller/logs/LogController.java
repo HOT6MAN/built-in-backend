@@ -24,7 +24,7 @@ public class LogController {
                                                     @PathVariable("configId")Long configId,
                                                     @RequestParam("type") String type){
         System.out.println("call find 400 log");
-        String topic = "vector_container_SN-"+serviceScheduleId+"_TID-"+projectInfoId+"_CID-"+configId;
+        String topic = "vector_container_SN-"+serviceScheduleId+"_TID-"+projectInfoId+"_"+type+"_CID-"+configId;
         System.out.println("topic = "+topic);
         List<LogEntryDto> list = kafkaService.getRecentLogs(topic, 1L,"log-group");
         return list;
@@ -36,7 +36,7 @@ public class LogController {
                                 @PathVariable("projectInfoId")Long projectInfoId,
                                 @PathVariable("configId")Long configId,
                                 @RequestParam String type){
-        String topic = "vector_container_SN-"+serviceScheduleId+"_TID-"+projectInfoId+"_CID-"+configId;
+        String topic = "vector_container_SN-"+serviceScheduleId+"_TID-"+projectInfoId+"_"+type+"_CID-"+configId;
         String groupId = "log-group";
         System.out.println("topic = "+topic);
         System.out.println("type= "+type);
