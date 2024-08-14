@@ -48,6 +48,9 @@ public class SecurityConfig {
     @Value("${jenkins.url}")
     private String jenkinsUrl;
 
+    @Value("${openvidu.url}")
+    private String openviduUrl;
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
@@ -129,7 +132,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList(clientHost, "http://localhost:5173", jenkinsUrl));
+        configuration.setAllowedOrigins(Arrays.asList(clientHost, "http://localhost:5173", jenkinsUrl, openviduUrl));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowCredentials(true);
         configuration.setAllowedHeaders(Collections.singletonList("*"));

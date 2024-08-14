@@ -13,11 +13,14 @@ public class CorsMvcConfig implements WebMvcConfigurer {
     @Value("${client.host}")
     private String clientHost;
 
+    @Value("${openvidu.url}")
+    private String openviduUrl;
+
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
                 .exposedHeaders("Set-Cookie")
-                .allowedOrigins("http://localhost:5173", clientHost) // 특정 도메인만 허용
+                .allowedOrigins("http://localhost:5173", clientHost, openviduUrl) // 특정 도메인만 허용
                 .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
                 .allowCredentials(true);
