@@ -104,8 +104,9 @@ public class RecruitController {
 
         Recruit newRecruit = recruitRequest.toEntity(author, recruitingTeam);
 
+        if (recruitRequest.isUploadedWithThumbnail()) storageService.store(recruitRequest.thumbnail());
+
         recruitService.save(newRecruit);
-        storageService.store(recruitRequest.thumbnail());
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)

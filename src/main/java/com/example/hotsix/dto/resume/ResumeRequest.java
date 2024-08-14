@@ -18,12 +18,16 @@ public record ResumeRequest(
     public Resume toEntity(Member author) {
         return Resume.builder()
                 .title(title)
-                .profile(profile.getOriginalFilename())
+                .profile(profile == null ? "default-profile.jpg" : profile.getOriginalFilename())
                 .position(position)
                 .techStack(techStack)
                 .experiences(new ArrayList<>())
                 .comment(comment)
                 .author(author)
                 .build();
+    }
+
+    public boolean isUploadedWithProfile() {
+        return profile != null;
     }
 }

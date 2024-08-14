@@ -72,7 +72,8 @@ public class ResumeController {
         Resume newResume = resumeRequest.toEntity(author);
         resumeRequest.experiences().forEach(newResume::addExperience);
 
-        storageService.store(resumeRequest.profile());
+        if (resumeRequest.isUploadedWithProfile()) storageService.store(resumeRequest.profile());
+
         resumeService.save(newResume);
     }
 

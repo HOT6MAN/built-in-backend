@@ -25,10 +25,14 @@ public record RecruitRequest(
                 .hit(0)
                 .author(author)
                 .team(team)
-                .thumbnail(thumbnail==null?null : thumbnail.getOriginalFilename())
+                .thumbnail(thumbnail == null ? "default-thumbnail.jpg" : thumbnail.getOriginalFilename())
                 .introduction(introduction)
                 .domain(domain)
                 .desiredPosList(desiredPosList)
                 .build();
+    }
+
+    public boolean isUploadedWithThumbnail() {
+        return thumbnail != null;
     }
 }
