@@ -64,6 +64,7 @@ public class BackendConfig {
         this.framework = dto.getFramework();
         this.buildTool = dto.getBuildTool();
         this.configName = dto.getConfigName();
+        this.contextPath = dto.getContextPath();
     }
 
     public BackendConfigDto toDto() {
@@ -80,6 +81,7 @@ public class BackendConfig {
                 .framework(framework)
                 .buildTool(buildTool)
                 .configName(configName)
+                .contextPath(contextPath)
                 .build();
     }
 
