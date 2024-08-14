@@ -20,4 +20,6 @@ public interface BuildService {
     BuildResult insertBuildResult(Long teamProjectInfoId, Long deployNum);
 
     void startJenkisJob(DeployConfig deployConfig);
+
+    void addMonitoringService(BuildResultDto buildResultDto) throws Exception;
 }

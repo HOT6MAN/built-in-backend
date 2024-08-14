@@ -62,7 +62,7 @@
         "targets": [
           {
             "exemplar": true,
-            "expr": "sum(rate(nginx_http_response_count_total{instance=\"$node\",job=\"$job\"}[1m]))",
+            "expr": "sum(rate(nginx_http_response_count_total{instance=\"$NGINX_INSTANCE\",job=\"$job\"}[1m]))",
             "interval": "",
             "legendFormat": "rps trend",
             "queryType": "randomWalk",
@@ -70,7 +70,7 @@
           },
           {
             "exemplar": true,
-            "expr": "sum(rate(nginx_http_response_count_total{instance=\"$node\",job=\"$job\"}[1m] offset 1d))",
+            "expr": "sum(rate(nginx_http_response_count_total{instance=\"$NGINX_INSTANCE\",job=\"$job\"}[1m] offset 1d))",
             "hide": false,
             "interval": "",
             "legendFormat": "rps past day",
@@ -78,7 +78,7 @@
           },
           {
             "exemplar": true,
-            "expr": "sum(rate(nginx_http_response_count_total{instance=\"$node\",job=\"$job\"}[1m] offset 1w))",
+            "expr": "sum(rate(nginx_http_response_count_total{instance=\"$NGINX_INSTANCE\",job=\"$job\"}[1m] offset 1w))",
             "hide": false,
             "interval": "",
             "legendFormat": "rps past week",
@@ -169,7 +169,7 @@
         "targets": [
           {
             "exemplar": true,
-            "expr": "(sum(rate(nginx_http_response_count_total{status=~\"2..|3..\", instance=\"$node\"}[1m])) / sum(rate(nginx_http_response_count_total{instance=\"$node\"}[1m]))) * 100",
+            "expr": "(sum(rate(nginx_http_response_count_total{status=~\"2..|3..\", instance=\"$NGINX_INSTANCE\"}[1m])) / sum(rate(nginx_http_response_count_total{instance=\"$NGINX_INSTANCE\"}[1m]))) * 100",
             "interval": "",
             "legendFormat": "success rate",
             "queryType": "randomWalk",
@@ -177,7 +177,7 @@
           },
           {
             "exemplar": true,
-            "expr": "(sum(rate(nginx_http_response_count_total{status=~\"400|401|402|403|404\", instance=\"$node\",job=\"$job\"}[1m])) / sum(rate(nginx_http_response_count_total{instance=\"$node\",job=\"$job\"}[1m]))) * 100",
+            "expr": "(sum(rate(nginx_http_response_count_total{status=~\"400|401|402|403|404\", instance=\"$NGINX_INSTANCE\",job=\"$job\"}[1m])) / sum(rate(nginx_http_response_count_total{instance=\"$NGINX_INSTANCE\",job=\"$job\"}[1m])))* 100",
             "hide": false,
             "interval": "",
             "legendFormat": "400-404 rate",
@@ -185,7 +185,7 @@
           },
           {
             "exemplar": true,
-            "expr": "(sum(rate(nginx_http_response_count_total{status=~\"4..\", instance=\"$node\",job=\"$job\"}[1m])) / sum(rate(nginx_http_response_count_total{instance=\"$node\",job=\"$job\"}[1m]))) * 100",
+            "expr": "(sum(rate(nginx_http_response_count_total{status=~\"4..\", instance=\"$NGINX_INSTANCE\",job=\"$job\"}[1m])) / sum(rate(nginx_http_response_count_total{instance=\"$NGINX_INSTANCE\",job=\"$job\"}[1m]))) * 100",
             "hide": false,
             "interval": "",
             "legendFormat": "4xx rate",
@@ -193,7 +193,7 @@
           },
           {
             "exemplar": true,
-            "expr": "(sum(rate(nginx_http_response_count_total{status=~\"5..\", instance=\"$node\",job=\"$job\"}[1m])) / sum(rate(nginx_http_response_count_total{instance=\"$node\",job=\"$job\"}[1m]))) * 100",
+            "expr": "(sum(rate(nginx_http_response_count_total{status=~\"5..\", instance=\"$NGINX_INSTANCE\",job=\"$job\"}[1m])) / sum(rate(nginx_http_response_count_total{instance=\"$NGINX_INSTANCE\",job=\"$job\"}[1m]))) * 100",
             "hide": false,
             "interval": "",
             "legendFormat": "5xx rate",
@@ -262,30 +262,28 @@
               },
               "lineInterpolation": "smooth",
               "lineWidth": 1,
-              "pointSize": 11,
-              "scaleDistribution": {
-                "type": "linear"
+              "pointSize": 5,
+              "stacking": {
+                "group": null,
+                "mode": "normal"
               },
               "showPoints": "auto",
-              "spanNulls": false,
-              "stacking": {
-                "group": "A",
-                "mode": "none"
-              },
-              "thresholdsStyle": {
-                "mode": "off"
-              }
+              "spanNulls": true
             },
-            "mappings": [],
+            "mappingType": 1,
             "thresholds": {
               "mode": "absolute",
               "steps": [
                 {
-                  "color": "green",
+                  "color": "red",
                   "value": null
                 },
                 {
-                  "color": "red",
+                  "color": "yellow",
+                  "value": 70
+                },
+                {
+                  "color": "green",
                   "value": 80
                 }
               ]
@@ -294,63 +292,50 @@
           "overrides": []
         },
         "gridPos": {
-          "h": 11,
+          "h": 6,
           "w": 12,
           "x": 0,
           "y": 11
         },
         "id": 2,
         "options": {
-          "legend": {
-            "calcs": [],
-            "displayMode": "list",
-            "placement": "bottom"
-          },
-          "tooltip": {
-            "mode": "single"
-          }
+          "displayMode": "lcd",
+          "graphMode": "area",
+          "justifyMode": "auto"
         },
         "pluginVersion": "8.0.6",
         "targets": [
           {
             "exemplar": true,
-            "expr": "sum(rate(nginx_http_response_count_total{status=~\"2..\", instance=\"$node\"}[1m]))",
-            "hide": false,
-            "instant": false,
+            "expr": "sum(rate(nginx_http_response_count_total{status=~\"2..\", instance=\"$NGINX_INSTANCE\"}[1m]))",
             "interval": "",
             "legendFormat": "2xx",
-            "queryType": "randomWalk",
             "refId": "A"
           },
           {
             "exemplar": true,
-            "expr": "sum(rate(nginx_http_response_count_total{status=~\"3..\", instance=\"$node\"}[1m]))",
-            "hide": false,
+            "expr": "sum(rate(nginx_http_response_count_total{status=~\"3..\", instance=\"$NGINX_INSTANCE\"}[1m]))",
             "interval": "",
             "legendFormat": "3xx",
             "refId": "B"
           },
           {
             "exemplar": true,
-            "expr": "sum(rate(nginx_http_response_count_total{status=~\"4..\", instance=\"$node\"}[1m]))",
-            "hide": false,
+            "expr": "sum(rate(nginx_http_response_count_total{status=~\"4..\", instance=\"$NGINX_INSTANCE\"}[1m]))",
             "interval": "",
             "legendFormat": "4xx",
             "refId": "C"
           },
           {
             "exemplar": true,
-            "expr": "sum(rate(nginx_http_response_count_total{status=~\"5..\", instance=\"$node\"}[1m])) ",
-            "hide": false,
+            "expr": "sum(rate(nginx_http_response_count_total{status=~\"5..\", instance=\"$NGINX_INSTANCE\"}[1m]))",
             "interval": "",
             "legendFormat": "5xx",
             "refId": "D"
           }
         ],
-        "timeFrom": null,
-        "timeShift": null,
         "title": "Status Code",
-        "type": "timeseries"
+        "type": "stat"
       },
       {
         "aliasColors": {},
@@ -395,9 +380,9 @@
         "targets": [
           {
             "exemplar": true,
-            "expr": "sum by (method, request_uri)(rate(nginx_http_response_time_seconds_hist_sum{instance=\"$node\"}[1m])) \n/ \nsum by (method, request_uri)(rate(nginx_http_response_time_seconds_hist_count{instance=\"$node\"}[1m]))",
+            "expr": "sum by (method, request_uri)(rate(nginx_http_response_time_seconds_hist_sum{instance=\"$NGINX_INSTANCE\"}[1m])) / sum by (method, request_uri)(rate(nginx_http_response_time_seconds_hist_count{instance=\"$NGINX_INSTANCE\"}[1m]))",
             "interval": "",
-            "legendFormat": "{{method}}-{{request_uri}}",
+            "legendFormat": "avg response time",
             "refId": "A"
           }
         ],
@@ -443,107 +428,26 @@
         }
       }
     ],
-    "refresh": "5s",
+    "refresh": false,
     "schemaVersion": 30,
     "style": "dark",
     "tags": [],
     "templating": {
-      "list": [
-        {
-          "current": {
-            "selected": false,
-            "text": "Prometheus",
-            "value": "Prometheus"
-          },
-          "description": null,
-          "error": null,
-          "hide": 0,
-          "includeAll": false,
-          "label": "datasource",
-          "multi": false,
-          "name": "DS_PROMETHEUS",
-          "options": [],
-          "query": "prometheus",
-          "queryValue": "",
-          "refresh": 1,
-          "regex": "",
-          "skipUrlSync": false,
-          "type": "datasource"
-        },
-        {
-          "allValue": null,
-          "current": {
-            "selected": false,
-            "text": "prometheus-nginxlog-exporter",
-            "value": "prometheus-nginxlog-exporter"
-          },
-          "datasource": "Prometheus",
-          "definition": "label_values(nginx_parse_errors_total, job)",
-          "description": null,
-          "error": null,
-          "hide": 0,
-          "includeAll": false,
-          "label": "Job",
-          "multi": false,
-          "name": "job",
-          "options": [],
-          "query": {
-            "query": "label_values(nginx_parse_errors_total, job)",
-            "refId": "Prometheus-job-Variable-Query"
-          },
-          "refresh": 1,
-          "regex": "",
-          "skipUrlSync": false,
-          "sort": 1,
-          "tagValuesQuery": "",
-          "tagsQuery": "",
-          "type": "query",
-          "useTags": false
-        },
-        {
-          "allValue": null,
-          "current": {
-            "selected": false,
-            "text": "prometheus-nginxlog-exporter:4040",
-            "value": "prometheus-nginxlog-exporter:4040"
-          },
-          "datasource": "Prometheus",
-          "definition": "label_values(nginx_parse_errors_total{job=\"$job\"}, instance)",
-          "description": null,
-          "error": null,
-          "hide": 0,
-          "includeAll": false,
-          "label": "Host:",
-          "multi": false,
-          "name": "node",
-          "options": [],
-          "query": {
-            "query": "label_values(nginx_parse_errors_total{job=\"$job\"}, instance)",
-            "refId": "Prometheus-node-Variable-Query"
-          },
-          "refresh": 1,
-          "regex": "",
-          "skipUrlSync": false,
-          "sort": 1,
-          "tagValuesQuery": "",
-          "tagsQuery": "",
-          "type": "query",
-          "useTags": false
-        }
-      ]
+      "list": []
     },
     "time": {
-      "from": "now-5m",
+      "from": "now-1h",
       "to": "now"
     },
-    "timepicker": {},
-    "timezone": "",
-    "title": "asdfsafa231423413",
-    "uid": "2rgasdgase",
-    "version": 1,
-    "id": null
+    "timepicker": {
+      "refresh_intervals": [],
+      "time_options": [],
+      "type": "time"
+    },
+    "title": "NGINX Monitoring Dashboard",
+    "uid": "nginx-monitoring",
+    "version": 1
   },
-  "overwrite": true,
-  "inputs": [],
-  "folderUid": ""
+  "folderId": 0,
+  "overwrite": true
 }

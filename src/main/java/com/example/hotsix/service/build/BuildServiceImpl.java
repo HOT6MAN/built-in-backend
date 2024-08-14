@@ -151,11 +151,6 @@ public class BuildServiceImpl implements BuildService {
         Long buildNum = buildResultDto.getBuildNum();
         String targetUrl = String.format("%sjob/%s/%d/wfapi/describe", hostJenkinsUrl, jobName, buildNum);
 
-        // todo: 다른 데로 옮기기
-        // jenkins 서버 모니터링용 grafana dashBoard 추가
-//        String uId = addGrafanaDashboard(buildResultDto);
-//        System.out.println("uId = " + uId);
-
         log.warn("targetUrl = {}", targetUrl);
 
         WebClient client = WebClient.builder()
@@ -285,11 +280,6 @@ public class BuildServiceImpl implements BuildService {
                 .build();
     }
 
-
-    private String addGrafanaDashboard(BuildResultDto buildResultDto) throws Exception {
-        return grafanaClient.addGrafanaDashboard(buildResultDto.getServiceNum());
-    }
-
     @Override
     public BuildStartDto wholeBuildStart(Long projectInfoId) {
         TeamProjectInfo teamProjectInfo = teamProjectInfoRepository.findProjectInfoByProjectInfoId(projectInfoId);
@@ -401,6 +391,13 @@ public class BuildServiceImpl implements BuildService {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void addMonitoringService(BuildResultDto buildResultDto) throws Exception {
+        // jenkins 서버 모니터링용 grafana dashBoard 추가
+        String uId = grafanaClient.addGrafanaDashboard(buildResultDto.getServiceNum());
+        System.out.println("grafana uId = " + uId);
     }
 
     private void createJenkinsDatabaseInstance(CloseableHttpClient httpClient, String crumb, DeployConfig deployConfig) {

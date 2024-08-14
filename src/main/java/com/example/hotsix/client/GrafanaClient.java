@@ -34,22 +34,52 @@ public class GrafanaClient {
             String uId = this.generateOrderId();
             String title = "Monitoring Nginx Server - Service Metric-" + uId;
             System.out.println("uId = " + uId);
+
             ObjectNode dashBoardNode = (ObjectNode) jsonNode.get("dashboard");
             dashBoardNode.put("title", title);
             dashBoardNode.put("uId", uId);
+
+            // NGINX_INSTANCE 환경 변수와 쿼리 업데이트
+            updateNginxInstanceInQueries(dashBoardNode, serviceNum);
 
             HttpHeaders httpHeaders = new HttpHeaders();
             httpHeaders.setBearerAuth(adminToken);
             httpHeaders.setContentType(MediaType.APPLICATION_JSON);
 
             String response = builtInWebClient.post(createDashBoardUrl, jsonNode, httpHeaders);
-            // Process response
-            log.info("grafana response = {}", response);
+
+            // 응답 처리
+            if (response != null) {
+                log.info("grafana response = {}", response);
+            } else {
+                log.error("Grafana API 호출 후 응답이 없습니다.");
+            }
 
             return uId;
         }
 
         return null;
+    }
+
+    private void updateNginxInstanceInQueries(ObjectNode dashBoardNode, int serviceNum) {
+        // 쿼리에서 NGINX_INSTANCE 값을 serviceNum으로 업데이트
+        String instanceValue = "nginx-" + serviceNum;
+        // 아래의 코드는 jsonNode 내의 모든 쿼리를 찾아 업데이트하는 방법을 예시로 보여줍니다.
+
+        // 예시: targets 필드를 포함한 쿼리를 순회하며 수정하는 로직 구현
+        if (dashBoardNode.has("panels")) {
+            for (JsonNode panel : dashBoardNode.get("panels")) {
+                if (panel.has("targets")) {
+                    for (JsonNode target : panel.get("targets")) {
+                        if (target.has("expr")) {
+                            String expr = target.get("expr").asText();
+                            expr = expr.replace("$NGINX_INSTANCE", instanceValue);  // NGINX_INSTANCE 환경변수 업데이트
+                            ((ObjectNode) target).put("expr", expr);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private String generateOrderId() {

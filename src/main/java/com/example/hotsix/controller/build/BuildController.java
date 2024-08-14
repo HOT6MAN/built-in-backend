@@ -158,6 +158,12 @@ public class BuildController {
 
         log.info("로그 저장 완료");
 
+        // final 작업이 완료되었을 경우, grafana 추가
+        if (buildResultDto.getJobType().equals("final")) {
+            log.info("grafana 저장 시도");
+            buildService.addMonitoringService(buildResultDto);
+        }
+
         // 알림 보내기 기능 테스트
         notificationService.sendGeneralResponse(GeneralResponseDto.builder()
                         .type(buildResultDto.getJobType())
