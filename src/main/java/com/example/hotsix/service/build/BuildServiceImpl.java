@@ -430,6 +430,7 @@ public class BuildServiceImpl implements BuildService {
         params.add(new BasicNameValuePair("MYSQL_DATABASE", databaseConfigDto.getSchemaName()));
         params.add(new BasicNameValuePair("MYSQL_USER", databaseConfigDto.getUsername()));
         params.add(new BasicNameValuePair("MYSQL_PASSWORD", databaseConfigDto.getPassword()));
+        params.add(new BasicNameValuePair("CONFIG_ID", String.valueOf(databaseConfigDto.getId())));
 
         log.info("params: {}", params);
 
@@ -522,6 +523,7 @@ public class BuildServiceImpl implements BuildService {
         params.add(new BasicNameValuePair("GIT_USERNAME", frontendConfigDto.getGitUsername()));
         params.add(new BasicNameValuePair("GIT_BRANCH", frontendConfigDto.getGitBranch()));
         params.add(new BasicNameValuePair("GIT_ACCESS_TOKEN", frontendConfigDto.getGitAccessToken()));
+        params.add(new BasicNameValuePair("CONFIG_ID", String.valueOf(frontendConfigDto.getId())));
 
 
         log.info("params: {}", params);
