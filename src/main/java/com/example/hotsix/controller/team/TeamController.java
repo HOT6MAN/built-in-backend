@@ -25,8 +25,9 @@ public class TeamController {
 
     private final TeamService teamService;
 
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @PostMapping("/teams")
-    public Team createTeam(@RequestBody TeamDto teamDto) {
+    public void createTeam(@RequestBody TeamDto teamDto) {
         log.info("teamDto: {}", teamDto.toString());
 
         Team team = Team.builder()
@@ -36,7 +37,6 @@ public class TeamController {
         Long memberId = teamDto.getMemberId();
 
         teamService.createTeam(team, memberId);
-        return team;
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
