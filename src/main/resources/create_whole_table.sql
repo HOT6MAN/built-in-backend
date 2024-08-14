@@ -170,6 +170,7 @@ CREATE TABLE `backend_config` (
                                   `language_version` varchar(255) DEFAULT NULL,
                                   `framework` varchar(255) DEFAULT NULL,
                                   `build_tool` varchar(255) DEFAULT NULL,
+                                  `context_path` varchar(255) DEFAULT NULL,
                                   PRIMARY KEY (`id`),
                                   KEY `fk_backend_config_project_info` (`project_info_id`),
                                   CONSTRAINT `fk_backend_config_project_info` FOREIGN KEY (`project_info_id`) REFERENCES `team_project_info` (`id`) ON DELETE CASCADE
@@ -182,7 +183,7 @@ CREATE TABLE `backend_config` (
 
 LOCK TABLES `backend_config` WRITE;
 /*!40000 ALTER TABLE `backend_config` DISABLE KEYS */;
-INSERT INTO `backend_config` VALUES (1,1,NULL,'환경설정 1','https://lab.ssafy.com/s11-webmobile1-sub2/S11P12A606.git','BE-Develop','17452','nZhB4Uus8zfsAxKsZxCA','Java/Spring','17',NULL,'Gradle');
+INSERT INTO `backend_config` VALUES (1,1,NULL,'환경설정 1','https://lab.ssafy.com/s11-webmobile1-sub2/S11P12A606.git','BE-Develop','17452','nZhB4Uus8zfsAxKsZxCA','Java/Spring','17',NULL,'Gradle', 'hot6man');
 /*!40000 ALTER TABLE `backend_config` ENABLE KEYS */;
 UNLOCK TABLES;
 

@@ -51,8 +51,10 @@ public class BackendConfig {
     @Column(name = "build_tool")
     private String buildTool;
 
+    @Column(name = "context_path")
+    private String contextPath;
+
     public void setProperties(BackendConfigDto dto) {
-        this.configName = dto.getConfigName();
         this.gitUrl = dto.getGitUrl();
         this.gitBranch = dto.getGitBranch();
         this.gitUsername = dto.getGitUsername();
@@ -61,6 +63,7 @@ public class BackendConfig {
         this.languageVersion = dto.getLanguageVersion();
         this.framework = dto.getFramework();
         this.buildTool = dto.getBuildTool();
+        this.configName = dto.getConfigName();
     }
 
     public BackendConfigDto toDto() {
@@ -76,6 +79,7 @@ public class BackendConfig {
                 .languageVersion(languageVersion)
                 .framework(framework)
                 .buildTool(buildTool)
+                .configName(configName)
                 .build();
     }
 
@@ -91,6 +95,7 @@ public class BackendConfig {
                 .languageVersion(dto.getLanguageVersion())
                 .framework(dto.getFramework())
                 .buildTool(dto.getBuildTool())
+                .contextPath(dto.getContextPath())
                 .build();
     }
 }

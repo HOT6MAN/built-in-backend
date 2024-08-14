@@ -28,5 +28,5 @@ public class BackendConfigDto {
     private String languageVersion;
     private String framework;
     private String buildTool;
-
+    private String contextPath;
 }
