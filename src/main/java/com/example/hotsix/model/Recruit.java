@@ -20,7 +20,7 @@ import java.util.List;
 @DiscriminatorValue("RECRUIT")
 public class Recruit extends Board {
 
-    @Column(name = "thumbnail", nullable = false)
+    @Column(name = "thumbnail")
     private String thumbnail;
 
     @Column(name = "introduction", nullable = false)
