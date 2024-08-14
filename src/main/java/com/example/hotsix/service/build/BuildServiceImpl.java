@@ -391,11 +391,154 @@ public class BuildServiceImpl implements BuildService {
                 createJenkinsSetupInstance(httpClient, crumb, deployConfig);
             } else if (jobType.equals(JenkinsJobType.BACKEND)) {
                 createJenkinsBackendInstance(httpClient, crumb, deployConfig);
+            } else if (jobType.equals(JenkinsJobType.FRONTEND)) {
+                createJenkinsFrontEndInstance(httpClient, crumb, deployConfig);
             } else if (jobType.equals(JenkinsJobType.DATABASE)) {
-
+                createJenkinsDatabaseInstance(httpClient, crumb, deployConfig);
+            } else if (jobType.equals(JenkinsJobType.FINAL)) {
+                createJenkinsFinalInstance(httpClient, crumb, deployConfig);
             }
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    private void createJenkinsDatabaseInstance(CloseableHttpClient httpClient, String crumb, DeployConfig deployConfig) {
+        System.out.println("Crumb = " + crumb);
+        String[] crumbParts = crumb.split(":");
+        String crumbFieldName = crumbParts[0];
+        String crumbValue = crumbParts[1];
+
+        String jenkinsJobName = "built_in_database_docker";
+        String hostJobName = String.format("%sjob/%s/buildWithParameters", hostJenkinsUrl, jenkinsJobName);
+
+        HttpPost httpPost = new HttpPost(hostJobName);
+        httpPost.setHeader(crumbFieldName, crumbValue);
+        httpPost.setHeader("Authorization", "Basic " + Base64.getEncoder().encodeToString((hostJenkinsUsername + ":" + hostJenkinsToken).getBytes()));
+
+        System.out.println("deployConfig = " + deployConfig);
+
+        List<NameValuePair> params = new ArrayList<>();
+        params.add(new BasicNameValuePair("SERVICE_NUM", String.valueOf(deployConfig.getServiceNum())));
+        params.add(new BasicNameValuePair("PROJECT_ID", String.valueOf(deployConfig.getTeamProjectInfoId())));
+        params.add(new BasicNameValuePair("MEMBER_ID", String.valueOf(deployConfig.getMemberId())));
+        params.add(new BasicNameValuePair("DEPLOY_NUM", String.valueOf(deployConfig.getDeployNum())));
+        params.add(new BasicNameValuePair("JOB_TYPE", String.valueOf(deployConfig.getJobType())));
+        params.add(new BasicNameValuePair("ACCESS_TOKEN", String.valueOf(deployConfig.getAccessToken())));
+
+        // todo: 나중에 여러 개의 jenkinsJob을 build 가능하도록 수정
+        // 현재는 첫 번째 세팅만 jenkins build 실행
+        DatabaseConfigDto databaseConfigDto = deployConfig.getDatabaseConfigs().get(0);
+        params.add(new BasicNameValuePair("MYSQL_ROOT_PASSWORD", "HOT&6Man!A606"));
+        params.add(new BasicNameValuePair("MYSQL_DATABASE", databaseConfigDto.getSchemaName()));
+        params.add(new BasicNameValuePair("MYSQL_USER", databaseConfigDto.getUsername()));
+        params.add(new BasicNameValuePair("MYSQL_PASSWORD", databaseConfigDto.getPassword()));
+
+        log.info("params: {}", params);
+
+        UrlEncodedFormEntity entity = new UrlEncodedFormEntity(params, StandardCharsets.UTF_8);
+        httpPost.setEntity(entity);
+        System.out.println("Call HttpClient execute");
+        HttpResponse response = null;
+        try {
+            response = httpClient.execute(httpPost);
+            System.out.println("Response status: " + response.getStatusLine().getStatusCode());
+            System.out.println("Response body: " + EntityUtils.toString(response.getEntity()));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void createJenkinsFinalInstance(CloseableHttpClient httpClient, String crumb, DeployConfig deployConfig) {
+        System.out.println("Crumb = " + crumb);
+        String[] crumbParts = crumb.split(":");
+        String crumbFieldName = crumbParts[0];
+        String crumbValue = crumbParts[1];
+
+        String jenkinsJobName = "built_in_final_docker";
+        String hostJobName = String.format("%sjob/%s/buildWithParameters", hostJenkinsUrl, jenkinsJobName);
+
+        HttpPost httpPost = new HttpPost(hostJobName);
+        httpPost.setHeader(crumbFieldName, crumbValue);
+        httpPost.setHeader("Authorization", "Basic " + Base64.getEncoder().encodeToString((hostJenkinsUsername + ":" + hostJenkinsToken).getBytes()));
+
+        System.out.println("deployConfig = " + deployConfig);
+
+        List<NameValuePair> params = new ArrayList<>();
+        params.add(new BasicNameValuePair("SERVICE_NUM", String.valueOf(deployConfig.getServiceNum())));
+        params.add(new BasicNameValuePair("PROJECT_ID", String.valueOf(deployConfig.getTeamProjectInfoId())));
+        params.add(new BasicNameValuePair("MEMBER_ID", String.valueOf(deployConfig.getMemberId())));
+        params.add(new BasicNameValuePair("DEPLOY_NUM", String.valueOf(deployConfig.getDeployNum())));
+        params.add(new BasicNameValuePair("JOB_TYPE", String.valueOf(deployConfig.getJobType())));
+        params.add(new BasicNameValuePair("ACCESS_TOKEN", String.valueOf(deployConfig.getAccessToken())));
+
+        String hasBackendConfig = deployConfig.getBackendConfigs().isEmpty()? "FALSE": "TRUE";
+        String hasFrontendConfig = deployConfig.getFrontendConfigs().isEmpty()? "FALSE": "TRUE";
+        String hasDatabaseConfig = deployConfig.getDatabaseConfigs().isEmpty()? "FALSE": "TRUE";
+
+        params.add(new BasicNameValuePair("BACKEND_CONFIG", hasBackendConfig));
+        params.add(new BasicNameValuePair("FRONTEND_CONFIG", hasFrontendConfig));
+        params.add(new BasicNameValuePair("DATABASE_CONFIG", hasDatabaseConfig));
+
+        log.info("params: {}", params);
+
+        UrlEncodedFormEntity entity = new UrlEncodedFormEntity(params, StandardCharsets.UTF_8);
+        httpPost.setEntity(entity);
+        System.out.println("Call HttpClient execute");
+        HttpResponse response = null;
+        try {
+            response = httpClient.execute(httpPost);
+            System.out.println("Response status: " + response.getStatusLine().getStatusCode());
+            System.out.println("Response body: " + EntityUtils.toString(response.getEntity()));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void createJenkinsFrontEndInstance(CloseableHttpClient httpClient, String crumb, DeployConfig deployConfig) {
+        System.out.println("Crumb = " + crumb);
+        String[] crumbParts = crumb.split(":");
+        String crumbFieldName = crumbParts[0];
+        String crumbValue = crumbParts[1];
+
+        String jenkinsJobName = "built_in_frontend_docker";
+        String hostJobName = String.format("%sjob/%s/buildWithParameters", hostJenkinsUrl, jenkinsJobName);
+
+        HttpPost httpPost = new HttpPost(hostJobName);
+        httpPost.setHeader(crumbFieldName, crumbValue);
+        httpPost.setHeader("Authorization", "Basic " + Base64.getEncoder().encodeToString((hostJenkinsUsername + ":" + hostJenkinsToken).getBytes()));
+
+        System.out.println("deployConfig = " + deployConfig);
+
+        List<NameValuePair> params = new ArrayList<>();
+        params.add(new BasicNameValuePair("SERVICE_NUM", String.valueOf(deployConfig.getServiceNum())));
+        params.add(new BasicNameValuePair("PROJECT_ID", String.valueOf(deployConfig.getTeamProjectInfoId())));
+        params.add(new BasicNameValuePair("MEMBER_ID", String.valueOf(deployConfig.getMemberId())));
+        params.add(new BasicNameValuePair("DEPLOY_NUM", String.valueOf(deployConfig.getDeployNum())));
+        params.add(new BasicNameValuePair("JOB_TYPE", String.valueOf(deployConfig.getJobType())));
+        params.add(new BasicNameValuePair("ACCESS_TOKEN", String.valueOf(deployConfig.getAccessToken())));
+
+        // todo: 나중에 여러 개의 jenkinsJob을 build 가능하도록 수정
+        // 현재는 첫 번째 세팅만 jenkins build 실행
+        FrontendConfigDto frontendConfigDto = deployConfig.getFrontendConfigs().get(0);
+        params.add(new BasicNameValuePair("GIT_URL", frontendConfigDto.getGitUrl()));
+        params.add(new BasicNameValuePair("GIT_USERNAME", frontendConfigDto.getGitUsername()));
+        params.add(new BasicNameValuePair("GIT_BRANCH", frontendConfigDto.getGitBranch()));
+        params.add(new BasicNameValuePair("GIT_ACCESS_TOKEN", frontendConfigDto.getGitAccessToken()));
+
+
+        log.info("params: {}", params);
+
+        UrlEncodedFormEntity entity = new UrlEncodedFormEntity(params, StandardCharsets.UTF_8);
+        httpPost.setEntity(entity);
+        System.out.println("Call HttpClient execute");
+        HttpResponse response = null;
+        try {
+            response = httpClient.execute(httpPost);
+            System.out.println("Response status: " + response.getStatusLine().getStatusCode());
+            System.out.println("Response body: " + EntityUtils.toString(response.getEntity()));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -513,7 +656,9 @@ public class BuildServiceImpl implements BuildService {
         String crumbFieldName = crumbParts[0];
         String crumbValue = crumbParts[1];
 
-        String hostJobName = hostJenkinsUrl + "job/deploy_setup/buildWithParameters";
+        String jenkinsJobName = "built_in_backend_docker";
+        String hostJobName = String.format("%sjob/%s/buildWithParameters", hostJenkinsUrl, jenkinsJobName);
+//                hostJenkinsUrl + "job/deploy_setup/buildWithParameters";
         HttpPost httpPost = new HttpPost(hostJobName);
         httpPost.setHeader(crumbFieldName, crumbValue);
         httpPost.setHeader("Authorization", "Basic " + Base64.getEncoder().encodeToString((hostJenkinsUsername + ":" + hostJenkinsToken).getBytes()));
@@ -531,6 +676,8 @@ public class BuildServiceImpl implements BuildService {
         // todo: 나중에 여러 개의 jenkinsJob을 build 가능하도록 수정
         // 현재는 첫 번째 세팅만 jenkins build 실행
         BackendConfigDto backendConfigDto = deployConfig.getBackendConfigs().get(0);
+
+        params.add(new BasicNameValuePair("CONFIG_ID", String.valueOf(backendConfigDto.getId())));
         params.add(new BasicNameValuePair("GIT_URL", backendConfigDto.getGitUrl()));
         params.add(new BasicNameValuePair("GIT_USERNAME", backendConfigDto.getGitUsername()));
         params.add(new BasicNameValuePair("GIT_BRANCH", backendConfigDto.getGitBranch()));
@@ -560,7 +707,8 @@ public class BuildServiceImpl implements BuildService {
         String crumbFieldName = crumbParts[0];
         String crumbValue = crumbParts[1];
 
-        String hostJobName = hostJenkinsUrl + "job/deploy_setup/buildWithParameters";
+        String jenkinsJobName = "deploy_setup";
+        String hostJobName = String.format("%sjob/%s/buildWithParameters", hostJenkinsUrl, jenkinsJobName);
         HttpPost httpPost = new HttpPost(hostJobName);
         httpPost.setHeader(crumbFieldName, crumbValue);
         httpPost.setHeader("Authorization", "Basic " + Base64.getEncoder().encodeToString((hostJenkinsUsername + ":" + hostJenkinsToken).getBytes()));
