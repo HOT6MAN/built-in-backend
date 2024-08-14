@@ -151,6 +151,10 @@ public class NotificationServiceImpl implements NotificationService{
             notification.setType("join");
             notification.setType("join");
         }
+        else if("apply".equals(type)){
+            notification.setType("apply");
+            notification.setType("apply");
+        }
         else if("RTC".equals(type)){
             notification.setType("RTC");
             notification.setUrl("RTC");

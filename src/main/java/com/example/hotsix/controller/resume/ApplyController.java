@@ -9,6 +9,7 @@ import com.example.hotsix.model.Member;
 import com.example.hotsix.model.Resume;
 import com.example.hotsix.model.Team;
 import com.example.hotsix.model.id.ApplyId;
+import com.example.hotsix.service.notification.NotificationService;
 import com.example.hotsix.service.resume.ApplyService;
 import com.example.hotsix.service.resume.ResumeService;
 import com.example.hotsix.service.team.TeamService;
@@ -27,6 +28,7 @@ public class ApplyController {
     private final TeamService teamService;
     private final ResumeService resumeService;
     private final ApplyService applyService;
+    private final NotificationService notificationService;
     private final Provider<TeamPropertyEditor> teamPropertyEditorProvider;
 
     @InitBinder
@@ -44,6 +46,11 @@ public class ApplyController {
         Team teamToApply = teamService.findById(teamId);
 
         applyService.apply(teamToApply, application);
+
+        Long applicantId = application.getAuthor().getId();
+        Long teamLeaderId = teamToApply.getLeaderId();
+
+        notificationService.send(applicantId, teamLeaderId, "apply");
     }
 
     @GetMapping("/applications/team/{teamId}")
