@@ -177,12 +177,13 @@ public class NotificationServiceImpl implements NotificationService{
     @Override
     public void sendToClient(SseEmitter emitter, String id, Notification data) {
         System.out.println("Before Send Event Check Type : "+data.getType());
+        System.out.println("Receiver Emitter Id = "+id);
         try {
             emitter.send(SseEmitter.event()
                     .id(id)
                     .name(data.getType())
                     .data(data, MediaType.APPLICATION_JSON)
-                    .reconnectTime(0));
+                    .reconnectTime(1000L));
             log.info("send Successfully clear to Client");
         } catch (Exception exception) {
             log.error("Send to Client Error {}", exception.getMessage());
