@@ -59,6 +59,8 @@ public class MeetingServiceImpl implements MeetingService {
         List<Member> members = memberRepository.findAllMemberByTeamId(teamId);
         for(Member member : members) {
             notificationService.send(memberId, member.getId(), "RTC");
+            System.out.println("Meeting Service Impl Create Session Notification send");
+            log.info("Sender = {}, receiver = {}, Type = {}", memberId, member.getId(), "RTC");
             Notification notification = Notification.builder()
                     .receiver(member.getId())
                     .sender(memberId)

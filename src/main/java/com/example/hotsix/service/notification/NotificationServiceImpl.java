@@ -156,6 +156,8 @@ public class NotificationServiceImpl implements NotificationService{
             notification.setType("apply");
         }
         else if("RTC".equals(type)){
+            log.info("Notification Type RTC Call By Notification Service Send Method");
+            System.out.println("Notification RTC sender = " +sender + " // receiver = " + receiver);
             notification.setType("RTC");
             notification.setUrl("RTC");
         }
