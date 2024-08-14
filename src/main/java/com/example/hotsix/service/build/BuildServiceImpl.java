@@ -423,7 +423,7 @@ public class BuildServiceImpl implements BuildService {
         params.add(new BasicNameValuePair("PROJECT_ID", String.valueOf(deployConfig.getTeamProjectInfoId())));
         params.add(new BasicNameValuePair("MEMBER_ID", String.valueOf(deployConfig.getMemberId())));
         params.add(new BasicNameValuePair("DEPLOY_NUM", String.valueOf(deployConfig.getDeployNum())));
-        params.add(new BasicNameValuePair("JOB_TYPE", String.valueOf(deployConfig.getJobType())));
+        params.add(new BasicNameValuePair("JOB_TYPE", String.valueOf(deployConfig.getJobType()).toLowerCase()));
         params.add(new BasicNameValuePair("ACCESS_TOKEN", String.valueOf(deployConfig.getAccessToken())));
 
         // todo: 나중에 여러 개의 jenkinsJob을 build 가능하도록 수정
@@ -515,7 +515,7 @@ public class BuildServiceImpl implements BuildService {
         params.add(new BasicNameValuePair("PROJECT_ID", String.valueOf(deployConfig.getTeamProjectInfoId())));
         params.add(new BasicNameValuePair("MEMBER_ID", String.valueOf(deployConfig.getMemberId())));
         params.add(new BasicNameValuePair("DEPLOY_NUM", String.valueOf(deployConfig.getDeployNum())));
-        params.add(new BasicNameValuePair("JOB_TYPE", String.valueOf(deployConfig.getJobType())));
+        params.add(new BasicNameValuePair("JOB_TYPE", String.valueOf(deployConfig.getJobType()).toLowerCase()));
         params.add(new BasicNameValuePair("ACCESS_TOKEN", String.valueOf(deployConfig.getAccessToken())));
 
         // todo: 나중에 여러 개의 jenkinsJob을 build 가능하도록 수정
@@ -670,7 +670,7 @@ public class BuildServiceImpl implements BuildService {
         params.add(new BasicNameValuePair("PROJECT_ID", String.valueOf(deployConfig.getTeamProjectInfoId())));
         params.add(new BasicNameValuePair("MEMBER_ID", String.valueOf(deployConfig.getMemberId())));
         params.add(new BasicNameValuePair("DEPLOY_NUM", String.valueOf(deployConfig.getDeployNum())));
-        params.add(new BasicNameValuePair("JOB_TYPE", String.valueOf(deployConfig.getJobType())));
+        params.add(new BasicNameValuePair("JOB_TYPE", String.valueOf(deployConfig.getJobType()).toLowerCase()));
         params.add(new BasicNameValuePair("ACCESS_TOKEN", String.valueOf(deployConfig.getAccessToken())));
 
         // todo: 나중에 여러 개의 jenkinsJob을 build 가능하도록 수정
