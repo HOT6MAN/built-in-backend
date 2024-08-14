@@ -53,6 +53,9 @@ public class NotificationServiceImpl implements NotificationService{
             if(noti.getType().equals("chat")){
                 dto.setContent("님과 새로운 대화가 시작되었습니다.");
             }
+            else if(noti.getType().equals("apply")){
+                dto.setContent("님이 팀에 지원하였습니다.");
+            }
             else if(noti.getType().equals("RTC")){
                 dto.setContent("님이 새로운 팀 화상회의를 만드셨습니다.");
             }
