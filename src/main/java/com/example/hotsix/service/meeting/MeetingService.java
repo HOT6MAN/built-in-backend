@@ -9,7 +9,7 @@ import io.openvidu.java.client.OpenViduHttpException;
 import io.openvidu.java.client.OpenViduJavaClientException;
 
 public interface MeetingService {
-    TeamDto createSession(Long teamId)
+    TeamDto createSession(Long teamId, Long memberId)
             throws OpenViduJavaClientException, OpenViduHttpException;
     TeamDto getSession(Long teamId)
             throws OpenViduJavaClientException, OpenViduHttpException;

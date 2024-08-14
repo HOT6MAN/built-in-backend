@@ -10,8 +10,12 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 import static com.example.hotsix.model.QMember.member;
 import static com.example.hotsix.model.QMemberImage.memberImage;
+import static com.example.hotsix.model.QMemberTeam.memberTeam;
+import static com.example.hotsix.model.QTeam.team;
 
 
 @Repository
@@ -72,5 +76,15 @@ public class MemberRepositoryImpl extends Querydsl4RepositorySupport implements 
                 .set(memberImage.type, dto.getType())
                 .where(memberImage.member.id.eq(dto.getMember().getId()))
                 .execute();
+    }
+
+    @Override
+    public List<Member> findAllMemberByTeamId(Long teamId) {
+        return queryFactory
+                .selectFrom(member)
+                .join(member.memberTeams, memberTeam)
+                .join(memberTeam.team, team)
+                .where(team.id.eq(teamId))
+                .fetch();
     }
 }

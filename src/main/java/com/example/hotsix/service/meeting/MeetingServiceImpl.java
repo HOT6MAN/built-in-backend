@@ -1,10 +1,15 @@
 package com.example.hotsix.service.meeting;
 
+import com.example.hotsix.dto.notification.Notification;
 import com.example.hotsix.dto.team.TeamDto;
 import com.example.hotsix.enums.Process;
 import com.example.hotsix.exception.BuiltInException;
+import com.example.hotsix.model.Member;
 import com.example.hotsix.model.Team;
+import com.example.hotsix.repository.member.MemberRepository;
 import com.example.hotsix.repository.team.TeamRepository;
+import com.example.hotsix.service.notification.NotificationService;
+import com.example.hotsix.util.LocalTimeUtil;
 import io.openvidu.java.client.*;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -28,6 +34,8 @@ public class MeetingServiceImpl implements MeetingService {
 
     private OpenVidu openvidu;
     private final TeamRepository teamRepository;
+    private final NotificationService notificationService;
+    private final MemberRepository memberRepository;
 
 
     @Value("${openvidu.url}")
@@ -42,12 +50,25 @@ public class MeetingServiceImpl implements MeetingService {
     }
 
     @Override
-    public TeamDto createSession(Long teamId)
+    public TeamDto createSession(Long teamId, Long memberId)
             throws OpenViduJavaClientException, OpenViduHttpException {
         //openvidu 서버에 session 생성 요청
         Map<String, Object> params = Map.of();
         String sessionId = initializeSession(params);
 
+        List<Member> members = memberRepository.findAllMemberByTeamId(teamId);
+        for(Member member : members) {
+            notificationService.send(memberId, member.getId(), "RTC");
+            Notification notification = Notification.builder()
+                    .receiver(member.getId())
+                    .sender(memberId)
+                    .type("RTC")
+                    .url("/")
+                    .isRead(false)
+                    .notifyDate(LocalTimeUtil.getDateTime())
+                    .build();
+            notificationService.save(notification);
+        }
         // sessionId 저장 후 TeamDto return
         return updateSessionId(sessionId, teamId);
 

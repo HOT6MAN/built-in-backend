@@ -23,11 +23,11 @@ public class MeetingController {
 
     private final MeetingService meetingService;
 
-    @PatchMapping("/sessions/{teamId}/create") // session 생성 요청
-    public TeamDto createSession(@PathVariable("teamId") Long teamId)
+    @PatchMapping("/sessions/{teamId}/create/{userId}") // session 생성 요청
+    public TeamDto createSession(@PathVariable("teamId") Long teamId, @PathVariable("userId")Long memberId)
             throws OpenViduJavaClientException, OpenViduHttpException {
 
-        return meetingService.createSession(teamId);
+        return meetingService.createSession(teamId, memberId);
     }
 
     @GetMapping("/sessions/{teamId}/get") // session 접근 요청

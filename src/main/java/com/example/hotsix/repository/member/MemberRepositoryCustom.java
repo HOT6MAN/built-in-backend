@@ -5,6 +5,8 @@ import com.example.hotsix.model.MemberImage;
 import com.example.hotsix.model.Member;
 import com.example.hotsix.vo.MemberVo;
 
+import java.util.List;
+
 public interface MemberRepositoryCustom {
     Member findMemberById(long id);
 
@@ -17,5 +19,7 @@ public interface MemberRepositoryCustom {
     void updateMemberProfileByMemberId(MemberDto dto);
 
     void updateMemberProfileImageByMemberId(MemberImage dto);
+
+    List<Member> findAllMemberByTeamId(Long teamId);
 
 }

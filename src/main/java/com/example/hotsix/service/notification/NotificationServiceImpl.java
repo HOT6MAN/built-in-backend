@@ -50,7 +50,12 @@ public class NotificationServiceImpl implements NotificationService{
             NotificationDto dto = noti.toDto();
             Member member = memberRepository.findMemberById(noti.getSender());
             dto.setSenderName(member.getName());
-            dto.setContent("님과 새로운 대화가 시작되었습니다.");
+            if(noti.getType().equals("chat")){
+                dto.setContent("님과 새로운 대화가 시작되었습니다.");
+            }
+            else if(noti.getType().equals("RTC")){
+                dto.setContent("님이 새로운 팀 화상회의를 만드셨습니다.");
+            }
             result.add(dto);
         }
         return result;
@@ -145,6 +150,10 @@ public class NotificationServiceImpl implements NotificationService{
         else if("join".equals(type)){
             notification.setType("join");
             notification.setType("join");
+        }
+        else if("RTC".equals(type)){
+            notification.setType("RTC");
+            notification.setUrl("RTC");
         }
         Map<String, SseEmitter> sseEmitters = repository.findAllEmittersByUserId(receiver);
         // 로그인 한 유저의 SseEmitter 모두 가져오기
