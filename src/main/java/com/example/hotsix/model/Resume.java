@@ -89,8 +89,4 @@ public class Resume extends BaseEntity {
                 .resume(this)
                 .build();
     }
-
-    public boolean isDefaultProfile() {
-        return this.profile.startsWith("default");
-    }
 }

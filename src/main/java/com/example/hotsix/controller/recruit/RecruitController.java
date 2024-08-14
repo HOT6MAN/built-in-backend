@@ -130,7 +130,7 @@ public class RecruitController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/teambuilding/recruit/{id}")
     public void deleteRecruit(@PathVariable("id") Recruit recruit) throws IOException {
-        if (!recruit.isDefaultThumbnail()) storageService.remove(recruit.getThumbnail());
+        storageService.remove(recruit.getThumbnail());
 
         recruitService.delete(recruit);
     }

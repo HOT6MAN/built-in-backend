@@ -74,8 +74,4 @@ public class Recruit extends Board {
                 this.getCreatedDate().toLocalDate()
         );
     }
-
-    public boolean isDefaultThumbnail() {
-        return this.thumbnail.startsWith("default");
-    }
 }
