@@ -31,16 +31,20 @@ public class MailLinkService {
         //링크는 서버주소로 해야함. 서버의 /register나 /email-login api로 들어와서 code의 토큰을 검증해줘야
         // 클라이언트의 /afterlogin이나 /register 페이지로 보냄.
         String link = hostUrl+"/hot6man/"+ type + "?code="+code;
-//        String link = "http://localhost:8080/"+ type + "?code="+code;
+//        String link = "http://localhost:8080/hot6man/"+ type + "?code="+code;
         return link;
     }
 
     public void sendMail(String email, String type, String link){
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+        String title = "Built-In 로그인";
+        if(type.equals("register")){
+            title = "Built-In 회원가입";
+        }
         try {
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, false, "UTF-8");
             mimeMessageHelper.setTo(email); // 메일 수신자
-            mimeMessageHelper.setSubject("Test"); // 메일 제목
+            mimeMessageHelper.setSubject(title); // 메일 제목
             mimeMessageHelper.setText(setContext(type,link), true); // 메일 본문 내용, HTML 여부
             javaMailSender.send(mimeMessage);
 
