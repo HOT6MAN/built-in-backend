@@ -98,7 +98,7 @@ public class ResumeController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/resume/{id}")
     public void deleteRecruit(@PathVariable("id") Resume resume) throws IOException {
-        storageService.remove(resume.getProfile());
+        if (!resume.isDefaultProfile()) storageService.remove(resume.getProfile());
 
         resumeService.delete(resume);
     }
