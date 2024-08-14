@@ -11,7 +11,6 @@ import static com.example.hotsix.model.QApply.apply;
 @Repository
 public class ApplyRepositoryImpl extends Querydsl4RepositorySupport implements ApplyRepositoryCustom {
 
-    @Transactional
     @Override
     public void approve(ApplyId applyId) {
         updateFrom(apply)
@@ -20,7 +19,6 @@ public class ApplyRepositoryImpl extends Querydsl4RepositorySupport implements A
                 .execute();
     }
 
-    @Transactional
     @Override
     public void reject(ApplyId applyId) {
         updateFrom(apply)
@@ -29,7 +27,6 @@ public class ApplyRepositoryImpl extends Querydsl4RepositorySupport implements A
                 .execute();
     }
 
-    @Transactional
     @Override
     public void delete(ApplyId applyId) {
         deleteFrom(apply)
