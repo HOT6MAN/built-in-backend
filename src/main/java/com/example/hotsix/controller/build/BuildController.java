@@ -7,7 +7,10 @@ import com.example.hotsix.dto.notification.Notification;
 import com.example.hotsix.enums.BuildStatus;
 import com.example.hotsix.enums.JenkinsJobType;
 import com.example.hotsix.model.ServiceSchedule;
+import com.example.hotsix.model.DatabaseConfigSql;
+import com.example.hotsix.model.project.BackendConfig;
 import com.example.hotsix.model.project.BuildResult;
+import com.example.hotsix.model.project.DatabaseConfig;
 import com.example.hotsix.model.project.TeamProjectInfo;
 import com.example.hotsix.repository.build.ServiceScheduleRepository;
 import com.example.hotsix.repository.team.TeamProjectInfoRepository;
@@ -16,11 +19,19 @@ import com.example.hotsix.service.build.ServiceScheduleServiceImpl;
 import com.example.hotsix.service.notification.NotificationService;
 import com.example.hotsix.service.team.TeamProjectInfoService;
 import com.example.hotsix.util.LocalTimeUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -97,12 +108,36 @@ public class BuildController {
         else return "fail";
     }
     @PostMapping("/project/database/{projectInfoId}")
-    public String saveDatabaseConfigs(@PathVariable("projectInfoId")Long projectInfoId,
-                                      @RequestBody DatabaseConfigDto[] dtos){
-        for(DatabaseConfigDto dto : dtos){
-            System.out.println(dto);
-        }
-        Boolean flag = teamProjectInfoService.saveDatabaseConfigs(projectInfoId, dtos);
+    public String saveDatabaseConfigs(
+            @PathVariable("projectInfoId") Long projectInfoId,
+            @RequestParam Map<String, MultipartFile> files) {
+
+        System.out.println("Received request for projectInfoId: " + projectInfoId);
+        Map<Integer, DatabaseConfigDto> configMap = new HashMap<>();
+        Map<Integer, MultipartFile> fileMap = new HashMap<>();
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        files.forEach((key, file) -> {
+            int index = extractIndex(key);
+            if (key.startsWith("config_")) {
+                try {
+                    String configJson = new String(file.getBytes(), StandardCharsets.UTF_8);
+                    DatabaseConfigDto dto = objectMapper.readValue(configJson, DatabaseConfigDto.class);
+                    configMap.put(index, dto);
+                    System.out.println("Config " + key + ": " + configJson);
+                } catch (IOException e) {
+                    System.out.println("Error reading config file: " + e.getMessage());
+                }
+            } else if (key.startsWith("file_")) {
+                fileMap.put(index, file);
+                System.out.println("File " + key + ": Name - " + file.getOriginalFilename() +
+                        ", Size - " + file.getSize() + " bytes");
+            }
+        });
+        System.out.println("Dto map = "+configMap);
+        System.out.println("File Map = "+fileMap);
+//        Boolean flag = teamProjectInfoService.saveDatabaseConfigs(projectInfoId, dtos);
+        Boolean flag = teamProjectInfoService.saveDatabaseConfigs(projectInfoId, configMap, fileMap);
         if(flag) return "success";
         else return "fail";
     }
@@ -218,6 +253,8 @@ public class BuildController {
         return buildService.getBuildResultInfo(teamProjectInfoId);
     }
 
-
+    private int extractIndex(String key) {
+        return Integer.parseInt(key.substring(key.lastIndexOf('_') + 1));
+    }
 
 }

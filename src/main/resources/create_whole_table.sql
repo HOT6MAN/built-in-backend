@@ -476,6 +476,29 @@ INSERT INTO `database_config` VALUES (1,1,NULL,'환경설정 1','jdbc-url: jdbc:
 /*!40000 ALTER TABLE `database_config` ENABLE KEYS */;
 UNLOCK TABLES;
 
+DROP TABLE IF EXISTS `database_config_sql`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `database_config_sql` (
+                                   `id` bigint NOT NULL AUTO_INCREMENT,
+                                   `database_config_id` bigint DEFAULT NULL,
+                                   `origin_name` varchar(255) DEFAULT NULL,
+                                   `fixed_name` varchar(255) DEFAULT NULL,
+                                   `saveFolder` varchar(255) DEFAULT NULL,
+                                   PRIMARY KEY (`id`),
+                                   KEY `fk_database_config_sql_database_config` (`database_config_id`),
+                                   CONSTRAINT `fk_database_config_sql_database_config` FOREIGN KEY (`database_config_id`) REFERENCES `database_config` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `database_config`
+--
+
+LOCK TABLES `database_config_sql` WRITE;
+/*!40000 ALTER TABLE `database_config_sql` DISABLE KEYS */;
+/*!40000 ALTER TABLE `database_config_sql` ENABLE KEYS */;
+UNLOCK TABLES;
 --
 -- Table structure for table `following`
 --

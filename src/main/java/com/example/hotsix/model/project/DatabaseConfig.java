@@ -3,6 +3,8 @@ package com.example.hotsix.model.project;
 import com.example.hotsix.dto.build.DatabaseConfigDto;
 import com.example.hotsix.enums.DatabaseJobName;
 import com.example.hotsix.enums.FrontendJobName;
+import com.example.hotsix.model.DatabaseConfigSql;
+import com.example.hotsix.model.MemberImage;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
@@ -27,6 +29,9 @@ public class DatabaseConfig {
     @Column(name = "database_job_name")
     private DatabaseJobName databaseJobName;
 
+    @OneToOne(mappedBy = "databaseConfig", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private DatabaseConfigSql databaseConfigSQL;
+
     @Column(name = "config_name")
     private String configName;
 
@@ -43,7 +48,7 @@ public class DatabaseConfig {
     private String password;
 
     public DatabaseConfigDto toDto() {
-        return DatabaseConfigDto.builder()
+        DatabaseConfigDto dto =  DatabaseConfigDto.builder()
                 .id(id)
                 .configName(configName)
                 .url(url)
@@ -51,6 +56,10 @@ public class DatabaseConfig {
                 .username(username)
                 .password(password)
                 .build();
+        if (this.databaseConfigSQL != null) {
+            dto.setSqlFileName(this.databaseConfigSQL.getOriginName());
+        }
+        return dto;
     }
 
     public static DatabaseConfig fromDto(DatabaseConfigDto dto) {
@@ -72,4 +81,3 @@ public class DatabaseConfig {
         this.password = dto.getPassword();
     }
 }
-
