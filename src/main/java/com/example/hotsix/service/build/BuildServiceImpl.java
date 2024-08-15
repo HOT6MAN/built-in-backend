@@ -478,6 +478,10 @@ public class BuildServiceImpl implements BuildService {
         params.add(new BasicNameValuePair("FRONTEND_CONFIG", hasFrontendConfig));
         params.add(new BasicNameValuePair("DATABASE_CONFIG", hasDatabaseConfig));
 
+        if (hasBackendConfig.equals("TRUE")) {
+            params.add(new BasicNameValuePair("CONTEXT_PATH", deployConfig.getBackendConfigs().get(0).getContextPath()));
+        }
+
         log.info("params: {}", params);
 
         UrlEncodedFormEntity entity = new UrlEncodedFormEntity(params, StandardCharsets.UTF_8);
