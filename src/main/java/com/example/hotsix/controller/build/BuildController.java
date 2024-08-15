@@ -166,6 +166,7 @@ public class BuildController {
             buildService.addMonitoringService(buildResultDto);
             Notification notification = notificationService.save(Notification.builder()
                     .receiver(buildResultDto.getMemberId())
+                    .sender(buildResultDto.getMemberId())
                     .isRead(false)
                     .type("final")
                     .notifyDate(LocalTimeUtil.getDateTime())
