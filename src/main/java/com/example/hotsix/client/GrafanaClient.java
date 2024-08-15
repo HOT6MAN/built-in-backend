@@ -4,6 +4,7 @@ import com.example.hotsix.util.JsonUtil;
 import com.example.hotsix.util.RandomUtil;
 import com.example.hotsix.util.TimeUtil;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,7 +41,7 @@ public class GrafanaClient {
             dashBoardNode.put("uId", uId);
 
             // NGINX_INSTANCE 환경 변수와 쿼리 업데이트
-            updateNginxInstanceInQueries(dashBoardNode, serviceNum);
+            updateNginxInstanceInQueries(dashBoardNode, serviceNum, uId);
 
             System.out.println("dashBoardNode = " + dashBoardNode);
 
@@ -64,7 +65,7 @@ public class GrafanaClient {
     }
 
     public String getGrafanaUrlByUID(String uid) throws Exception {
-        String getGrafanaInfoUrl = String.format("%s/api/dashboards/uid/%s", grafanaUrl, uid);
+        String getGrafanaInfoUrl = String.format("%s/api/search?tag=%s", grafanaUrl, uid);
 
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setBearerAuth(adminToken);
@@ -74,10 +75,15 @@ public class GrafanaClient {
                 .bodyToMono(JsonNode.class)
                 .block();
 
-        return response.get("meta").get("url").asText();
+        // 첫 번째 원소의 url 값을 반환
+        if (response.isArray() && response.size() > 0) {
+            return response.get(0).get("url").asText();
+        } else {
+            throw new Exception("Grafana dashboard not found for the given UID: " + uid);
+        }
     }
 
-    private void updateNginxInstanceInQueries(ObjectNode dashBoardNode, Long serviceNum) {
+    private void updateNginxInstanceInQueries(ObjectNode dashBoardNode, Long serviceNum, String uId) {
         // 쿼리에서 NGINX_INSTANCE 값을 serviceNum으로 업데이트
         String instanceValue = "nginx_SN-" + serviceNum;
 
@@ -94,6 +100,13 @@ public class GrafanaClient {
                     }
                 }
             }
+        }
+
+        // tags: [] 안에 tags: [{uId}] 추가
+        if (dashBoardNode.has("tags")) {
+            ArrayNode tagsArray = (ArrayNode) dashBoardNode.get("tags");
+            // uId를 태그 배열에 추가
+            tagsArray.add(uId);
         }
     }
 
