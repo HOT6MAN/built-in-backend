@@ -32,7 +32,7 @@ public class Resume extends BaseEntity {
     @Column(name = "title", nullable = false)
     private String title;
 
-    @Column(name = "profile", nullable = false)
+    @Column(name = "profile")
     private String profile;
 
     @Column(name = "position", nullable = false)

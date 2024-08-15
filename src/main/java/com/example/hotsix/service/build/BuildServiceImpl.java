@@ -6,6 +6,7 @@ import com.example.hotsix.enums.JenkinsJobType;
 import com.example.hotsix.model.ServiceSchedule;
 import com.example.hotsix.enums.BuildStatus;
 //import com.example.hotsix.model.TeamProjectCredential;
+import com.example.hotsix.model.Team;
 import com.example.hotsix.model.project.*;
 import com.example.hotsix.repository.build.*;
 import com.example.hotsix.repository.member.MemberRepository;
@@ -316,12 +317,12 @@ public class BuildServiceImpl implements BuildService {
     public BuildCheckDto buildCheck(Long memberId, Long projectInfoId) {
         TeamProjectInfo teamProjectInfo = teamProjectInfoRepository.findProjectInfoByProjectInfoId(projectInfoId);
 
-        System.out.println("teamProjectInfo = " + teamProjectInfo.getId());
+        Team team = teamProjectInfo.getTeam();
 
         // 1. 현재 teamProjectInfo 기준으로 서비스하고 있는지 여부를 판단
-        ServiceSchedule curServiceSchedule = serviceScheduleRepository.findByTeamProjectInfo(teamProjectInfo);
+        List<ServiceSchedule> serviceSchedules = serviceScheduleRepository.findAllByTeam(team);
         // 현재 서비스하고 있을 경우
-        if (curServiceSchedule != null) {
+        if (!serviceSchedules.isEmpty()) {
             return null;
         }
 
@@ -430,6 +431,7 @@ public class BuildServiceImpl implements BuildService {
         params.add(new BasicNameValuePair("MYSQL_DATABASE", databaseConfigDto.getSchemaName()));
         params.add(new BasicNameValuePair("MYSQL_USER", databaseConfigDto.getUsername()));
         params.add(new BasicNameValuePair("MYSQL_PASSWORD", databaseConfigDto.getPassword()));
+        params.add(new BasicNameValuePair("CONFIG_ID", String.valueOf(databaseConfigDto.getId())));
 
         log.info("params: {}", params);
 
@@ -466,7 +468,7 @@ public class BuildServiceImpl implements BuildService {
         params.add(new BasicNameValuePair("PROJECT_ID", String.valueOf(deployConfig.getTeamProjectInfoId())));
         params.add(new BasicNameValuePair("MEMBER_ID", String.valueOf(deployConfig.getMemberId())));
         params.add(new BasicNameValuePair("DEPLOY_NUM", String.valueOf(deployConfig.getDeployNum())));
-        params.add(new BasicNameValuePair("JOB_TYPE", String.valueOf(deployConfig.getJobType())));
+        params.add(new BasicNameValuePair("JOB_TYPE", String.valueOf(deployConfig.getJobType()).toLowerCase()));
         params.add(new BasicNameValuePair("ACCESS_TOKEN", String.valueOf(deployConfig.getAccessToken())));
 
         String hasBackendConfig = deployConfig.getBackendConfigs().isEmpty()? "FALSE": "TRUE";
@@ -476,6 +478,10 @@ public class BuildServiceImpl implements BuildService {
         params.add(new BasicNameValuePair("BACKEND_CONFIG", hasBackendConfig));
         params.add(new BasicNameValuePair("FRONTEND_CONFIG", hasFrontendConfig));
         params.add(new BasicNameValuePair("DATABASE_CONFIG", hasDatabaseConfig));
+
+        if (hasBackendConfig.equals("TRUE")) {
+            params.add(new BasicNameValuePair("CONTEXT_PATH", deployConfig.getBackendConfigs().get(0).getContextPath()));
+        }
 
         log.info("params: {}", params);
 
@@ -522,6 +528,7 @@ public class BuildServiceImpl implements BuildService {
         params.add(new BasicNameValuePair("GIT_USERNAME", frontendConfigDto.getGitUsername()));
         params.add(new BasicNameValuePair("GIT_BRANCH", frontendConfigDto.getGitBranch()));
         params.add(new BasicNameValuePair("GIT_ACCESS_TOKEN", frontendConfigDto.getGitAccessToken()));
+        params.add(new BasicNameValuePair("CONFIG_ID", String.valueOf(frontendConfigDto.getId())));
 
 
         log.info("params: {}", params);

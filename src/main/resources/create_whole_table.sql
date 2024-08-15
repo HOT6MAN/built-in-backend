@@ -865,7 +865,7 @@ DROP TABLE IF EXISTS `recruit`;
 CREATE TABLE `recruit` (
                            `id` bigint NOT NULL,
                            `introduction` varchar(50) NOT NULL,
-                           `thumbnail` varchar(100) NOT NULL,
+                           `thumbnail` varchar(100),
                            `domain` varchar(20) NOT NULL,
                            `desired_pos_list` json NOT NULL,
                            `team_id` bigint NOT NULL,
@@ -895,7 +895,7 @@ DROP TABLE IF EXISTS `resume`;
 CREATE TABLE `resume` (
                           `id` bigint NOT NULL AUTO_INCREMENT,
                           `title` varchar(40) NOT NULL,
-                          `profile` varchar(100) NOT NULL,
+                          `profile` varchar(100),
                           `position` varchar(40) NOT NULL,
                           `tech_stack` json NOT NULL,
                           `comment` varchar(40) NOT NULL,

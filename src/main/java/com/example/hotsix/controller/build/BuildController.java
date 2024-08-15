@@ -3,6 +3,7 @@ package com.example.hotsix.controller.build;
 
 import com.example.hotsix.dto.build.*;
 import com.example.hotsix.dto.notification.GeneralResponseDto;
+import com.example.hotsix.dto.notification.Notification;
 import com.example.hotsix.enums.JenkinsJobType;
 import com.example.hotsix.model.project.BuildResult;
 import com.example.hotsix.model.project.TeamProjectInfo;
@@ -147,6 +148,7 @@ public class BuildController {
     }
 
     // Jenkins Build 결과를 DB에 저장하는 API
+    // Jenkins 가 호출하는 API임
     @PostMapping("/deploy/result")
     public String saveBuildResult(@RequestBody BuildResultDto buildResultDto) throws Exception {
         log.info("save build start");
@@ -162,15 +164,23 @@ public class BuildController {
         if (buildResultDto.getJobType().equals("final")) {
             log.info("grafana 저장 시도");
             buildService.addMonitoringService(buildResultDto);
+            Notification notification = notificationService.save(Notification.builder()
+                    .receiver(buildResultDto.getMemberId())
+                    .sender(buildResultDto.getMemberId())
+                    .isRead(false)
+                    .type("final")
+                    .notifyDate(LocalTimeUtil.getDateTime())
+                    .build());
         }
 
         // 알림 보내기 기능 테스트
         notificationService.sendGeneralResponse(GeneralResponseDto.builder()
-                        .type(buildResultDto.getJobType())
-                        .receiverId(buildResultDto.getMemberId())
-                        .notifyDate(LocalTimeUtil.getDateTime())
-                        .response(buildResultDto)
-                        .build());
+                .type(buildResultDto.getJobType())
+                .receiverId(buildResultDto.getMemberId())
+                .notifyDate(LocalTimeUtil.getDateTime())
+                .response(buildResultDto)
+                .build());
+
         return "success";
     }
 
