@@ -6,6 +6,7 @@ import com.example.hotsix.enums.JenkinsJobType;
 import com.example.hotsix.model.ServiceSchedule;
 import com.example.hotsix.enums.BuildStatus;
 //import com.example.hotsix.model.TeamProjectCredential;
+import com.example.hotsix.model.Team;
 import com.example.hotsix.model.project.*;
 import com.example.hotsix.repository.build.*;
 import com.example.hotsix.repository.member.MemberRepository;
@@ -316,12 +317,12 @@ public class BuildServiceImpl implements BuildService {
     public BuildCheckDto buildCheck(Long memberId, Long projectInfoId) {
         TeamProjectInfo teamProjectInfo = teamProjectInfoRepository.findProjectInfoByProjectInfoId(projectInfoId);
 
-        System.out.println("teamProjectInfo = " + teamProjectInfo.getId());
+        Team team = teamProjectInfo.getTeam();
 
         // 1. 현재 teamProjectInfo 기준으로 서비스하고 있는지 여부를 판단
-        ServiceSchedule curServiceSchedule = serviceScheduleRepository.findByTeamProjectInfo(teamProjectInfo);
+        List<ServiceSchedule> serviceSchedules = serviceScheduleRepository.findAllByTeam(team);
         // 현재 서비스하고 있을 경우
-        if (curServiceSchedule != null) {
+        if (!serviceSchedules.isEmpty()) {
             return null;
         }
 
