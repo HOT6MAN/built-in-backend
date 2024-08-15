@@ -320,7 +320,7 @@ CREATE TABLE `build_result` (
 
 LOCK TABLES `build_result` WRITE;
 /*!40000 ALTER TABLE `build_result` DISABLE KEYS */;
-INSERT INTO `build_result` VALUES (1,1,1,'PENDING',NULL,NULL,0,'2024-08-12 16:16:16',1,'2024-08-12 16:16:16');
+INSERT INTO `build_result` VALUES (1,1,1,'PENDING',NULL,0,'2024-08-12 16:16:16',1,'2024-08-12 16:16:16', 1);
 /*!40000 ALTER TABLE `build_result` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -514,8 +514,8 @@ UNLOCK TABLES;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `ssafy`.`chatroom` (
                                                   `id` BIGINT NOT NULL AUTO_INCREMENT,
-    `create_date` TIMESTAMP NULL DEFAULT NULL,
-    `last_message` VARCHAR(200) NULL DEFAULT NULL,
+                                                  `create_date` TIMESTAMP NULL DEFAULT NULL,
+                                                  `last_message` VARCHAR(200) NULL DEFAULT NULL,
     `last_message_date` TIMESTAMP NULL DEFAULT NULL,
     PRIMARY KEY (`id`))
     ENGINE = InnoDB
@@ -555,10 +555,10 @@ CREATE TABLE `frontend_config` (
 CREATE TABLE IF NOT EXISTS `ssafy`.`chatroom_status` (
                                                          `id` BIGINT NOT NULL AUTO_INCREMENT,
                                                          `chatroom_id` BIGINT NOT NULL,
-    `room_name` VARCHAR(255) NULL,
-                                                         `user_id` BIGINT NOT NULL,
-                                                         `unread_count` INT NULL DEFAULT '0',
-                                                         `online` TINYINT(1) NULL DEFAULT '0',
+                                                         `room_name` VARCHAR(255) NULL,
+    `user_id` BIGINT NOT NULL,
+    `unread_count` INT NULL DEFAULT '0',
+    `online` TINYINT(1) NULL DEFAULT '0',
     PRIMARY KEY (`id`),
     UNIQUE INDEX `chatroom_id` (`chatroom_id` ASC, `user_id` ASC) VISIBLE,
     CONSTRAINT `chatroom_status_ibfk_1`
