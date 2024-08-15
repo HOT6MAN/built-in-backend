@@ -65,8 +65,7 @@ public class GrafanaClient {
 
     private void updateNginxInstanceInQueries(ObjectNode dashBoardNode, int serviceNum) {
         // 쿼리에서 NGINX_INSTANCE 값을 serviceNum으로 업데이트
-        String instanceValue = "nginx-" + serviceNum;
-        // 아래의 코드는 jsonNode 내의 모든 쿼리를 찾아 업데이트하는 방법을 예시로 보여줍니다.
+        String instanceValue = "nginx_SN-" + serviceNum;
 
         // 예시: targets 필드를 포함한 쿼리를 순회하며 수정하는 로직 구현
         if (dashBoardNode.has("panels")) {
