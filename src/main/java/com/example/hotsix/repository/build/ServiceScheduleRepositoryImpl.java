@@ -11,6 +11,7 @@ import java.util.List;
 
 import static com.example.hotsix.model.QServiceSchedule.serviceSchedule;
 import static com.example.hotsix.model.QTeam.team;
+import static com.example.hotsix.model.project.QTeamProjectInfo.teamProjectInfo;
 
 @Repository
 @RequiredArgsConstructor
@@ -37,12 +38,10 @@ public class ServiceScheduleRepositoryImpl implements ServiceScheduleRepositoryC
 
     @Override
     public List<TeamProjectInfo> findUsedProjectInfoIdByTeamId(Long teamId) {
-        return queryFactory
-                .select(serviceSchedule.teamProjectInfo)
+        return queryFactory.select(serviceSchedule.teamProjectInfo)
                 .from(serviceSchedule)
-//                .join(serviceSchedule, team)
-//                .where(team.id.eq(teamId)
-//                        .and(serviceSchedule.isUsed.isTrue()))
-                .fetch();
+                .where(serviceSchedule.teamProjectInfo.team.id.eq(teamId).and(
+                        serviceSchedule.buildStatus.eq(BuildStatus.SUCCESS)
+                )).fetch();
     }
 }
