@@ -155,6 +155,7 @@ public class BuildController {
     }
     @GetMapping("/project/use/{teamId}")
     public TeamProjectInfoDto findUsedProjectInfosByTeamId(@PathVariable("teamId")Long teamId){
+        System.out.println("Find Used team Id = "+teamId);
         TeamProjectInfo list = serviceScheduleServiceImpl.findUsedProjectInfoIdByTeamId(teamId);
 //        List<TeamProjectInfoDto> returnList = new ArrayList<>();
 //        for(TeamProjectInfo entity: list){
@@ -162,6 +163,7 @@ public class BuildController {
 //            dto.setServiceScheduleId(entity.getServiceSchedule().getId());
 //            returnList.add(dto);
 //        }
+        System.out.println("Result Used = "+list);
         return list.toDto();
     }
 
