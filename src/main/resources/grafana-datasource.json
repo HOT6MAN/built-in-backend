@@ -444,8 +444,6 @@
       "time_options": [],
       "type": "time"
     },
-    "title": "NGINX Monitoring Dashboard",
-    "uid": "nginx-monitoring",
     "version": 1
   },
   "folderId": 0,

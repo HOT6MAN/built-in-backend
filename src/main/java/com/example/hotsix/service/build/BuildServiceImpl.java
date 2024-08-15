@@ -391,6 +391,7 @@ public class BuildServiceImpl implements BuildService {
     }
 
     @Override
+    @Transactional
     public void addMonitoringService(BuildResultDto buildResultDto) throws Exception {
         // jenkins 서버 모니터링용 grafana dashBoard 추가
         String uId = grafanaClient.addGrafanaDashboard(buildResultDto.getServiceNum());
@@ -406,6 +407,8 @@ public class BuildServiceImpl implements BuildService {
         serviceSchedule.setBuildStatus(buildStatus);
 
         serviceSchedule.setGrafanaUid(grafanaUrlByUID);
+
+        System.out.println("serviceSchedule = " + serviceSchedule);
     }
 
     private void createJenkinsDatabaseInstance(CloseableHttpClient httpClient, String crumb, DeployConfig deployConfig) {
