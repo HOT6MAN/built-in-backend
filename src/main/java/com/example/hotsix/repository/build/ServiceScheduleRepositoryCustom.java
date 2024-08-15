@@ -9,5 +9,5 @@ public interface ServiceScheduleRepositoryCustom {
 
     ServiceSchedule findServiceScheduleByServiceScheduleId(Long serviceScheduleId);
     ServiceSchedule findEmptyService(TeamProjectInfo teamProjectInfo);
-    TeamProjectInfo findUsedProjectInfoIdByTeamId(Long teamId);
+    List<TeamProjectInfo> findUsedProjectInfoByTeamId(Long teamId);
 }

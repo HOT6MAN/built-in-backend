@@ -1,7 +1,9 @@
 package com.example.hotsix.repository.build;
 
 import com.example.hotsix.enums.BuildStatus;
+import com.example.hotsix.model.QServiceSchedule;
 import com.example.hotsix.model.ServiceSchedule;
+import com.example.hotsix.model.project.QTeamProjectInfo;
 import com.example.hotsix.model.project.TeamProjectInfo;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -37,11 +39,12 @@ public class ServiceScheduleRepositoryImpl implements ServiceScheduleRepositoryC
     }
 
     @Override
-    public TeamProjectInfo findUsedProjectInfoIdByTeamId(Long teamId) {
-        return queryFactory.select(serviceSchedule.teamProjectInfo)
-                .from(serviceSchedule)
-                .where(serviceSchedule.team.id.eq(teamId)
-                        .and(serviceSchedule.buildStatus.eq(BuildStatus.SUCCESS)))
-                .fetchOne();
+    public List<TeamProjectInfo> findUsedProjectInfoByTeamId(Long teamId) {
+        return queryFactory
+                .selectFrom(QTeamProjectInfo.teamProjectInfo)
+                .join(QTeamProjectInfo.teamProjectInfo.serviceSchedule, QServiceSchedule.serviceSchedule)
+                .where(QServiceSchedule.serviceSchedule.team.id.eq(teamId)
+                        .and(QServiceSchedule.serviceSchedule.buildStatus.eq(BuildStatus.SUCCESS)))
+                .fetch();
     }
 }

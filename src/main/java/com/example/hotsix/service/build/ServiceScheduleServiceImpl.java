@@ -20,8 +20,8 @@ public class ServiceScheduleServiceImpl {
         return serviceScheduleRepository.findServiceScheduleByServiceScheduleId(serviceScheduleId);
     }
 
-    public TeamProjectInfo findUsedProjectInfoIdByTeamId(Long teamId){
-        return serviceScheduleRepository.findUsedProjectInfoIdByTeamId(teamId);
+    public List<TeamProjectInfo> findUsedProjectInfoIdByTeamId(Long teamId){
+        return serviceScheduleRepository.findUsedProjectInfoByTeamId(teamId);
     }
 
     public Boolean stopDeployByServiceScheduleId(Long serviceScheduleId){
