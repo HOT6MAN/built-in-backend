@@ -42,6 +42,8 @@ public class GrafanaClient {
             // NGINX_INSTANCE 환경 변수와 쿼리 업데이트
             updateNginxInstanceInQueries(dashBoardNode, serviceNum);
 
+            System.out.println("dashBoardNode = " + dashBoardNode);
+
             HttpHeaders httpHeaders = new HttpHeaders();
             httpHeaders.setBearerAuth(adminToken);
             httpHeaders.setContentType(MediaType.APPLICATION_JSON);
