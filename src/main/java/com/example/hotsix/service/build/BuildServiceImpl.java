@@ -197,8 +197,6 @@ public class BuildServiceImpl implements BuildService {
                 // /job/:job-name/:run-id/execution/node/:node-id/wfapi/log
                 String describeUrl = String.format("%sjob/%s/%d/execution/node/%d/wfapi/describe", hostJenkinsUrl, jobName, buildNum, stageId);
 
-                System.out.println("describeUrl = " + describeUrl);
-
                 WebClient describeClient = WebClient.builder()
                         .baseUrl(describeUrl)
                         .build();
@@ -221,12 +219,9 @@ public class BuildServiceImpl implements BuildService {
                                 .title(title)
                                 .build();
 
-                        System.out.println("log = " + log);
-
                         String href = log.get("_links").get("self").get("href").asText();
                         String logUrl = concatenateUrls(hostJenkinsUrl, href);
 
-                        System.out.println("logUrl = " + logUrl);
 
                         WebClient logClient = WebClient.builder()
                                 .baseUrl(logUrl)
@@ -237,8 +232,6 @@ public class BuildServiceImpl implements BuildService {
                                 .retrieve()
                                 .bodyToMono(JsonNode.class)
                                 .block();
-
-                        System.out.println("logNode = " + logNode);
 
                         JsonNode text = logNode.get("parameterDescription");
                         if (text != null) {
