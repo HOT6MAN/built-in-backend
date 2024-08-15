@@ -154,15 +154,15 @@ public class BuildController {
         return returnList;
     }
     @GetMapping("/project/use/{teamId}")
-    public List<TeamProjectInfoDto> findUsedProjectInfosByTeamId(@PathVariable("teamId")Long teamId){
-        List<TeamProjectInfo> list = serviceScheduleServiceImpl.findUsedProjectInfoIdByTeamId(teamId);
-        List<TeamProjectInfoDto> returnList = new ArrayList<>();
-        for(TeamProjectInfo entity: list){
-            TeamProjectInfoDto dto = entity.toDto();
-            dto.setServiceScheduleId(entity.getServiceSchedule().getId());
-            returnList.add(dto);
-        }
-        return returnList;
+    public TeamProjectInfoDto findUsedProjectInfosByTeamId(@PathVariable("teamId")Long teamId){
+        TeamProjectInfo list = serviceScheduleServiceImpl.findUsedProjectInfoIdByTeamId(teamId);
+//        List<TeamProjectInfoDto> returnList = new ArrayList<>();
+//        for(TeamProjectInfo entity: list){
+//            TeamProjectInfoDto dto = entity.toDto();
+//            dto.setServiceScheduleId(entity.getServiceSchedule().getId());
+//            returnList.add(dto);
+//        }
+        return list.toDto();
     }
 
 //    @PostMapping("/deploy/{teamId}/{projectInfoId}")

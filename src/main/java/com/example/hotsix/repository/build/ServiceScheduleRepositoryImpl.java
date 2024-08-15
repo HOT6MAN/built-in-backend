@@ -37,11 +37,11 @@ public class ServiceScheduleRepositoryImpl implements ServiceScheduleRepositoryC
     }
 
     @Override
-    public List<TeamProjectInfo> findUsedProjectInfoIdByTeamId(Long teamId) {
+    public TeamProjectInfo findUsedProjectInfoIdByTeamId(Long teamId) {
         return queryFactory.select(serviceSchedule.teamProjectInfo)
                 .from(serviceSchedule)
-                .where(serviceSchedule.teamProjectInfo.team.id.eq(teamId).and(
-                        serviceSchedule.buildStatus.eq(BuildStatus.SUCCESS)
-                )).fetch();
+                .where(serviceSchedule.team.id.eq(teamId)
+                        .and(serviceSchedule.buildStatus.eq(BuildStatus.SUCCESS)))
+                .fetchOne();
     }
 }
