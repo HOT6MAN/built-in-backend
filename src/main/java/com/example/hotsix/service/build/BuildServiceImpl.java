@@ -3,6 +3,7 @@ package com.example.hotsix.service.build;
 import com.example.hotsix.client.GrafanaClient;
 import com.example.hotsix.dto.build.*;
 import com.example.hotsix.enums.JenkinsJobType;
+import com.example.hotsix.model.DatabaseConfigSql;
 import com.example.hotsix.model.ServiceSchedule;
 import com.example.hotsix.enums.BuildStatus;
 //import com.example.hotsix.model.TeamProjectCredential;
@@ -56,6 +57,8 @@ public class BuildServiceImpl implements BuildService {
     private final BuildStageRepository buildStageRepository;
     private final BuildResultRepository buildResultRepository;
     private final BuildJenkinsJobRepository buildJobRepository;
+    private final DatabaseConfigRepository databaseConfigRepository;
+
 
     private static final String GIT_TYPE = "git";
     private static final String DOCKER_TYPE = "docker";
@@ -428,6 +431,7 @@ public class BuildServiceImpl implements BuildService {
         params.add(new BasicNameValuePair("JOB_TYPE", String.valueOf(deployConfig.getJobType()).toLowerCase()));
         params.add(new BasicNameValuePair("ACCESS_TOKEN", String.valueOf(deployConfig.getAccessToken())));
 
+        DatabaseConfigSql sql = databaseConfigRepository.findDatabaseConfigById(deployConfig.getDatabaseConfigs().get(0).getId()).getDatabaseConfigSQL();
         // todo: 나중에 여러 개의 jenkinsJob을 build 가능하도록 수정
         // 현재는 첫 번째 세팅만 jenkins build 실행
         DatabaseConfigDto databaseConfigDto = deployConfig.getDatabaseConfigs().get(0);
@@ -436,6 +440,14 @@ public class BuildServiceImpl implements BuildService {
         params.add(new BasicNameValuePair("MYSQL_USER", databaseConfigDto.getUsername()));
         params.add(new BasicNameValuePair("MYSQL_PASSWORD", databaseConfigDto.getPassword()));
         params.add(new BasicNameValuePair("CONFIG_ID", String.valueOf(databaseConfigDto.getId())));
+        String saveFolder= null;
+        String fixedName = null;
+        if(sql!=null){
+            saveFolder = sql.getSaveFolder();
+            fixedName = sql.getFixedName();
+            params.add(new BasicNameValuePair("SAVE_FOLDER", saveFolder));
+            params.add(new BasicNameValuePair("FIXED_NAME", fixedName));
+        }
 
         log.info("params: {}", params);
 
