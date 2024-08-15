@@ -4,6 +4,7 @@ import com.example.hotsix.dto.chat.ChatRoom;
 import com.example.hotsix.dto.chat.ChatRoomStatus;
 import com.example.hotsix.dto.chat.UserChatRoomId;
 import com.example.hotsix.dto.notification.Notification;
+import com.example.hotsix.model.Member;
 import com.example.hotsix.repository.chat.BoardRepository;
 import com.example.hotsix.repository.chat.ChatRoomRepository;
 import com.example.hotsix.repository.chat.ChatRoomStatusRepository;
@@ -42,8 +43,11 @@ public class ChatRoomServiceImpl implements ChatRoomService{
                 .last_message_date(LocalTimeUtil.getDateTime())
                 .build();
         chatRoom = chatRoomRepository.save(chatRoom);
-        String memberName = memberRepository.findMemberById(memberId).getName();
-        String receiverName = memberRepository.findMemberById(receiveId).getName();
+        Member member = memberRepository.findMemberById(memberId);
+        Member receiver = memberRepository.findMemberById(receiveId);
+        String memberName = member.getName();
+        String receiverName = receiver.getName();
+
         ChatRoomStatus userAStatus = ChatRoomStatus.builder()
                 .chatRoom(chatRoom)
                 .roomName(receiverName+"님과의 채팅방")
@@ -61,7 +65,7 @@ public class ChatRoomServiceImpl implements ChatRoomService{
                 .userId(receiveId)
                 .build();
         chatRoomStatusRepository.save(userBStatus);
-
+        notificationService.send(member.getId(), receiver.getId(), "chat");
         notificationService.save(Notification.builder()
                 .isRead(false)
                 .url("/")

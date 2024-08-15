@@ -3,6 +3,8 @@ package com.example.hotsix.dto.member;
 import lombok.*;
 import org.springframework.core.io.Resource;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -18,6 +20,7 @@ public class MemberDto {
     private String address;
     private String role;
     private String lgnMtd;
+    private LocalDateTime regDTTM;
 
     @Override
     public String toString() {

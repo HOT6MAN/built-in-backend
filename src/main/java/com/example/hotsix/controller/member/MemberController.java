@@ -38,7 +38,9 @@ public class MemberController {
     public MemberDto findMemberProfileByMemberId(@PathVariable("memberId")Long memberId){
 //        return memberService.findMemberProfileByMemberId(memberId);
         Member member = memberService.findMemberProfileByMemberId(memberId);
-        return member.toDto();
+        MemberDto dto = member.toDto();
+        dto.setRegDTTM(member.getCreatedDate());
+        return dto;
     }
 
     @GetMapping("/image/{memberId}")
