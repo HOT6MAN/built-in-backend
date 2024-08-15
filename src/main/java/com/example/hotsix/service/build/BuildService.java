@@ -22,4 +22,5 @@ public interface BuildService {
     void startJenkisJob(DeployConfig deployConfig);
 
     void addMonitoringService(BuildResultDto buildResultDto) throws Exception;
+
 }

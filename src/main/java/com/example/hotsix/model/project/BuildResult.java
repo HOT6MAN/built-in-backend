@@ -33,7 +33,4 @@ public class BuildResult extends BaseEntity {
         @Temporal(TemporalType.TIMESTAMP)
         @Column(name = "build_time")
         private LocalDateTime buildTime;
-
-        @Column(name = "grafana_uid")
-        private String grafanaUid;
 }

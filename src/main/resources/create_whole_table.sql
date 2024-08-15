@@ -302,7 +302,6 @@ CREATE TABLE `build_result` (
                                 `deploy_num` bigint DEFAULT NULL,
                                 `status` varchar(255) DEFAULT NULL,
                                 `build_time` timestamp NULL DEFAULT NULL,
-                                `grafana_uid` varchar(255) DEFAULT NULL,
                                 `DEL_YN` tinyint(1) NOT NULL,
                                 `REG_DTTM` timestamp NOT NULL,
                                 `REG_USER_SEQ` bigint NOT NULL,
@@ -959,6 +958,7 @@ CREATE TABLE `service_schedule` (
                                     `team_id` bigint DEFAULT NULL,
                                     `team_project_info_id` bigint DEFAULT NULL,
                                     `build_status` varchar(255) DEFAULT NULL,
+                                    `grafana_uid` varchar(255) DEFAULT NULL,
                                     PRIMARY KEY (`id`),
                                     KEY `team_id` (`team_id`),
                                     KEY `team_project_info_id` (`team_project_info_id`),
@@ -973,7 +973,7 @@ CREATE TABLE `service_schedule` (
 
 LOCK TABLES `service_schedule` WRITE;
 /*!40000 ALTER TABLE `service_schedule` DISABLE KEYS */;
-INSERT INTO `service_schedule` VALUES (1,NULL,NULL,'SUCCESS'),(2,NULL,NULL,'SUCCESS'),(3,NULL,NULL,'SUCCESS'),(4,NULL,NULL,'EMPTY'),(5,NULL,NULL,'EMPTY'),(6,NULL,NULL,'EMPTY'),(7,NULL,NULL,'EMPTY'),(8,NULL,NULL,'EMPTY'),(9,NULL,NULL,'EMPTY'),(10,NULL,NULL,'EMPTY');
+INSERT INTO `service_schedule` VALUES (1,NULL,NULL,'SUCCESS',NULL),(2,NULL,NULL,'SUCCESS',NULL),(3,NULL,NULL,'SUCCESS',NULL),(4,NULL,NULL,'EMPTY',NULL),(5,NULL,NULL,'EMPTY',NULL),(6,NULL,NULL,'EMPTY',NULL),(7,NULL,NULL,'EMPTY',NULL),(8,NULL,NULL,'EMPTY',NULL),(9,NULL,NULL,'EMPTY',NULL),(10,NULL,NULL,'EMPTY',NULL);
 /*!40000 ALTER TABLE `service_schedule` ENABLE KEYS */;
 UNLOCK TABLES;
 

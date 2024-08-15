@@ -4,9 +4,13 @@ package com.example.hotsix.controller.build;
 import com.example.hotsix.dto.build.*;
 import com.example.hotsix.dto.notification.GeneralResponseDto;
 import com.example.hotsix.dto.notification.Notification;
+import com.example.hotsix.enums.BuildStatus;
 import com.example.hotsix.enums.JenkinsJobType;
+import com.example.hotsix.model.ServiceSchedule;
 import com.example.hotsix.model.project.BuildResult;
 import com.example.hotsix.model.project.TeamProjectInfo;
+import com.example.hotsix.repository.build.ServiceScheduleRepository;
+import com.example.hotsix.repository.team.TeamProjectInfoRepository;
 import com.example.hotsix.service.build.BuildService;
 import com.example.hotsix.service.build.ServiceScheduleServiceImpl;
 import com.example.hotsix.service.notification.NotificationService;
@@ -19,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/build")
@@ -29,6 +34,11 @@ public class BuildController {
     private final TeamProjectInfoService teamProjectInfoService;
     private final ServiceScheduleServiceImpl serviceScheduleServiceImpl;
     private final NotificationService notificationService;
+
+    @GetMapping("/service-schedule/{serviceScheduleId}")
+    public ServiceSchedule getServiceSchedule(@PathVariable Long serviceScheduleId) {
+        return serviceScheduleServiceImpl.findServiceScheduleByServiceScheduleId(serviceScheduleId);
+    }
 
     @PostMapping("/{teamId}/{projectInfoId}")
     public String insertTeamProjectCredential(@PathVariable("teamId") Long teamId,
@@ -160,17 +170,19 @@ public class BuildController {
 
         log.info("로그 저장 완료");
 
-        // final 작업이 완료되었을 경우, grafana 추가
+        // final 작업이 완료되었을 경우
         if (buildResultDto.getJobType().equals("final")) {
+            // 1. grafana 추가
             log.info("grafana 저장 시도");
             buildService.addMonitoringService(buildResultDto);
-            Notification notification = notificationService.save(Notification.builder()
+            notificationService.save(Notification.builder()
                     .receiver(buildResultDto.getMemberId())
                     .sender(buildResultDto.getMemberId())
                     .isRead(false)
                     .type("final")
                     .notifyDate(LocalTimeUtil.getDateTime())
                     .build());
+
         }
 
         // 알림 보내기 기능 테스트

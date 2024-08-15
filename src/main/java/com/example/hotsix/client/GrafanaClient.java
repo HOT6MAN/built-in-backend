@@ -23,7 +23,7 @@ public class GrafanaClient {
     private final JsonUtil jsonUtil;
     private final BuiltInWebClient builtInWebClient;
 
-    public String addGrafanaDashboard(int serviceNum) throws Exception {
+    public String addGrafanaDashboard(Long serviceNum) throws Exception {
         String createDashBoardUrl = grafanaUrl + "/api/dashboards/import";
 
         JsonNode jsonNode = jsonUtil.readJsonFile("/grafana-datasource.json");
@@ -63,7 +63,21 @@ public class GrafanaClient {
         return null;
     }
 
-    private void updateNginxInstanceInQueries(ObjectNode dashBoardNode, int serviceNum) {
+    public String getGrafanaUrlByUID(String uid) throws Exception {
+        String getGrafanaInfoUrl = String.format("%s/api/dashboards/uid/%s", grafanaUrl, uid);
+
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setBearerAuth(adminToken);
+        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+
+        JsonNode response = builtInWebClient.get(getGrafanaInfoUrl, httpHeaders)
+                .bodyToMono(JsonNode.class)
+                .block();
+
+        return response.get("meta").get("url").asText();
+    }
+
+    private void updateNginxInstanceInQueries(ObjectNode dashBoardNode, Long serviceNum) {
         // 쿼리에서 NGINX_INSTANCE 값을 serviceNum으로 업데이트
         String instanceValue = "nginx_SN-" + serviceNum;
 

@@ -392,6 +392,17 @@ public class BuildServiceImpl implements BuildService {
         // jenkins 서버 모니터링용 grafana dashBoard 추가
         String uId = grafanaClient.addGrafanaDashboard(buildResultDto.getServiceNum());
         System.out.println("grafana uId = " + uId);
+
+        String grafanaUrlByUID = grafanaClient.getGrafanaUrlByUID(uId);
+        System.out.println("grafanaUrlByUID = " + grafanaUrlByUID);
+
+        BuildStatus buildStatus = BuildStatus.valueOf(buildResultDto.getResult().toUpperCase());
+        ServiceSchedule serviceSchedule = serviceScheduleRepository.findById(buildResultDto.getServiceNum())
+                .orElseThrow();
+
+        serviceSchedule.setBuildStatus(buildStatus);
+
+        serviceSchedule.setGrafanaUid(grafanaUrlByUID);
     }
 
     private void createJenkinsDatabaseInstance(CloseableHttpClient httpClient, String crumb, DeployConfig deployConfig) {

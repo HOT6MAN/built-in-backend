@@ -25,4 +25,7 @@ public class ServiceSchedule {
     @Column(name = "build_status")
     @Enumerated(EnumType.STRING)
     private BuildStatus buildStatus;
+
+    @Column(name = "grafana_uid")
+    private String grafanaUid;
 }
