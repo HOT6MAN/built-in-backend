@@ -95,7 +95,7 @@ public class JWTUtil {
         return Jwts.builder()
                 .claim("email",email)
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 20000))
+                .expiration(new Date(System.currentTimeMillis() + 259200000))
                 .signWith(secretKey)
                 .compact();
     }
