@@ -217,6 +217,7 @@ public class NotificationServiceImpl implements NotificationService{
             log.info("send Successfully clear to Client");
         } catch (Exception exception) {
             log.error("Send to Client Error {}", exception.getMessage());
+            exception.printStackTrace();
 //            repository.deleteById(id);
             emitter.completeWithError(exception);
         }
