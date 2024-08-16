@@ -47,8 +47,8 @@ public class BuildController {
     private final NotificationService notificationService;
 
     @GetMapping("/service-schedule/{serviceScheduleId}")
-    public ServiceSchedule getServiceSchedule(@PathVariable Long serviceScheduleId) {
-        return serviceScheduleServiceImpl.findServiceScheduleByServiceScheduleId(serviceScheduleId);
+    public ServiceScheduleDto getServiceSchedule(@PathVariable Long serviceScheduleId) {
+        return ServiceScheduleDto.fromEntity(serviceScheduleServiceImpl.findServiceScheduleByServiceScheduleId(serviceScheduleId));
     }
 
     @PostMapping("/{teamId}/{projectInfoId}")
