@@ -217,6 +217,7 @@ public class BuildController {
                     .isRead(false)
                     .type("final")
                     .notifyDate(LocalTimeUtil.getDateTime())
+                            .url("www.jenkins.final")
                     .build());
 
         }
