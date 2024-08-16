@@ -186,7 +186,7 @@ public class NotificationServiceImpl implements NotificationService{
                     .id(id)
                     .name(data.getType())
                     .data(data, MediaType.APPLICATION_JSON)
-                    .reconnectTime(1000L));
+                    .reconnectTime(5000L));
             log.info("send Successfully clear to Client");
         } catch (Exception exception) {
             log.error("Send to Client Error {}", exception.getMessage());
@@ -213,7 +213,7 @@ public class NotificationServiceImpl implements NotificationService{
                     .id(key)
                     .name(response.getType())
                     .data(response, MediaType.APPLICATION_JSON)
-                    .reconnectTime(0));
+                    .reconnectTime(5000L));
             log.info("send Successfully clear to Client");
         } catch (Exception exception) {
             log.error("Send to Client Error {}", exception.getMessage());
