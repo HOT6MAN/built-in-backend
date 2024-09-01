@@ -1,4 +1,4 @@
-Built-In Backend
+# Built-In Backend
 
 # 1. Introduction
 ![스크린샷 2024-09-02 오전 5 39 07](https://github.com/user-attachments/assets/30b28f55-60bd-4f08-96c2-6e9ca0cc8112)
@@ -41,11 +41,10 @@ https://github.com/user-attachments/assets/899e79ca-33d7-437f-bdd0-9eeae703b201
 # 5. Development Steps
 ![스크린샷 2024-09-02 오전 5 43 27](https://github.com/user-attachments/assets/eb9af1f1-09e0-4d48-8d11-4317d8da84bb)
 
-# 5. Team
-김노아(팀장): Full Stack(Team Building, Resume)
-조용수(PM): Full Stack(Build) + DevOps
-임동길(BE Lead): Full Stack(Notification & Chatting & User & Build)
-민호(FE Lead): FE(User & Team & Team Building)
-김도훈: Full Stack(Authentication & Team) 
-이현재(서기): Full Stack(Meeting) 
-
+# 6. Team
+- 김노아(팀장): Full Stack(Team Building, Resume)
+- 조용수(PM): Full Stack(Build) + DevOps
+- 임동길(BE Lead): Full Stack(Notification & Chatting & User & Build)
+- 민호(FE Lead): FE(User & Team & Team Building)
+- 이현재(서기): Full Stack(Meeting) 
+- 김도훈: Full Stack(Authentication & Team) 
