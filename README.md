@@ -11,6 +11,7 @@ https://github.com/user-attachments/assets/ee114011-fce5-4982-ad3b-467f9bfa4bf9
 # 3. Architecture
 ![스크린샷 2024-09-02 오전 5 39 47](https://github.com/user-attachments/assets/3721e39b-7f3a-4bba-bf15-9ce233cc70d5)
 ![스크린샷 2024-09-02 오전 5 42 56](https://github.com/user-attachments/assets/e849f082-c22f-48c0-8b4f-74b4fd68bb9b)
+![erd](https://github.com/user-attachments/assets/4eaa76e1-436a-41af-923c-6595c71992ca)
 
 # 4. Feature
 ## Video
