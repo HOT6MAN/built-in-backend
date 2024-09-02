@@ -14,7 +14,6 @@ https://github.com/user-attachments/assets/ee114011-fce5-4982-ad3b-467f9bfa4bf9
 ![erd](https://github.com/user-attachments/assets/4eaa76e1-436a-41af-923c-6595c71992ca)
 
 # 4. Feature
-## Video
 https://github.com/user-attachments/assets/899e79ca-33d7-437f-bdd0-9eeae703b201
 
 ## Authentication
