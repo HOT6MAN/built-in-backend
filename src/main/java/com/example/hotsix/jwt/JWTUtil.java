@@ -1,7 +1,12 @@
 package com.example.hotsix.jwt;
 
 import com.example.hotsix.dto.member.MemberDto;
+import com.example.hotsix.enums.Process;
+import com.example.hotsix.exception.BuiltInException;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -49,9 +54,27 @@ public class JWTUtil {
 
 
 
-    public Boolean isExpired(String token) {
+    public Boolean validateToken(String token) {
         log.info("[JWTUtil] 토큰 만료 검증");
-        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().getExpiration().before(new Date());
+        try {
+            if (token != null) {
+                Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token);
+                return true;
+            }
+        }catch (SecurityException | MalformedJwtException e) {
+            log.error("유효하지 않는 JWT 토큰 입니다. {}",e.getMessage());
+            throw new BuiltInException(com.example.hotsix.enums.Process.INVALID_TOKEN);
+        } catch (ExpiredJwtException e) {
+            log.error("만료된 JWT 토큰 입니다.");
+            throw new BuiltInException(com.example.hotsix.enums.Process.EXPIRED_TOKEN);
+        } catch (UnsupportedJwtException e) {
+            log.error("지원되지 않는 JWT 토큰 입니다.");
+            throw new BuiltInException(com.example.hotsix.enums.Process.INVALID_TOKEN);
+        } catch (IllegalArgumentException e) {
+            log.error("잘못된 JWT 토큰 입니다.");
+            throw new BuiltInException(Process.INVALID_TOKEN);
+        }
+        return false;
     }
 
     public long getRemainingTime(String token) {

@@ -50,7 +50,7 @@ public class ReissueController {
         }
 
         try {
-            jwtUtil.isExpired(refresh);
+            jwtUtil.validateToken(refresh);
         }catch (ExpiredJwtException e){
             log.info("refresh token is expired");
             throw new BuiltInException(Process.EXPIRED_TOKEN);

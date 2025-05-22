@@ -1,6 +1,5 @@
 package com.example.hotsix.jwt;
 
-import ch.qos.logback.core.spi.ErrorCodes;
 import com.example.hotsix.dto.common.APIResponse;
 import com.example.hotsix.dto.common.ErrorResponse;
 import com.example.hotsix.dto.common.ProcessResponse;
@@ -8,7 +7,6 @@ import com.example.hotsix.enums.Process;
 import com.example.hotsix.exception.BuiltInException;
 import com.example.hotsix.oauth.dto.CustomOAuth2User;
 import com.example.hotsix.oauth.dto.UserDTO;
-import com.example.hotsix.service.auth.LoginService;
 import com.example.hotsix.service.auth.LogoutService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -19,15 +17,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -94,7 +89,7 @@ public class JWTFilter extends OncePerRequestFilter {
 
             //토큰 소멸 시간 검증
             try{
-                jwtUtil.isExpired(accessToken) ;
+                jwtUtil.validateToken(accessToken) ;
             }catch (ExpiredJwtException e){
                 //response body
                 log.info("Access 토큰 만료");
@@ -138,7 +133,7 @@ public class JWTFilter extends OncePerRequestFilter {
             accessToken = authorization;
             try {
                 // accessToken 유효성 검사
-                if (!jwtUtil.isExpired(accessToken)) {
+                if (!jwtUtil.validateToken(accessToken)) {
                     // 유효한 경우, SecurityContext 설정 및 필터 통과
                     setSecurityContext(request, response, filterChain, accessToken);
                     return;

@@ -140,7 +140,7 @@ public class EmailController {
 
 
     private Boolean isTokenExpired(String code) {
-        return jwtUtil.isExpired(code);
+        return jwtUtil.validateToken(code);
     }
 
 
